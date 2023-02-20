@@ -1,0 +1,1 @@
+This is the raw data folder. It should be used once and once only, to upload data at the beginning of the project. The only exception to this is if we want to do some sort of train/test split, in which case we should do this on day 1, document, and then leave well alone.
