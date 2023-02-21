@@ -12,7 +12,7 @@ get_tables <- function(results) {
   
   for (table_index in seq_len(length(tables))) {
     print(xtable(tables[[table_index]]), 
-          file = paste0(here("tables/", names(tables)[table_index])))
+          file = paste0(here("tables/", names(tables)[table_index]), ".tex"))
   }
   return(tables)
 }
