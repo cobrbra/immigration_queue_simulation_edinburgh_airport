@@ -6,9 +6,8 @@ get_tables <- function(results) {
   # tables$table_1 <- ...
   
   for (table_index in seq_len(length(tables))) {
-    table <- tables[table_index]
-    table_name <- names(tables)[table_index]
-    write_csv(table, paste0(here("tables/", table_name)))
+    write_csv(tables[[table_index]], 
+              paste0(here("tables/", names(tables)[table_index])))
   }
   return(tables)
 }

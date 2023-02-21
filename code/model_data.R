@@ -7,9 +7,8 @@ model_data <- function(processed_data, simulated_data) {
   
   
   for (model_index in seq_len(length(models))) {
-    model <- models[model_index]
-    model_name <- names(models)[model_index]
-    write_rds(model, file = paste0(here("results/", model_name)))
+    write_rds(models[[model_index]], 
+              file = paste0(here("results/", names(models)[model_index])))
   }
   return(models)
 }
