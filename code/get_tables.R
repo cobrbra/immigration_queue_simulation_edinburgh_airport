@@ -10,6 +10,7 @@ get_tables <- function(results) {
   # tables$table_1 <- ...
   # add code to generate new tables here
   
+  
   for (table_index in seq_len(length(tables))) {
     print(xtable(tables[[table_index]]), 
           file = paste0(here("tables/", names(tables)[table_index]), ".tex"))
