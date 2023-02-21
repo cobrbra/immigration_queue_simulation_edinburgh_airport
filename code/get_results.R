@@ -4,7 +4,6 @@ library(here)
 get_results <- function(processed_data, simulated_data, models) {
   results <- list()
   
-  print(typeof(processed_data))
   results$mt_table <- processed_data
   
   # results$results_1 <- ...
