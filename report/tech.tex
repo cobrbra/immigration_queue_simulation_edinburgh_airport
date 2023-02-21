@@ -1,0 +1,82 @@
+\documentclass[12pt]{article}
+\textwidth 16.5cm
+\textheight 23.5cm
+\oddsidemargin 0pt
+\topmargin -2cm
+% \usepackage{epsf}
+
+% Writing maths
+\usepackage{
+    amsmath, % aligns, equations, etc.
+    amsfonts, % blackboard bold, etc.
+    bbm, % blackboard bold for numbers.
+}
+
+% Figures
+\usepackage{graphicx}
+
+% References
+\usepackage{hyperref}
+
+% References 
+\usepackage{natbib}
+\bibliographystyle{natbib}
+\setcitestyle{authoryear, open={(},close={)}}
+
+% Inline comments from Jacob and Bella
+\usepackage{xcolor}
+\usepackage[draft,inline,nomargin,index]{fixme}
+\fxsetup{theme=color,mode=multiuser}
+\FXRegisterAuthor{jb}{ajb}{\color{blue} JB}
+\FXRegisterAuthor{bd}{abd}{\color{red} BD}
+
+\title{Simulations of Immigration Queues at Edinburgh Airport: Tech Setup}
+ \author{Jacob R. Bradley
+ \\ \emph{School of Mathematics, University of Edinburgh}}
+
+\begin{document}
+\maketitle
+
+\section{Introduction}
+This document contains descriptions of how GitHub, RStudio, Overleaf, and Zotero interact for a (hopefully) seamless and ultra-efficient competition-smashing workflow!
+
+\section{Methods}
+\subsection{GitHub}
+The code for this project is held in a \href{https://github.com/cobrbra/immigration_queue_simulation_edinburgh_airport}{GitHub repository}. This stores and tracks the history of all the data, code, and docs associated with the project, but shouldn't be used directly for editing anything aside from in an emergency! Instead, coding should be done in RStudio and writing should be done in Overleaf. In GitHub, you can see the entire project folder layout (Figure~\ref{fig:github_overview}).
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=4in]{figures/github_overview.png}
+    \caption{GitHub view of project folder.}
+    \label{fig:github_overview}
+\end{figure}
+
+The ``Code'' tab will be useful for syncing GitHub with RStudio (see below). Syncing with Overleaf should already have been done from here.
+
+\subsection{RStudio}
+\subsection{Overleaf}
+\subsection{Zotero}
+\subsection{Targets}
+
+% \section{Results}
+
+% \begin{figure}[htbp]
+%     \centering
+%     \includegraphics[width=4in]{figures/mt_cars_summary.png}
+%     \caption{Example figure generated from mtcars workflow.}
+%     \label{fig:mtcars}
+% \end{figure}
+
+% \begin{figure}[htbp]
+%     \centering
+%     \includegraphics[width=4in]{figures/mpg_model_actual_vs_predicted.png}
+%     \caption{Example figure generated from a model of mtcars data.}
+%     \label{fig:mtcars_model}
+% \end{figure}
+
+% \input{tables/mtcars_full.tex}
+
+% \section{Discussion}
+% \section{Conclusion}
+% \bibliography{references.bib}
+\end{document}
