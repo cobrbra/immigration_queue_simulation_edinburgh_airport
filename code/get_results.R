@@ -6,6 +6,11 @@ get_results <- function(processed_data, simulated_data, models) {
   
   results$mt_table <- processed_data
   
+  results$mpg_model_predictions <- tibble(
+    actual = processed_data$mpg,
+    predicted = predict(models$model_mpg_from_rest, processed_data)
+  )
+  
   # results$results_1 <- ...
   # insert more code that generates results here
   

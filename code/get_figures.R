@@ -9,6 +9,9 @@ get_figures <- function(results) {
       geom_point() + 
       geom_smooth(method = "lm")
   
+  figures$mpg_model_actual_vs_predicted <- results$mpg_model_predictions %>% 
+    ggplot(aes(x = actual, y = predicted)) + geom_point()
+  
   # figures$figure_1 <- ...
   # insert more code that generates figures here
   
