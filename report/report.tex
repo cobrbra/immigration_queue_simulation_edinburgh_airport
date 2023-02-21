@@ -58,17 +58,19 @@ We'll also pretend that we're only interested in doing this prediction for car m
 
 \input{tables/mtcars_full.tex}
 
+We take two modelling strategies, both based on linear models. Firstly, we model mpg as a function of number of cylinders alone, and then as a function of all other input covariates.
 
 \subsection{Data sources}
 \subsection{Approximate Bayesian computation}
 
 \section{Results}
 \subsection{Example results: \texttt{mtcars}}
+Firstly, we show a negative association between number of cylinders and miles per gallon (Figure~\ref{fig:mt_cars_summary}). We then fitted a linear model for mpg based on all other available covariates (see Table~\ref{tab:mtcars_full}), and show predicted vs actual values of mpg in Figure~\ref{fig:mtcars_model}.
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=4in]{figures/mt_cars_summary.png}
-    \caption{Example figure generated from mtcars workflow.}
-    \label{fig:mtcars}
+    \caption{Miles per gallon versus number of cylinders.}
+    \label{fig:mt_cars_summary}
 \end{figure}
 
 \begin{figure}[htbp]
