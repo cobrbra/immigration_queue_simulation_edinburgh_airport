@@ -5,11 +5,12 @@
 
 # Load packages required to define the pipeline:
 library(targets)
+library(here)
 # library(tarchetypes) # Load other packages as needed. # nolint
 
 # Set target options:
 tar_option_set(
-  packages = c("tibble"), # packages that your targets need to run
+  packages = c("here", "tidyverse"), # packages that your targets need to run
   format = "rds" # default storage format
   # Set other options as needed.
 )
@@ -21,18 +22,34 @@ options(clustermq.scheduler = "multicore")
 # Install packages {{future}}, {{future.callr}}, and {{future.batchtools}} to allow use_targets() to configure tar_make_future() options.
 
 # Run the R scripts in the R/ folder with your custom functions:
-tar_source(files = "code")
+tar_source(files = c(
+  here("code/process_data.R"), 
+  here("code/simulate_data.R"),
+  here("code/model_data.R"),
+  here("code/get_results.R"),
+  here("code/get_figures.R"),
+  here("code/get_tables.R")
+  )
+)
 # source("other_functions.R") # Source other scripts as needed. # nolint
 
 # Replace the target list below with your own:
 list(
-  tar_target(
-    name = data,
-    command = tibble(x = rnorm(100), y = rnorm(100))
-#   format = "feather" # efficient storage of large data frames # nolint
-  ),
-  tar_target(
-    name = model,
-    command = coefficients(lm(y ~ x, data = data))
-  )
+  tar_target(example_raw_data, 
+             here("raw_data/example_raw_data.csv"), 
+             format = "file"),
+  tar_target(example_processed_data, 
+             get_processed_data(example_raw_data)),
+  tar_target(example_simulated_data, 
+             simulate_data()),
+  tar_target(example_models, 
+             model_data(example_processed_data, example_simulated_data)),
+  tar_target(example_results, 
+             get_results(example_processed_data, 
+                         example_simulated_data, 
+                         example_models)),
+  tar_target(example_figures,
+             get_figures(example_results)),
+  tar_target(example_tables,
+             get_tables(example_results))
 )
