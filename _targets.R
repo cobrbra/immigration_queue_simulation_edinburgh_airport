@@ -10,7 +10,7 @@ library(here)
 
 # Set target options:
 tar_option_set(
-  packages = c("here", "tidyverse"), # packages that your targets need to run
+  packages = c("here", "tidyverse", "xtable"), # packages that your targets need to run
   format = "rds" # default storage format
   # Set other options as needed.
 )
