@@ -16,7 +16,7 @@ get_results <- function(processed_data, simulated_data, models) {
   
   for (result_index in seq_len(length(results))) {
     write_csv(results[[result_index]], 
-              here(paste0("results/", names(results)[result_index])))
+              here(paste0("results/", names(results)[result_index], ".csv")))
   }
   return(results)
 }
