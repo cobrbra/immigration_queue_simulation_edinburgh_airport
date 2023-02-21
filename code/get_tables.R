@@ -8,7 +8,7 @@ get_tables <- function(results) {
   captions <- list()
   
   tables$mtcars_full <- results$mt_table # read_csv("processed_data/example_processed_data.csv") # 
-  captions$mtcars_full <- "MTCars dataset restricted to observations with <20 miles per gallon"
+  captions$mtcars_full <- "MTCars dataset restricted to observations with $<20$ miles per gallon"
   
   # tables$table_1 <- ...
   # add code to generate new tables here
