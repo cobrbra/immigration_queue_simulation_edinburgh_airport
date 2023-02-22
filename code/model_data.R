@@ -4,7 +4,7 @@ library(here)
 model_data <- function(processed_data, simulated_data) {
   models <- list()
   
-  models$model_mpg_from_rest <- processed_data %>% 
+  models$model_mpg_from_rest <- processed_data %>% # read_csv(here("processed_data/example_processed_data.csv")) %>% # 
     lm(formula = mpg ~ .)
   
   # models$model_1 <- ...
