@@ -1,13 +1,13 @@
 name|type|data|command|depend|seed|path|time|size|bytes|format|repository|iteration|parent|children|seconds|warnings|error
 data|stem|6afcb05a96a54f6c|43fae4011a0626f4|136bf5e07fbd9b1c|1588979285||t19408.8231332049s|d07e2e962de596ec|1750|rds|local|vector|||0.006||
-example_figures|stem|446258a41653e24d|4cf3e7994928321a|9bd3db3ad5cfbc7e|186214781||t19409.1042741478s|36f1d668140ad4eb|47307|rds|local|vector|||1.585||
+example_figures|stem|fa6cb4c0bf38d758|4cf3e7994928321a|03e94b74f4a5cc79|186214781||t19410.6902210858s|c1514e3cc29eeeef|52495|rds|local|vector|||0.995||
 example_models|stem|b65b97bc0ed06d82|3f5e034ebe6af739|76f2834533ce4c52|525081452||t19409.101328534s|4f12b392d38a3cf9|4858|rds|local|vector|||0.007||
 example_processed_data|stem|75b523ceecf46411|df8f837bc08cafdc|b784a4fc7e9a4671|1173300241||t19408.8508827018s|f1fe2878fbf4bdd1|764|rds|local|vector|||0.077||
 example_raw_data|stem|bad87c183ef2f311|900ecf8ef15fdadb|4e3739ef91745af0|5772440|/Users/jbradley/Documents/immigration_queue_simulation_edinburgh_airport/raw_data/example_raw_data.csv|t19408.7980814871s|81467fd6396a174d|1281|file|local|vector|||0.001||
 example_results|stem|f27d626a4329c10d|a08541f7f6379100|7909ff2dbe9141e0|310924966||t19409.1057777537s|b1a741821fe54a75|1070|rds|local|vector|||0.069||
 example_simulated_data|stem|9dab10bb2afb5f5a|395e8f4ee51f0c0d|8982207d98f0657f|1408151031||t19408.8508816359s|985da00faf3c8820|976|rds|local|vector|||0.109||
 example_tables|stem|39e35e2eff42c9ae|76dca0c604fc0e9d|bbaf4182a0739f0b|2136085811||t19409.6269891641s|8f19145563e08cbb|781|rds|local|vector|||0.013||
-get_figures|function|e0c2a2168d901225|||||||||||||||
+get_figures|function|2ea87f0f65f08dfb|||||||||||||||
 get_processed_data|function|ca6c86d6bb46fbbf|||||||||||||||
 get_results|function|e30d209ec903dae5|||||||||||||||
 get_tables|function|91740aa9017e9fb5|||||||||||||||

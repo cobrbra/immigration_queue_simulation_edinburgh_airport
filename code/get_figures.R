@@ -7,10 +7,14 @@ get_figures <- function(results) {
   figures$mt_cars_summary <- results$mt_table %>% 
     ggplot(aes(x = cyl, y = mpg)) + 
       geom_point() + 
-      geom_smooth(method = "lm")
+      geom_smooth(method = "lm") +
+      theme_minimal()
   
   figures$mpg_model_actual_vs_predicted <- results$mpg_model_predictions %>% 
-    ggplot(aes(x = actual, y = predicted)) + geom_point()
+    ggplot(aes(x = actual, y = predicted)) + 
+      geom_point() +
+      geom_smooth(method = "lm") + 
+      theme_minimal()
   
   # figures$figure_1 <- ...
   # insert more code that generates figures here
