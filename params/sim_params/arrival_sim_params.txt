@@ -1,0 +1,4 @@
+inter_arrival_rate, n_customers, arrival_sim_fun, seed
+4, 100, simple_arrivals_sim, 1234
+10, 100, simple_arrivals_sim, 1234
+

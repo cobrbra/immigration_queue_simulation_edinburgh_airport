@@ -1,4 +1,5 @@
 name|type|data|command|depend|seed|path|time|size|bytes|format|repository|iteration|parent|children|seconds|warnings|error
+arrivals_sim_params|stem|b772894eaa425547|1699bc8ff31bd99e|4e3739ef91745af0|2120511976|/Users/jbradley/Documents/immigration_queue_simulation_edinburgh_airport/params/sim_params/arrival_sim_params.txt|t19411.9608528624s|237f91a00ac3de41|125|file|local|vector|||0.001||
 data|stem|6afcb05a96a54f6c|43fae4011a0626f4|136bf5e07fbd9b1c|1588979285||t19408.8231332049s|d07e2e962de596ec|1750|rds|local|vector|||0.006||
 example_figures|stem|fa6cb4c0bf38d758|4cf3e7994928321a|03e94b74f4a5cc79|186214781||t19410.7186766201s|c1514e3cc29eeeef|52495|rds|local|vector|||0.759||
 example_models|stem|b65b97bc0ed06d82|3f5e034ebe6af739|76f2834533ce4c52|525081452||t19410.7186674859s|4f12b392d38a3cf9|4858|rds|local|vector|||0.011||
@@ -13,4 +14,15 @@ get_results|function|e30d209ec903dae5|||||||||||||||
 get_tables|function|91740aa9017e9fb5|||||||||||||||
 model|stem|d8e1fb9dc5567626|ae83bc723fe2997c|326e0a6129599004|1816327236||t19408.8231333432s|1254f8a9a0ffbd1f|107|rds|local|vector|||0.003||
 model_data|function|355a4f782e7eaae5|||||||||||||||
+planes_processed|stem|6dc687ba1d7f8d9e|46426cf1e7b6020d|9e4bebefa02db41e|1700164047||t19412.0685964989s|4a751d21e95b14ee|238764|rds|local|vector|||0.126||
+planes_raw|stem|a70aa3c204095a56|8f8bf4b479c26414|4e3739ef91745af0|-1891222926|/Users/jbradley/Documents/immigration_queue_simulation_edinburgh_airport/raw_data/planes/GlobalAirportDatabase.txt|t10957s|0a8497d35a63e5a7|760437|file|local|vector|||0.001||
+process_planes_data|function|e6256ece3aba8271|||||||||||||||
+queue_sim_params|stem|7994c9991913d46e|e5d5ef9d42de42ea|4e3739ef91745af0|-1132325236|/Users/jbradley/Documents/immigration_queue_simulation_edinburgh_airport/params/sim_params/queue_sim_params.txt|t19411.965972158s|82d1d1c4d23d6aba|150|file|local|vector|||0||
+queue_simulation|function|4a2fa567cc238a80|||||||||||||||
+simple_arrivals_sim|function|12e9596ed25cbad6|||||||||||||||
+simple_queue_sim|function|cae77f1f7c98317a|||||||||||||||
+simulate_arrivals|function|b81193a36a6b3b8d|||||||||||||||
 simulate_data|function|0bbfdf76552fde35|||||||||||||||
+simulate_queue|function|a6994b7165960511|||||||||||||||
+simulated_arrivals_data|stem|0ada45eee7722003|56ad784fe75bdee3|cf5e9229a65d14f0|-177499631||t19411.9612852589s|663dcff7cdda4069|1703|rds|local|vector|||0.232||
+simulated_queue_data|stem|875a8e0892412a1a|c025a4e8b562599c|e6f22d56be6424cb|-593284353||t19411.9663896944s|caffc78dae8c0f55|1768|rds|local|vector|||0.162||

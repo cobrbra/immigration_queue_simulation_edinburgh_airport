@@ -1,0 +1,3 @@
+queue_sim_fun, arrivals, service_rate, n_desks, max_start_time, seed
+simple_queue_sim, sim_1, 4, 4, 100, 1234
+simple_queue_sim, sim_2, 4, 4, 100, 1234
