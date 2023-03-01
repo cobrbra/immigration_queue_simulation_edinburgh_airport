@@ -20,7 +20,8 @@ simple_arrivals_sim <- function(inter_arrival_rate,
 }
 
 simulate_arrivals <- function(arrival_sim_params_file) {
-  arrival_sim_params <- read_csv(arrival_sim_params_file) # read_csv(here("params/sim_params/arrival_sim_params.txt")) # #
+  simple_arrivals_sim # Kept here to inject tar dependency. TODO: better approach to this.
+  arrival_sim_params <- read_csv(arrival_sim_params_file) # read_csv(targets::tar_read(arrival_sim_param_file)) #
   output <- list()
   
   # For each simulation setting, run a simulation of arrivals and save the output

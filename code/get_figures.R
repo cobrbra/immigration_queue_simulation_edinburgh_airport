@@ -2,6 +2,8 @@ library(tidyverse)
 library(here)
 
 get_figures <- function(results) {
+  # results <- targets::tar_read(example_results) # Use for debugging, COMMENT WHEN RUNNING TARGETS
+  
   figures <- list()
   
   figures$mt_cars_summary <- results$mt_table %>% 

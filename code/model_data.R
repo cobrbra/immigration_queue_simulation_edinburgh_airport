@@ -2,9 +2,12 @@ library(tidyverse)
 library(here)
 
 model_data <- function(processed_data, simulated_data) {
+  # processed_data <- targets::tar_read(example_processed_data) # Use for debugging, COMMENT WHEN RUNNING TARGETS
+  # simulated_data <- targets::tar_read(example_simulated_data) # Use for debugging, COMMENT WHEN RUNNING TARGETS
+  
   models <- list()
   
-  models$model_mpg_from_rest <- processed_data %>% # read_csv(here("processed_data/example_processed_data.csv")) %>% # 
+  models$model_mpg_from_rest <- processed_data %>% 
     lm(formula = mpg ~ .)
   
   # models$model_1 <- ...

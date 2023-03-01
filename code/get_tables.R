@@ -3,7 +3,8 @@ library(here)
 library(xtable)
 
 get_tables <- function(results) {
-
+  # results <- targets::tar_read(example_results) # Use for debugging, COMMENT WHEN RUNNING TARGETS
+  
   tables <- list()
   captions <- list()
   
