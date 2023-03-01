@@ -21,8 +21,8 @@ queue_sim_params|stem|7994c9991913d46e|e5d5ef9d42de42ea|4e3739ef91745af0|-113232
 queue_simulation|function|4a2fa567cc238a80|||||||||||||||
 simple_arrivals_sim|function|12e9596ed25cbad6|||||||||||||||
 simple_queue_sim|function|cae77f1f7c98317a|||||||||||||||
-simulate_arrivals|function|b81193a36a6b3b8d|||||||||||||||
+simulate_arrivals|function|86aca0895821b4f0|||||||||||||||
 simulate_data|function|0bbfdf76552fde35|||||||||||||||
 simulate_queue|function|a6994b7165960511|||||||||||||||
-simulated_arrivals_data|stem|0ada45eee7722003|56ad784fe75bdee3|cf5e9229a65d14f0|-177499631||t19411.9612852589s|663dcff7cdda4069|1703|rds|local|vector|||0.232||
+simulated_arrivals_data|stem|0ada45eee7722003|56ad784fe75bdee3|7e8b71a007460a5f|-177499631||t19412.7436078177s|663dcff7cdda4069|1703|rds|local|vector|||0.148||
 simulated_queue_data|stem|875a8e0892412a1a|c025a4e8b562599c|e6f22d56be6424cb|-593284353||t19411.9663896944s|caffc78dae8c0f55|1768|rds|local|vector|||0.162||

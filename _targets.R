@@ -35,36 +35,49 @@ tar_source(files = c(
 
 # Replace the target list below with your own:
 list(
-  tar_target(example_raw_data, 
-             here("raw_data/example_raw_data.csv"), 
-             format = "file"),
+  # Making the planes dataset accessible
   tar_target(planes_raw,
              here("raw_data/planes/GlobalAirportDatabase.txt"),
              format = "file"),
+  tar_target(planes_processed,
+             process_planes_data(planes_raw)),
+  
+  # Generating simulated arrivals data
   tar_target(arrivals_sim_params,
              here("params/sim_params/arrival_sim_params.txt"),
              format = "file"),
+  tar_target(simulated_arrivals_data,
+             simulate_arrivals(arrivals_sim_params)),
+  
+  # Generating simulated queueing data
   tar_target(queue_sim_params,
              here("params/sim_params/queue_sim_params.txt"),
              format = "file"),
-  tar_target(example_processed_data, 
-             get_processed_data(example_raw_data)),
-  tar_target(planes_processed,
-             process_planes_data(planes_raw)),
-  tar_target(example_simulated_data, 
-             simulate_data()),
-  tar_target(simulated_arrivals_data,
-             simulate_arrivals(arrivals_sim_params)),
   tar_target(simulated_queue_data,
-             simulate_queue(queue_sim_params, simulated_arrivals_data)),
-  tar_target(example_models, 
-             model_data(example_processed_data, example_simulated_data)),
-  tar_target(example_results, 
-             get_results(example_processed_data, 
-                         example_simulated_data, 
-                         example_models)),
-  tar_target(example_figures,
-             get_figures(example_results)),
-  tar_target(example_tables,
-             get_tables(example_results))
+             simulate_queue(queue_sim_params, simulated_arrivals_data))#,
+  
+  # # Example data sources
+  # tar_target(example_raw_data, 
+  #            here("raw_data/example_raw_data.csv"), 
+  #            format = "file"),
+  # 
+  # tar_target(example_processed_data, 
+  #            get_processed_data(example_raw_data)),
+  # 
+  # tar_target(example_simulated_data, 
+  #            simulate_data()),
+  # 
+  # # Example models and results
+  # tar_target(example_models, 
+  #            model_data(example_processed_data, example_simulated_data)),
+  # tar_target(example_results, 
+  #            get_results(example_processed_data, 
+  #                        example_simulated_data, 
+  #                        example_models)),
+  # 
+  # # Example figures and tables
+  # tar_target(example_figures,
+  #            get_figures(example_results)),
+  # tar_target(example_tables,
+  #            get_tables(example_results))
 )
