@@ -12,23 +12,24 @@ ggsave(here("figures/plot_1_b.png"))
 
 
 
-### try out queuing ###
+### try out queuing (from arriving at the front of the queue) ###
+# 4th process # 
 
 library("stringr")
 
 set.seed(4)
 
 
-# customers 
+# passengers 
 
-N_customer <- 1000
-lambda_customer <- 5
+N_passenger <- 1000
+lambda_passenger <- 5
 
-customers <- data.frame(Customer.ID = paste0("C", str_pad(1:N_customer, 6, pad = "0")),
-                        Time.Arrival = cumsum(rexp(n = N_customer, rate = lambda_customer)),
-                        Time.Desk.Start = numeric(N_customer),
-                        Time.Desk.End = numeric(N_customer),
-                        Desk.Handled = character(N_customer) )
+passengers <- data.frame(Passenger.ID = paste0("C", str_pad(1:N_passenger, 6, pad = "0")),
+                        Time.Arrival = cumsum(rexp(n = N_passenger, rate = lambda_passenger)),
+                        Time.Desk.Start = numeric(N_passenger),
+                        Time.Desk.End = numeric(N_passenger),
+                        Desk.Handled = character(N_passenger) )
 
 
 # Desks
@@ -45,7 +46,7 @@ desks <- list(N_desk = N_desk,
 # Function
 
 
-queue <- function(customers, desks){
+queue <- function(passengers, desks){
   
   # Initialise variables
   
@@ -55,28 +56,28 @@ queue <- function(customers, desks){
   Desk.ID <- desks$Desk.ID
   desk_times <- rep(0, times = N_desk)
   
-  # customers
-  N_customer <- dim(customers)[1]
+  # passengers
+  N_passenger <- dim(passengers)[1]
   
   
-  for(i in 1:N_customer){ #loop over all customers
+  for(i in 1:N_passenger){ #loop over all passengers
     
-    next_arrival_time <- customers$Time.Arrival[i]
+    next_arrival_time <- passengers$Time.Arrival[i]
     
     # if a desk is idle, update their tie
     desk_times <- pmax(desk_times, next_arrival_time)
     
-    #decide which desk to send the customer to
+    #decide which desk to send the passenger to
     next_free_desk <- which(desk_times == min(desk_times))[1] # works even when some desks have the same time, edit for E-Gates with conditions
     next_free_desk_time <- min(desk_times)
     
-    # how long it takes to handle customer
+    # how long it takes to handle passenger
     handling_time <- rexp(1, mu_desk[next_free_desk])
     
-    # update accordingly for customer
-    customers$Time.Desk.Start[i] <- next_free_desk_time
-    customers$Time.Desk.End[i] <- next_free_desk_time + handling_time
-    customers$Desk.Handled[i] <- desks$Desk.ID[next_free_desk]
+    # update accordingly for passenger
+    passengers$Time.Desk.Start[i] <- next_free_desk_time
+    passengers$Time.Desk.End[i] <- next_free_desk_time + handling_time
+    passengers$Desk.Handled[i] <- desks$Desk.ID[next_free_desk]
     
     # update desk 
     desk_times[next_free_desk] <- desk_times[next_free_desk] + handling_time
@@ -84,19 +85,19 @@ queue <- function(customers, desks){
     
   }
   
-  return(customers)
+  return(passengers)
   
 }
 
 
 
-customers <- queue(customers = customers, desks = desks)
+passengers <- queue(passengers = passengers, desks = desks)
 
 
-wait_times <- customers$Time.Desk.Start - customers$Time.Arrival
+wait_times <- passengers$Time.Desk.Start - passengers$Time.Arrival
 
 plot(wait_times)
 plot(density(wait_times))
 summary(wait_times)
 
-tapply(X = wait_times, INDEX = customers$Desk.Handled, FUN = summary)
+tapply(X = wait_times, INDEX = passengers$Desk.Handled, FUN = summary)
