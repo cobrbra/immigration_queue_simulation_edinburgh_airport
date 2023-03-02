@@ -38,12 +38,12 @@
 \maketitle
 
 \section{Introduction}
-This document contains the results of Jacob and Bella's project to submit to the modelling competition. It should be ten pages or fewer. \jbnote{including references?} \bdnote{I would include the refs in the 10 pages -- rather make the font size smaller and avoid any discussion!}
+This document contains the results of Jacob and Bella's project to submit to the modelling competition. It should be ten pages or fewer.
 
 
-At present, we show some results derived from \texttt{R}'s \texttt{mtcars} dataset, to show how a coding and writing workflow integrating with GitHub, RStudio, and Zotero might work.
+% At present, we show some results derived from \texttt{R}'s \texttt{mtcars} dataset, to show how a coding and writing workflow integrating with GitHub, RStudio, and Zotero might work.
 
-On top of these, I've added some example headings for how a simulation project might look.
+% On top of these, I've added some example headings for how a simulation project might look.
 
 \subsection{Problem statement}
 \subsection{Key performance indicators}
@@ -51,40 +51,49 @@ On top of these, I've added some example headings for how a simulation project m
 
 
 \section{Methods}
-\subsection{Example methods: \texttt{mtcars}}
-The \texttt{mtcars} dataset contains 32 observations of 11 variables. Each of the 32 rows corresponds to a model of car, and the variables contain information about the miles per gallon (mpg) of the model, alongside other features including number of cylinders (cyl), horsepower (hp) and highest gear. We'll pretend our aim is to predict miles per gallon on the basis of the other quantities.
 
-We'll also pretend that we're only interested in doing this prediction for car models with an mpg less than 20. The only reason to do this is so that later on we can demo how the proposed workflow for data processing $\rightarrow$ modelling $\rightarrow$ results operates by changing it later. With this restriction in mind, the 18 observations that remain in our dataset are given in Table~\ref{tab:mtcars_full}.
+% \subsection{Example methods: \texttt{mtcars}}
+% The \texttt{mtcars} dataset contains 32 observations of 11 variables. Each of the 32 rows corresponds to a model of car, and the variables contain information about the miles per gallon (mpg) of the model, alongside other features including number of cylinders (cyl), horsepower (hp) and highest gear. We'll pretend our aim is to predict miles per gallon on the basis of the other quantities.
 
-\input{tables/mtcars_full.tex}
+% We'll also pretend that we're only interested in doing this prediction for car models with an mpg less than 20. The only reason to do this is so that later on we can demo how the proposed workflow for data processing $\rightarrow$ modelling $\rightarrow$ results operates by changing it later. With this restriction in mind, the 18 observations that remain in our dataset are given in Table~\ref{tab:mtcars_full}.
 
-We take two modelling strategies, both based on linear models. Firstly, we model mpg as a function of number of cylinders alone, and then as a function of all other input covariates.
+% \input{tables/mtcars_full.tex}
+
+% We take two modelling strategies, both based on linear models. Firstly, we model mpg as a function of number of cylinders alone, and then as a function of all other input covariates.
 
 \subsection{Data sources}
 \subsubsection{Passenger arrivals schedule}
 \subsubsection{External flight schedule data}
 \jbnote{Could come from e.g. flight radar?}
-\subsection{Modelling assumptions}
+\subsection{Model specification}
+We divide the flow of passengers through Edinburgh Airport into four stages:
 
-\subsection{Queue model specification}
+\begin{enumerate}
+    \item Aircraft arrive at Edinburgh airport. \label{step:aircraft}
+    \item Passengers are transported from their aircraft to the arrivals hall, either by coach or by contact. \label{step:transport}
+    \item Passengers arrive at the queue for passport control. \label{step:arrival}
+    \item Passengers queue and are processed by passport control. \label{step:queue}
+\end{enumerate}
+In Step~\ref{step:aircraft}, ...
 \subsection{Approximate Bayesian computation}
 
 \section{Results}
-\subsection{Example results: \texttt{mtcars}}
-Firstly, we show a negative association between number of cylinders and miles per gallon (Figure~\ref{fig:mt_cars_summary}). We then fitted a linear model for mpg based on all other available covariates (see Table~\ref{tab:mtcars_full}), and show predicted vs actual values of mpg in Figure~\ref{fig:mtcars_model}.
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=4in]{figures/mt_cars_summary.png}
-    \caption{Miles per gallon versus number of cylinders.}
-    \label{fig:mt_cars_summary}
-\end{figure}
 
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=4in]{figures/mpg_model_actual_vs_predicted.png}
-    \caption{Example figure generated from a model of mtcars data.}
-    \label{fig:mtcars_model}
-\end{figure}
+% \subsection{Example results: \texttt{mtcars}}
+% Firstly, we show a negative association between number of cylinders and miles per gallon (Figure~\ref{fig:mt_cars_summary}). We then fitted a linear model for mpg based on all other available covariates (see Table~\ref{tab:mtcars_full}), and show predicted vs actual values of mpg in Figure~\ref{fig:mtcars_model}.
+% \begin{figure}[htbp]
+%     \centering
+%     \includegraphics[width=4in]{figures/mt_cars_summary.png}
+%     \caption{Miles per gallon versus number of cylinders.}
+%     \label{fig:mt_cars_summary}
+% \end{figure}
+
+% \begin{figure}[htbp]
+%     \centering
+%     \includegraphics[width=4in]{figures/mpg_model_actual_vs_predicted.png}
+%     \caption{Example figure generated from a model of mtcars data.}
+%     \label{fig:mtcars_model}
+% \end{figure}
 
 \subsection{Simulating different eGate scenarios}
 
