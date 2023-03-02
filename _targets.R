@@ -25,6 +25,10 @@ options(clustermq.scheduler = "multicore")
 tar_source(files = c(
   here("code/process_data.R"), 
   here("code/simulate_data.R"),
+  here("code/step_1_aircraft.R"),
+  here("code/step_2_route.R"),
+  here("code/step_3_hall.R"),
+  here("code/step_4_immigration.R"),
   here("code/model_data.R"),
   here("code/get_results.R"),
   here("code/get_figures.R"),
@@ -36,11 +40,34 @@ tar_source(files = c(
 # Replace the target list below with your own:
 list(
   # Making the planes dataset accessible
-  tar_target(planes_raw,
-             here("raw_data/planes/GlobalAirportDatabase.txt"),
+  tar_target(aircraft_raw,
+             here("raw_data/aircraft/GlobalAirportDatabase.txt"),
              format = "file"),
-  tar_target(planes_processed,
-             process_planes_data(planes_raw)),
+  tar_target(aircraft_processed,
+             process_aircraft(aircraft_raw)),
+  
+  # Making the aircraft arrivals dataset accessible
+  tar_target(aircraft_schedule_raw,
+         here("raw_data/aircraft_schedule/aircraft_schedule.csv"),
+         format = "file"),
+  tar_target(aircraft_schedule_processed,
+             process_aircraft_schedule(aircraft_schedule_raw)),
+  
+  # Simulating passengers getting off aircraft
+  tar_target(passengers_from_aircraft,
+             get_passengers_from_aircraft(aircraft_schedule_processed)),
+  
+  # Simulating passengers getting through coach/contact route
+  tar_target(passengers_from_route,
+             get_passengers_from_route(passengers_from_aircraft)),
+  
+  # Simulating passengers getting through the hall
+  tar_target(passengers_from_hall,
+             get_passengers_from_hall(passengers_from_route)),
+  
+  # Simulating passengers getting through immigration
+  tar_target(passengers_from_immigration,
+             get_passengers_from_immigration(passengers_from_hall)),
   
   # Generating simulated arrivals data
   tar_target(arrivals_sim_params,
