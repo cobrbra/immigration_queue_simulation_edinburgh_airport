@@ -20,14 +20,26 @@ check_passengers_from_aircraft <- function(passengers_from_aircraft) {
   }
 }
 
-get_passengers_from_aircraft <- function(aircraft_schedule) {
-  passengers_from_aircraft <- data.frame(
-    passenger_id = character(),
-    aircraft_id = character(),
-    nationality = character(),
-    coached = numeric(),
-    aircraft_arrival = character()
+
+
+get_passenger_from_aircrafts <- function(aircrafts, seed = NULL){
+  
+  if (!is.null(seed)) {set.seed(seed)}
+  
+  n_passengers_aircraft <- aircrafts$passenger_on_board
+  n_passengers <- sum(n_passengers_aircraft)
+  
+  passengers <- data.frame(
+    
+    passenger_id =paste0("P", str_pad(1:n_passengers, 6, pad = "0")),
+    aircraft_id = rep(aircrafts$aircraft_id, n_passengers_aircraft),
+    nationality = character(n_passengers),
+    aircraft_arrival = rep(aircrafts$aircraft_arrival, n_passengers_aircraft),
+    coached = rep(aircrafts$coached, n_passengers_aircraft),
+    arrival_at_hall = character(n_passengers)
+    
   )
+  
   check_passengers_from_aircraft(passengers_from_aircraft)
-  return(passengers_from_aircraft)
+  return(passengers)
 }
