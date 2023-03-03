@@ -23,7 +23,6 @@ check_passengers_from_immigration <- function(passengers_from_immigration) {
     stop("Passenger IDs are not unique.")
   }
   
-  print("Check for IMMIGRATION passed.")
 }
 
 
