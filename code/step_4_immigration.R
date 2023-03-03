@@ -22,6 +22,8 @@ check_passengers_from_immigration <- function(passengers_from_immigration) {
   if (length(passengers_from_immigration$passenger_id) != length(unique(passengers_from_immigration$passenger_id))) {
     stop("Passenger IDs are not unique.")
   }
+  
+  print("Check for IMMIGRATION passed.")
 }
 
 
@@ -29,7 +31,7 @@ check_passengers_from_immigration <- function(passengers_from_immigration) {
 
 get_check_handling_time <- function(checks, check_id, seed = NULL) {
   if (!is.null(seed)) {set.seed(seed)}
-  check_handling_time <- rexp(1, checks$check_handling_rates[check_id])
+  check_handling_time <- rexp(1, checks$handling_rates[check_id])
   
   return (check_handling_time)
 }
@@ -51,7 +53,7 @@ immigration_queue <- function(passengers,
   
   for(i in 1:n_passengers){ 
     
-    next_arrival_time <- passengers$arrival_time[i]
+    next_arrival_time <- passengers$arrival_at_queue[i]
     
     # if a check is idle, update their time
     check_times <- pmax(check_times, next_arrival_time)
