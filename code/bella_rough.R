@@ -11,8 +11,8 @@ library("stringr")
 ########## Route ##########
 ###########################
 
+
 set.seed(4)
-walktimes <- data.frame(gate = 1:23, waltime_min = rpois(23, 6))
 
 n_aircrafts <- 5
 
@@ -28,43 +28,14 @@ aircrafts <- data.frame(
 )
 
 
-
-get_passenger_from_aircrafts <- function(aircrafts, seed = NULL){
-  
-  if (!is.null(seed)) {set.seed(seed)}
-  
-  n_passengers_aircraft <- aircrafts$passenger_on_board
-  n_passengers <- sum(n_passengers_aircraft)
-  
-  passengers <- data.frame(
-    
-    passenger_id =paste0("P", str_pad(1:n_passengers, 6, pad = "0")),
-    aircraft_id = rep(aircrafts$aircraft_id, n_passengers_aircraft),
-    nationality = character(n_passengers),
-    aircraft_arrival = rep(aircrafts$aircraft_arrival, n_passengers_aircraft),
-    coached = rep(aircrafts$coached, n_passengers_aircraft),
-    arrival_at_hall = character(n_passengers)
-    
-  )
-  
-  
-  return(passengers)
-}
-
-
+aircrafts$taxi_time <- get_taxi_time(aircrafts$coached)
+aircrafts$walk_time <- get_walk_time(aircrafts$coached)
 
 passengers <- get_passenger_from_aircrafts(aircrafts)
 
 check_passengers_from_route(passengers)
 
-
-route_process  <- function(passengers, seed = NULL){
-  
-  if (!is.null(seed)) {set.seed(seed)}
-  
-  
-  
-}
+route_process(passengers = passengers, seed = 4)
 
 
 
