@@ -24,21 +24,27 @@ check_passengers_from_immigration <- function(passengers_from_immigration) {
   }
 }
 
-get_desk_handling_time <- function(desks, desk_id, seed = NULL) {
+
+
+
+get_check_handling_time <- function(checks, check_id, seed = NULL) {
   if (!is.null(seed)) {set.seed(seed)}
-  desk_handling_time <- rexp(1, desks$desk_handling_rates[desk_id])
+  check_handling_time <- rexp(1, checks$check_handling_rates[check_id])
   
-  return (desk_handling_time)
+  return (check_handling_time)
 }
 
-queue <- function(passengers, 
-                  desks, 
-                  handling_time_func = get_desk_handling_time,
+
+
+
+immigration_queue <- function(passengers, 
+                  checks, 
+                  handling_time_func = get_check_handling_time,
                   seed = NULL){
   
   if (!is.null(seed)) {set.seed(seed)}
-  n_desks <- desks$n_desks
-  desk_times <- rep(0, times = desks$n_desks)
+  n_checks <- checks$n_checks
+  check_times <- rep(0, times = checks$n_checks)
   
   n_passengers <- dim(passengers)[1]
   
@@ -47,23 +53,23 @@ queue <- function(passengers,
     
     next_arrival_time <- passengers$arrival_time[i]
     
-    # if a desk is idle, update their time
-    desk_times <- pmax(desk_times, next_arrival_time)
+    # if a check is idle, update their time
+    check_times <- pmax(check_times, next_arrival_time)
     
-    # decide which desk to send the passenger to
-    next_free_desk <- which(desk_times == min(desk_times))[1] # TODO: edit for E-Gates with conditions
-    next_free_desk_time <- min(desk_times)
+    # decide which check to send the passenger to
+    next_free_check <- which(check_times == min(check_times))[1] # TODO: edit for E-Gates with conditions
+    next_free_check_time <- min(check_times)
     
     # how long it takes to handle passenger
-    handling_time <- handling_time_func(desks, next_free_desk)
+    handling_time <- handling_time_func(checks, next_free_check)
     
     # update accordingly for passenger
-    passengers$desk_start_time[i] <- next_free_desk_time
-    passengers$desk_end_time[i] <- next_free_desk_time + handling_time
-    passengers$desk_handled[i] <- desks$desk_ids[next_free_desk]
+    passengers$check_start_time[i] <- next_free_check_time
+    passengers$check_end_time[i] <- next_free_check_time + handling_time
+    passengers$check_handled[i] <- checks$check_ids[next_free_check]
     
-    # update desk 
-    desk_times[next_free_desk] <- desk_times[next_free_desk] + handling_time
+    # update check 
+    check_times[next_free_check] <- check_times[next_free_check] + handling_time
     
     
   }
