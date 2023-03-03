@@ -50,7 +50,7 @@ immigration_queue <- function(passengers,
   n_passengers <- dim(passengers)[1]
   
   
-  for(i in 1:n_passengers){ 
+  for(i in seq_len(n_passengers)){ 
     
     next_arrival_time <- passengers$arrival_at_queue[i]
     
