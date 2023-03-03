@@ -7,7 +7,9 @@ check_passengers_from_aircraft <- function(passengers_from_aircraft) {
     "aircraft_id",
     "nationality",
     "coached",
-    "aircraft_arrival"
+    "aircraft_arrival",
+    "walk_time", 
+    "taxi_time"
   )
   if (any(!(necessary_columns %in% colnames(passengers_from_aircraft)))) {
     stop(
@@ -19,6 +21,49 @@ check_passengers_from_aircraft <- function(passengers_from_aircraft) {
     stop("Passenger IDs are not unique.")
   }
 }
+
+
+
+get_taxi_time <- function(coached){
+  
+  n_aircrafts <- length(coached)
+  taxi_time <- numeric(n_aircrafts)
+  
+  for(j in seq_len(n_aircrafts)){
+    
+    if(coached[j]){
+      taxi_time[j]<- pmax(2, rnorm(1, mean = 4, sd = 0.5))
+    } else {
+      taxi_time[j] <- pmax(2, rnorm(1, mean = 5, sd = 1))
+    }
+    
+  }
+  
+  return(taxi_time)
+  
+}
+
+
+get_walk_time <- function(coached){
+  
+  n_aircrafts <- length(coached)
+  walk_time <- numeric(n_aircrafts)
+  
+  for(j in seq_len(n_aircrafts)){
+    
+    if(coached[j]){
+      walk_time[j]<- runif(1, min = 10, max = 15) # include getting everyone into busses, driving over, and walking
+    } else {
+      walk_time[j] <- pmax(3, rpois(n = 1, lambda = 5))
+    }
+    
+  }
+  
+  return(walk_time)
+  
+}
+
+
 
 
 
@@ -36,10 +81,12 @@ get_passenger_from_aircrafts <- function(aircrafts, seed = NULL){
     nationality = character(n_passengers),
     aircraft_arrival = rep(aircrafts$aircraft_arrival, n_passengers_aircraft),
     coached = rep(aircrafts$coached, n_passengers_aircraft),
+    taxi_time = rep(aircrafts$taxi_time, n_passengers_aircraft),
+    walk_time = rep(aircrafts$walk_time, n_passengers_aircraft),
     arrival_at_hall = character(n_passengers)
     
   )
   
-  check_passengers_from_aircraft(passengers_from_aircraft)
+  check_passengers_from_aircraft(passengers)
   return(passengers)
 }
