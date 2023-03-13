@@ -50,6 +50,7 @@ route_process  <- function(passengers, seed = NULL){
     
     bool_iter <- passengers$aircraft_id == aircraft_id[j]
     
+    # TODO: make these calls to randomness separate function calls
     if(coached[j]){
       
       # we should get this distribution from them 
