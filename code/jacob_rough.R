@@ -108,3 +108,22 @@ tapply(X = wait_times, INDEX = passengers$desk_handled, FUN = summary)
 # get_desk_handling_time.
 # - I've changed "C" to "P" for customers -> passengers.
 # - I've added an optional random seed to the queue function
+
+coached_levels <- aircrafts %>% 
+  arrange(desc(coached)) %>% 
+  pull(aircraft_id)
+
+arrivals_at_hall %>% 
+  mutate(`Aircraft ID` = aircraft_id,
+         coached = if_else(coached, "Coached", "Contact"),
+         stack_group = factor(aircraft_id, levels = coached_levels)) %>% 
+  ggplot(aes(x = arrival_at_hall, 
+             fill = `Aircraft ID`,
+             group = stack_group,
+             linetype = coached)) + 
+  geom_density(position = "stack") +
+  labs(x= "Arrival time in Hall", 
+       y = "Arrival Density",
+       title = "Coached arrivals occur in bulk; contact passengers are spread out") + 
+  theme_light() +
+  scale_linetype_discrete(name = "")
