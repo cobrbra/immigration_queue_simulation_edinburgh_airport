@@ -35,7 +35,7 @@ passengers <- get_passenger_from_aircrafts(aircrafts)
 
 check_passengers_from_route(passengers)
 
-route_process(passengers = passengers, seed = 4)
+arrivals_at_hall <- route_process(passengers = passengers, seed = 4)
 
 
 
