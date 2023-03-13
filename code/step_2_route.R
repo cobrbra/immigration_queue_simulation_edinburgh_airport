@@ -82,7 +82,9 @@ get_passengers_from_route <- function(passengers_from_aircraft) {
     aircraft_id = character(),
     nationality = character(),
     aircraft_arrival = character(),
-    arrival_at_hall = character()
+    arrival_at_hall = character(),
+    walk_time = vector(),
+    taxi_time = vector()
   )
   check_passengers_from_route(passengers_from_route)
   return(passengers_from_route)

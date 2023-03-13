@@ -25,7 +25,7 @@ get_passengers_from_aircraft|function|a53a8acdc13bf1d6|||||||||||||||
 get_passengers_from_aircrafts|function|d217b064557d8a89|||||||||||||||
 get_passengers_from_hall|function|016b16139ae87947|||||||||||||||
 get_passengers_from_immigration|function|4ef6daf0353dbb1a|||||||||||||||
-get_passengers_from_route|function|86bb4a8c5b381fb5|||||||||||||||
+get_passengers_from_route|function|9e985baa9b0e497c|||||||||||||||
 get_processed_data|function|ca6c86d6bb46fbbf|||||||||||||||
 get_results|function|e30d209ec903dae5|||||||||||||||
 get_tables|function|91740aa9017e9fb5|||||||||||||||
@@ -37,8 +37,8 @@ model_data|function|355a4f782e7eaae5|||||||||||||||
 passengers_from_aircraft|stem|1125943382a9721b|d973c786b3ee5c0b|31a2a8418ef3d7d6|-1014272765||t19418.6702960394s||167|rds|local|vector|||0.003||could not find function get_passengers_from_aircraft
 passengers_from_aircrafts|stem|8db2a62aadf2cbad|f5021214039e8846|95a04800f74ae212|-1183135713||t19423.8146365463s|1d5c59973993a867|194|rds|local|vector|||0.007||
 passengers_from_hall|stem|fba6ce12b929817d|4225491174f7f5fb|0290a5fbe5cacb7a|2060253316||t19418.6787434789s|1d5c59973993a867|194|rds|local|vector|||0||
-passengers_from_immigration|stem|53b202059451eaae|1c5a2e42a4121a1a|f1ea6e183e869216|525700736||t19418.6888783987s|e102fd4cf0167a36|208|rds|local|vector|||0.001||
-passengers_from_route|stem|e85f6bbe58f0fcc2|e79ed70625bf7690|f45eb9f19893c744|-1748590929||t19418.6787434315s||168|rds|local|vector|||0.003||Passengers from route should contain columns passenger_id aircraft_id nationality aircraft_arrival arrival_at_hall walk_time taxi_time
+passengers_from_immigration|stem|53b202059451eaae|18b6bab0277c99ab|cd87ed778c58e668|525700736||t19429.4884089407s|e102fd4cf0167a36|208|rds|local|vector|||0.001||
+passengers_from_route|stem|8b7a40f787f39a11|e79ed70625bf7690|6b663574f2b36632|-1748590929||t19429.4884088777s|9712f9cb4307e5f0|183|rds|local|vector|||0||
 planes_processed|stem|6dc687ba1d7f8d9e|46426cf1e7b6020d|9e4bebefa02db41e|1700164047||t19412.0685964989s|4a751d21e95b14ee|238764|rds|local|vector|||0.126||
 planes_raw|stem|a70aa3c204095a56|8f8bf4b479c26414|4e3739ef91745af0|-1891222926|/Users/jbradley/Documents/immigration_queue_simulation_edinburgh_airport/raw_data/planes/GlobalAirportDatabase.txt|t10957s|0a8497d35a63e5a7|760437|file|local|vector|||0.001||
 process_aircraft|function|e6256ece3aba8271|||||||||||||||
