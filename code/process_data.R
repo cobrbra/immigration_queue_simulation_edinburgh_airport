@@ -33,13 +33,15 @@ check_aircraft_schedule <- function(aircraft_schedule) {
   necessary_columns <- c(
     "aircraft_id",
     "scheuled_arrival",
-    "actual_arrival",
+    "aircraft_arrival",
     "arriving_from",
     "airline",
     "plane_type",
     "plane_capacity",
     "n_passengers",
-    "coached"
+    "coached",
+    "taxi_time",
+    "walk_time"
   )
   if (any(!(necessary_columns %in% colnames(aircraft_schedule)))) {
     stop(
@@ -47,17 +49,20 @@ check_aircraft_schedule <- function(aircraft_schedule) {
             collapse = " "))
   }
 }
+
 process_aircraft_schedule <- function(file) {
   aircraft_schedule <- data.frame(
     aircraft_id = character(),
     scheuled_arrival = character(),
-    actual_arrival = character(),
+    aircraft_arrival = character(),
     arriving_from = character(),
     airline = character(),
     plane_type = character(),
     plane_capacity = numeric(),
     n_passengers = numeric(),
-    coached = numeric()
+    coached = numeric(),
+    taxi_time = numeric(),
+    walk_time = numeric()
   )
   check_aircraft_schedule(aircraft_schedule)
   return(aircraft_schedule)

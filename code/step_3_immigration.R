@@ -79,7 +79,7 @@ immigration_queue <- function(passengers,
   
 }
 
-get_passengers_from_immigration <- function(passengers_from_hall) {
+get_passengers_from_immigration <- function(passengers_from_route) {
   passengers_from_immigration <- data.frame(
     passenger_id = character(),
     aircraft_id = character(),

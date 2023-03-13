@@ -27,8 +27,7 @@ tar_source(files = c(
   here("code/simulate_data.R"),
   here("code/step_1_aircraft.R"),
   here("code/step_2_route.R"),
-  here("code/step_3_hall.R"),
-  here("code/step_4_immigration.R"),
+  here("code/step_3_immigration.R"),
   here("code/model_data.R"),
   here("code/get_results.R"),
   here("code/get_figures.R"),
@@ -54,20 +53,16 @@ list(
              process_aircraft_schedule(aircraft_schedule_raw)),
   
   # Simulating passengers getting off aircraft
-  tar_target(passengers_from_aircraft,
-             get_passengers_from_aircraft(aircraft_schedule_processed)),
+  tar_target(passengers_from_aircrafts,
+             get_passengers_from_aircrafts(aircraft_schedule_processed)),
   
   # Simulating passengers getting through coach/contact route
   tar_target(passengers_from_route,
-             get_passengers_from_route(passengers_from_aircraft)),
-  
-  # Simulating passengers getting through the hall
-  tar_target(passengers_from_hall,
-             get_passengers_from_hall(passengers_from_route)),
-  
+             get_passengers_from_route(passengers_from_aircrafts)),
+
   # Simulating passengers getting through immigration
   tar_target(passengers_from_immigration,
-             get_passengers_from_immigration(passengers_from_hall)),
+             get_passengers_from_immigration(passengers_from_route)),
   
   # Generating simulated arrivals data
   tar_target(arrivals_sim_params,
