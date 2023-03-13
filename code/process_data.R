@@ -83,10 +83,10 @@ process_aircrafts_observed_arrivals <- function(folder_name,
            actual_arrival_datetime = t_actual,
            sched_arrival_date = as.Date(t_sched),
            actual_arrival_date = as.Date(t_actual),
-           sched_arrival_time = format(t_sched, format = '%H:%M:%S'),
-           actual_arrival_time = format(t_actual, format = '%H:%M:%S'),
-           t_sched = as.integer(t_sched),
-           t_actual = as.integer(t_actual)) 
+           t_sched = as.numeric(t_sched),
+           t_actual = as.numeric(t_actual)) %>% 
+    mutate(sched_arrival_time = t_sched - 86400 * as.numeric(sched_arrival_date),
+           actual_arrival_time = t_actual - 86400 * as.numeric(actual_arrival_date))
   
   # bind together with airports data
   aircrafts_observed_arrivals <- aircrafts_observed_arrivals %>% 
@@ -110,7 +110,11 @@ process_aircrafts_observed_arrivals <- function(folder_name,
            n_passengers = rep(NA, nrow(aircrafts_observed_arrivals)),
            coached = rep(NA, nrow(aircrafts_observed_arrivals)),
            taxi_time = rep(NA, nrow(aircrafts_observed_arrivals)),
-           walk_time = rep(NA, nrow(aircrafts_observed_arrivals))) %>% 
+           walk_time = rep(NA, nrow(aircrafts_observed_arrivals)),
+           n_nat_UKIE = rep(NA, nrow(aircrafts_observed_arrivals)),
+           n_nat_EU_plus = rep(NA, nrow(aircrafts_observed_arrivals)),
+           n_nat_other_easy = rep(NA, nrow(aircrafts_observed_arrivals)),
+           n_nat_other_hard = rep(NA, nrow(aircrafts_observed_arrivals))) %>% 
     select("aircraft_id",
            "dep_country",
            "dep_airport",
@@ -128,7 +132,11 @@ process_aircrafts_observed_arrivals <- function(folder_name,
            "n_passengers",
            "coached",
            "taxi_time",
-           "walk_time")
+           "walk_time",
+           "n_nat_UKIE",
+           "n_nat_EU_plus",
+           "n_nat_other_easy",
+           "n_nat_other_hard")
   
   check_aircrafts_observed_arrivals(aircrafts_observed_arrivals)
   return(aircrafts_observed_arrivals)

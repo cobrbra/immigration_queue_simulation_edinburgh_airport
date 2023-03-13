@@ -3,7 +3,7 @@ aircraft_processed|stem|6d7f10c9b09a6ee4|bc648b50196c1dd7|3bbbc8f443c3601a|48218
 aircraft_raw|stem|d9abc46771b8efbd|567ff5afef7a131b|4e3739ef91745af0|-1100775902|C:/Users/s1989890/Documents/modellinglocal/immigration_queue_simulation_edinburgh_airport/raw_data/aircraft/GlobalAirportDatabase.txt|t19419.3968329482s||769737|file|local|vector|||||_paths_ 31mmissing files CUserss1989890Documentsmodellinglocalimmigration_queue_simulation_edinburgh_airportraw_dataaircraftGlobalAirportDatabase.txt39m
 aircraft_schedule_processed|stem|28c9384e0666ee00|e594c89a37aa4a84|14eeff9246099534|1626630764||t19429.4916087152s|9208ff4405c91373|218|rds|local|vector|||0||
 aircraft_schedule_raw|stem|ef46db3751d8e999|a9e7739058f4c040|4e3739ef91745af0|-222011143|C:/Users/s1989890/Documents/modellinglocal/immigration_queue_simulation_edinburgh_airport/raw_data/aircraft_schedule/aircraft_schedule.csv|t19419.3968329713s|f4066a65ff755f48|0|file|local|vector|||0||
-aircrafts_observed_arrivals_processed|stem|9d6d4ac05824af39|aa56d215a3197d92|23422528e0b32334|1845573049||t19429.6842870542s|569b1757295cfeed|1083673|rds|local|vector|||0.773|NAs introduced by coercion|
+aircrafts_observed_arrivals_processed|stem|27c713c168796186|aa56d215a3197d92|d5281242bbb3e731|1845573049||t19429.7191808593s|ca169f41ae0598ee|1118711|rds|local|vector|||0.734|NAs introduced by coercion|
 aircrafts_observed_arrivals_raw|stem|c42aac3c4755478c|d4f33fcd775b0aba|4e3739ef91745af0|-1173286036|/Users/jbradley/Documents/immigration_queue_simulation_edinburgh_airport/raw_data/aircrafts_observed_arrivals/|t19429.5291211677s|f0ef80e5f0ea82e1|224|file|local|vector|||0.008||
 aircrafts_processed|stem|b85a29b8c833922e|576e9fcf25301d4d|480c5f8437868a97|-1192089391||t19429.6586239443s|9bec8d9b374094da|3801|rds|local|vector|||0.123||
 aircrafts_raw|stem|8f5bc33e90e3af2c|4d41e7fbd3b11163|4e3739ef91745af0|2037142243|/Users/jbradley/Documents/immigration_queue_simulation_edinburgh_airport/raw_data/aircrafts/aircrafts_capacity.txt|t19429.6540438175s|9f601c1a6e306c1b|10626|file|local|vector|||0.008||
@@ -51,7 +51,7 @@ planes_raw|stem|a70aa3c204095a56|8f8bf4b479c26414|4e3739ef91745af0|-1891222926|/
 process_aircraft|function|e6256ece3aba8271|||||||||||||||
 process_aircraft_schedule|function|7887b8dd94710750|||||||||||||||
 process_aircrafts|function|0375ead14200a84e|||||||||||||||
-process_aircrafts_observed_arrivals|function|f952fb7194ece285|||||||||||||||
+process_aircrafts_observed_arrivals|function|740e16c05b769eca|||||||||||||||
 process_airports|function|a0195fa36de80832|||||||||||||||
 process_planes_data|function|e6256ece3aba8271|||||||||||||||
 queue|function|8c5adf79697333cc|||||||||||||||
