@@ -64,19 +64,18 @@ get_walk_time <- function(coached){
 }
 
 
-
-
-
-get_passenger_from_aircrafts <- function(aircrafts, seed = NULL){
+get_passengers_from_aircrafts <- function(aircrafts, seed = NULL){
   
   if (!is.null(seed)) {set.seed(seed)}
   
-  n_passengers_aircraft <- aircrafts$passenger_on_board
+  n_passengers_aircraft <- aircrafts$n_passengers
   n_passengers <- sum(n_passengers_aircraft)
+  print(n_passengers_aircraft)
   
   passengers <- data.frame(
     
-    passenger_id =paste0("P", str_pad(1:n_passengers, 6, pad = "0")),
+    passenger_id = paste0("P", str_pad(seq_len(n_passengers), 6, pad = "0"),
+                          recycle0 = TRUE),
     aircraft_id = rep(aircrafts$aircraft_id, n_passengers_aircraft),
     nationality = character(n_passengers),
     aircraft_arrival = rep(aircrafts$aircraft_arrival, n_passengers_aircraft),
