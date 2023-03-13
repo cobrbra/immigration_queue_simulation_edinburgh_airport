@@ -9,7 +9,7 @@ airports_processed|stem|6d7f10c9b09a6ee4|a612defb13e9835f|02b4aa4524b5e49b|-1729
 airports_raw|stem|a70aa3c204095a56|39a8f2eabca64864|4e3739ef91745af0|-1345443841|C:/Users/s1989890/Documents/modellinglocal/immigration_queue_simulation_edinburgh_airport/raw_data/airports/GlobalAirportDatabase.txt|t19429.5272075431s|0a8497d35a63e5a7|760437|file|local|vector|||0.01||
 arrivals_sim_params|stem|f896466f258e2baa|1699bc8ff31bd99e|4e3739ef91745af0|2120511976|C:/Users/s1989890/Documents/modellinglocal/immigration_queue_simulation_edinburgh_airport/params/sim_params/arrival_sim_params.txt|t19417.5611849078s|f02b269bc80ae470|129|file|local|vector|||0||
 check_aircraft_schedule|function|cfcc7adb4fa518c9|||||||||||||||
-check_aircrafts_observed_arrivals|function|7ad3fb493d363400|||||||||||||||
+check_aircrafts_observed_arrivals|function|8c86605a0d171b72|||||||||||||||
 check_passengers_from_aircraft|function|a6a1f0966f69f746|||||||||||||||
 check_passengers_from_hall|function|32bf467128aa633d|||||||||||||||
 check_passengers_from_immigration|function|7f1f1fe171ba5a2d|||||||||||||||
@@ -40,15 +40,16 @@ immigration_queue|function|dd0a639aa3ab71d8|||||||||||||||
 model|stem|d8e1fb9dc5567626|ae83bc723fe2997c|326e0a6129599004|1816327236||t19408.8231333432s|1254f8a9a0ffbd1f|107|rds|local|vector|||0.003||
 model_data|function|355a4f782e7eaae5|||||||||||||||
 passengers_from_aircraft|stem|1125943382a9721b|d973c786b3ee5c0b|31a2a8418ef3d7d6|-1014272765||t19418.6702960394s||167|rds|local|vector|||0.003||could not find function get_passengers_from_aircraft
-passengers_from_aircrafts|stem|19f9c0bcc054d5a7|d9f37412dce76dce|fa0f12b066e42335|-1183135713||t19429.5303953124s|4704cb860dc3a9a3|193|rds|local|vector|||0.01||
+passengers_from_aircrafts|stem|4d225d934c497946|119915b9225489c7|7a33c030a2725175|-1183135713||t19429.6888757613s|bd9cdb2e6c3ecc89|253|rds|local|vector|||0.009||
 passengers_from_hall|stem|fba6ce12b929817d|4225491174f7f5fb|0290a5fbe5cacb7a|2060253316||t19418.6787434789s|1d5c59973993a867|194|rds|local|vector|||0||
-passengers_from_immigration|stem|d9fb96c199683299|18b6bab0277c99ab|b28516b09a9ac506|525700736||t19429.5303956829s|e102fd4cf0167a36|208|rds|local|vector|||0||
-passengers_from_route|stem|226945a5d122db8e|e79ed70625bf7690|ce3b9366e51a6297|-1748590929||t19429.5303954513s|9712f9cb4307e5f0|183|rds|local|vector|||0||
+passengers_from_immigration|stem|53b202059451eaae|18b6bab0277c99ab|cd87ed778c58e668|525700736||t19429.529318983s|e102fd4cf0167a36|208|rds|local|vector|||0||
+passengers_from_route|stem|8b7a40f787f39a11|e79ed70625bf7690|62b4f23a197205fe|-1748590929||t19429.6888758798s|9712f9cb4307e5f0|183|rds|local|vector|||0.001||
 planes_processed|stem|6dc687ba1d7f8d9e|46426cf1e7b6020d|9e4bebefa02db41e|1700164047||t19412.0685964989s|4a751d21e95b14ee|238764|rds|local|vector|||0.126||
 planes_raw|stem|a70aa3c204095a56|8f8bf4b479c26414|4e3739ef91745af0|-1891222926|/Users/jbradley/Documents/immigration_queue_simulation_edinburgh_airport/raw_data/planes/GlobalAirportDatabase.txt|t10957s|0a8497d35a63e5a7|760437|file|local|vector|||0.001||
 process_aircraft|function|e6256ece3aba8271|||||||||||||||
 process_aircraft_schedule|function|7887b8dd94710750|||||||||||||||
-process_aircrafts_observed_arrivals|function|6a08e8e3f6b2284f|||||||||||||||
+process_aircrafts|function|0375ead14200a84e|||||||||||||||
+process_aircrafts_observed_arrivals|function|740e16c05b769eca|||||||||||||||
 process_airports|function|a0195fa36de80832|||||||||||||||
 process_planes_data|function|e6256ece3aba8271|||||||||||||||
 queue|function|8c5adf79697333cc|||||||||||||||

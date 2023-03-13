@@ -10,7 +10,7 @@ library(here)
 
 # Set target options:
 tar_option_set(
-  packages = c("here", "tidyverse", "xtable"), # packages that your targets need to run
+  packages = c("here", "tidyverse", "readxl", "xtable"), # packages that your targets need to run
   format = "rds" # default storage format
   # Set other options as needed.
 )
@@ -45,16 +45,45 @@ list(
   tar_target(airports_processed,
              process_airports(airports_raw)),
   
+  # Making the aircrafts dataset accessible
+  tar_target(aircrafts_raw,
+             here("raw_data/aircrafts/aircrafts_capacity.txt"),
+             format = "file"),
+  tar_target(aircrafts_processed,
+             process_aircrafts(aircrafts_raw)),
+  
   # Making the aircraft arrivals dataset accessible
   tar_target(aircrafts_observed_arrivals_raw,
-         here("raw_data/aircrafts_observed_arrivals/aircraft_schedule.csv"),
+         here("raw_data/aircrafts_observed_arrivals/"),
          format = "file"),
   tar_target(aircrafts_observed_arrivals_processed,
-             process_aircrafts_observed_arrivals(aircrafts_observed_arrivals_raw)),
+             process_aircrafts_observed_arrivals(
+               aircrafts_observed_arrivals_raw,
+               airports_reference = airports_processed,
+               aircrafts_reference = aircrafts_processed)),
   
   # Simulating passengers getting off aircraft
   tar_target(passengers_from_aircrafts,
-             get_passengers_from_aircrafts(aircrafts_observed_arrivals_processed)),
+             data.frame(
+               aircraft_id = numeric(),
+               dep_country = numeric(),
+               dep_airport = numeric(),
+               ac_type = numeric(),
+               t_sched = numeric(),
+               t_actual = numeric(),
+               sched_arrival_datetim = numeric(),
+               actual_arrival_datetime = numeric(),
+               sched_arrival_date = numeric(),
+               actual_arrival_date = numeric(),
+               sched_arrival_time = numeric(),
+               actual_arrival_time = numeric(),
+               des_rwy = numeric(),
+               max_passengers = numeric(),
+               n_passengers = numeric(),
+               coached = numeric(),
+               taxi_time = numeric(),
+               walk_time = numeric())),
+             # get_passengers_from_aircrafts(aircrafts_observed_arrivals_processed)),
   
   # Simulating passengers getting through coach/contact route
   tar_target(passengers_from_route,
