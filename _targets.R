@@ -62,7 +62,21 @@ list(
 
   # Simulating passengers getting through immigration
   tar_target(passengers_from_immigration,
-             get_passengers_from_immigration(passengers_from_route))
+             get_passengers_from_immigration(passengers_from_route)), 
+  
+  # For passenger count and nationality
+  tar_target(EU_hubs, c("FRA", "AMS", "CDG")),
+  tar_target(Other_hubs, c("IST", "ATL", "ORD", "DBX", "DFW", "DEN")),
+  
+  tar_target(nationality_props,
+             here("params/nationality_proportions.txt"),
+             format = "file"),
+  
+  tar_target(load_factor_mean, 0.85),
+  tar_target(load_factor_sd, 0.1)
+  
+  
+  
   
   # # Generating simulated arrivals data
   # tar_target(arrivals_sim_params,
