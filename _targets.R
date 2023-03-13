@@ -24,14 +24,14 @@ options(clustermq.scheduler = "multicore")
 # Run the R scripts in the R/ folder with your custom functions:
 tar_source(files = c(
   here("code/process_data.R"), 
-  here("code/simulate_data.R"),
+  # here("code/simulate_data.R"),
   here("code/step_1_aircraft.R"),
   here("code/step_2_route.R"),
-  here("code/step_3_immigration.R"),
-  here("code/model_data.R"),
-  here("code/get_results.R"),
-  here("code/get_figures.R"),
-  here("code/get_tables.R")
+  here("code/step_3_immigration.R")
+  # here("code/model_data.R"),
+  # here("code/get_results.R"),
+  # here("code/get_figures.R"),
+  # here("code/get_tables.R")
   )
 )
 # source("other_functions.R") # Source other scripts as needed. # nolint
@@ -62,22 +62,22 @@ list(
 
   # Simulating passengers getting through immigration
   tar_target(passengers_from_immigration,
-             get_passengers_from_immigration(passengers_from_route)),
+             get_passengers_from_immigration(passengers_from_route))
   
-  # Generating simulated arrivals data
-  tar_target(arrivals_sim_params,
-             here("params/sim_params/arrival_sim_params.txt"),
-             format = "file"),
-  tar_target(simulated_arrivals_data,
-             simulate_arrivals(arrivals_sim_params)),
-  
-  # Generating simulated queueing data
-  tar_target(queue_sim_params,
-             here("params/sim_params/queue_sim_params.txt"),
-             format = "file"),
-  tar_target(simulated_queue_data,
-             simulate_queue(queue_sim_params, simulated_arrivals_data))#,
-  
+  # # Generating simulated arrivals data
+  # tar_target(arrivals_sim_params,
+  #            here("params/sim_params/arrival_sim_params.txt"),
+  #            format = "file"),
+  # tar_target(simulated_arrivals_data,
+  #            simulate_arrivals(arrivals_sim_params)),
+  # 
+  # # Generating simulated queueing data
+  # tar_target(queue_sim_params,
+  #            here("params/sim_params/queue_sim_params.txt"),
+  #            format = "file"),
+  # tar_target(simulated_queue_data,
+  #            simulate_queue(queue_sim_params, simulated_arrivals_data))#,
+  # 
   # # Example data sources
   # tar_target(example_raw_data, 
   #            here("raw_data/example_raw_data.csv"), 
