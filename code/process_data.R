@@ -13,21 +13,21 @@ get_processed_data <- function(file) {
 }
 
 
-process_aircraft <- function(file) {
-  planes_cols <- c("icao_code", "iata_code", "airport_name", "city", "country",
+process_airports <- function(file) {
+  airports_cols <- c("icao_code", "iata_code", "airport_name", "city", "country",
                    "lat_degrees", "lat_minutes", "lat_seconds", "lat_direction",
                    "lon_degrees", "lon_minutes", "lon_seconds", "lon_direction",
                    "altitude", "lat_dec", "lon_dec")
-  processed_data <- read_delim(file, # read_delim(here("raw_data/aircraft/GlobalAirportDatabase.txt"), # 
+  processed_data <- read_delim(file, 
                                delim = ":",
-                               col_names = planes_cols) 
-  write_csv(processed_data, here("processed_data/planes_data.csv"))
+                               col_names = airports_cols) 
+  
 
 }
 
 
-check_aircraft_schedule <- function(aircraft_schedule) {
-  if (!is.data.frame(aircraft_schedule)) {
+check_aircrafts_observed_arrivals <- function(aircrafts_observed_arrivals) {
+  if (!is.data.frame(aircrafts_observed_arrivals)) {
     stop("Aircraft schedule should be dataframe.")
   }
   necessary_columns <- c(
@@ -43,14 +43,15 @@ check_aircraft_schedule <- function(aircraft_schedule) {
     "taxi_time",
     "walk_time"
   )
-  if (any(!(necessary_columns %in% colnames(aircraft_schedule)))) {
+  if (any(!(necessary_columns %in% colnames(aircrafts_observed_arrivals)))) {
     stop(
-      paste(c("Aircraft schedule should contain columns", necessary_columns), 
+      paste(c("Aircraft Observed Arrivals should contain columns", necessary_columns), 
             collapse = " "))
   }
 }
 
-process_aircraft_schedule <- function(file) {
+process_aircrafts_observed_arrivals <- function(file) {
+  # this is a placeholder to be changed
   aircraft_schedule <- data.frame(
     aircraft_id = character(),
     scheuled_arrival = character(),
@@ -64,7 +65,7 @@ process_aircraft_schedule <- function(file) {
     taxi_time = numeric(),
     walk_time = numeric()
   )
-  check_aircraft_schedule(aircraft_schedule)
+  check_aircrafts_observed_arrivals(aircraft_schedule)
   return(aircraft_schedule)
 }
 

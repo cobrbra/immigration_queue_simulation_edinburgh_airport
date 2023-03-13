@@ -38,23 +38,23 @@ tar_source(files = c(
 
 # Replace the target list below with your own:
 list(
-  # Making the planes dataset accessible
-  tar_target(aircraft_raw,
-             here("raw_data/aircraft/GlobalAirportDatabase.txt"),
+  # Making the airports dataset accessible
+  tar_target(airports_raw,
+             here("raw_data/airports/GlobalAirportDatabase.txt"),
              format = "file"),
-  tar_target(aircraft_processed,
-             process_aircraft(aircraft_raw)),
+  tar_target(airports_processed,
+             process_airports(airports_raw)),
   
   # Making the aircraft arrivals dataset accessible
-  tar_target(aircraft_schedule_raw,
-         here("raw_data/aircraft_schedule/aircraft_schedule.csv"),
+  tar_target(aircrafts_observed_arrivals_raw,
+         here("raw_data/aircrafts_observed_arrivals/aircraft_schedule.csv"),
          format = "file"),
-  tar_target(aircraft_schedule_processed,
-             process_aircraft_schedule(aircraft_schedule_raw)),
+  tar_target(aircrafts_observed_arrivals_processed,
+             process_aircrafts_observed_arrivals(aircrafts_observed_arrivals_raw)),
   
   # Simulating passengers getting off aircraft
   tar_target(passengers_from_aircrafts,
-             get_passengers_from_aircrafts(aircraft_schedule_processed)),
+             get_passengers_from_aircrafts(aircrafts_observed_arrivals_processed)),
   
   # Simulating passengers getting through coach/contact route
   tar_target(passengers_from_route,
