@@ -64,6 +64,37 @@ get_walk_time <- function(coached){
 }
 
 
+
+
+
+get_n_passengers <- function(aircrafts, load_factor_mean, 
+                             load_factor_sd, seed = NULL){
+  
+  if (!is.null(seed)) {set.seed(seed)}
+  
+  load_factor <- rnorm(n = lenght(aircrafts$max_passengers),
+                       mean = load_factor_mean, sd = load_factor_sd) 
+  load_factor <- pmin(load_factor, 1)
+  load_factor <- pmax(load_factor, 0)
+  
+  aircrafts$n_passengers <- aircrafts$max_passengers * load_factor
+  
+  return(aircrafts)
+}
+
+get_nationality <- function(aircrafts, EU_hubs, Other_hubs, prop_nationality, seed = NULL){
+  
+  if (!is.null(seed)) {set.seed(seed)}
+  
+  if(dim(prop_nationality)!= c(4, 4)){stop("Prop Nationality needs to be 4x4.")}
+  
+  
+  
+  
+}
+
+
+
 get_passengers_from_aircrafts <- function(aircrafts, seed = NULL){
   
   if (!is.null(seed)) {set.seed(seed)}
