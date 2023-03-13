@@ -23,7 +23,7 @@ aircrafts <- data.frame(
   airline = rep("KLM", times = n_aircrafts),
   type = rep("Boing 737-800", times = n_aircrafts),
   capacity = rep(160, times = n_aircrafts),
-  passenger_on_board = 160 - rpois(n = n_aircrafts, lambda = 10),
+  n_passengers = 160 - rpois(n = n_aircrafts, lambda = 10),
   coached = sample(c(TRUE, FALSE), size = n_aircrafts, replace = TRUE)
 )
 
@@ -31,7 +31,7 @@ aircrafts <- data.frame(
 aircrafts$taxi_time <- get_taxi_time(aircrafts$coached)
 aircrafts$walk_time <- get_walk_time(aircrafts$coached)
 
-passengers <- get_passenger_from_aircrafts(aircrafts)
+passengers <- get_passengers_from_aircrafts(aircrafts)
 
 check_passengers_from_route(passengers)
 
