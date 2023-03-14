@@ -95,7 +95,7 @@ list(
   
   # For passenger count and nationality
   tar_target(EU_hubs, c("FRA", "AMS", "CDG")),
-  tar_target(Other_hubs, c("IST", "ATL", "ORD", "DBX", "DFW", "DEN")),
+  tar_target(other_hubs, c("IST", "ATL", "ORD", "DBX", "DFW", "DEN")),
   
   tar_target(nationality_props,
              here("params/nationality_proportions.txt"),
