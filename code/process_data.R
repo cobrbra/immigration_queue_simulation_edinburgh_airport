@@ -142,3 +142,11 @@ process_aircrafts_observed_arrivals <- function(folder_name,
   return(aircrafts_observed_arrivals)
 }
 
+get_time_from_numeric <- function(time_numeric_vector) {
+  time_character_vector <- format(as.POSIXct(time_numeric_vector, 
+                                             origin = '1970-01-01'), 
+                                  format = '%H:%M')
+  
+  return(time_character_vector)
+}
+
