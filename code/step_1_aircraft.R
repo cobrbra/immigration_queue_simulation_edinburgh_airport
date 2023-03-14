@@ -24,48 +24,34 @@ check_passengers_from_aircraft <- function(passengers_from_aircraft) {
 
 
 
-get_taxi_time <- function(coached){
+get_taxi_time <- function(coached, seed = NULL){
+  
+  if (!is.null(seed)) {set.seed(seed)}
   
   n_aircrafts <- length(coached)
   taxi_time <- numeric(n_aircrafts)
-  
-  for(j in seq_len(n_aircrafts)){
-    
-    if(coached[j]){
-      taxi_time[j]<- pmax(2, rnorm(1, mean = 4, sd = 0.5))
-    } else {
-      taxi_time[j] <- pmax(2, rnorm(1, mean = 5, sd = 1))
-    }
-    
-  }
+  coached_taxi_time <- pmax(20, rnorm(n_aircrafts, mean = 300, sd = 120))
+  contact_taxi_time <- pmax(20, rnorm(n_aircrafts, mean = 500, sd = 240))
+  taxi_time <- if_else(coached, coached_taxi_time, contact_taxi_time)
   
   return(taxi_time)
   
 }
 
-
-get_walk_time <- function(coached){
+get_walk_time <- function(coached, seed = NULL){
   # generates minimum walk time
+  
+  if (!is.null(seed)) {set.seed(seed)}
   
   n_aircrafts <- length(coached)
   walk_time <- numeric(n_aircrafts)
-  
-  for(j in seq_len(n_aircrafts)){
-    
-    if(coached[j]){
-      walk_time[j]<- runif(1, min = 10, max = 15) # include getting everyone into busses, driving over, and walking
-    } else {
-      walk_time[j] <- pmax(3, rpois(n = 1, lambda = 5))
-    }
-    
-  }
+  coached_walk_time <- runif(n_aircrafts, min = 600, max = 900)
+  contact_walk_time <- pmax(180, rpois(n = n_aircrafts, lambda = 300))
+  walk_time = if_else(coached, coached_walk_time, contact_walk_time)
   
   return(walk_time)
   
 }
-
-
-
 
 
 get_n_passengers <- function(max_passengers, load_factor_mean, 
@@ -87,18 +73,11 @@ get_n_passengers <- function(max_passengers, load_factor_mean,
 get_airport_classification <- function(airport_country, airport_3letter, 
                                        EU_hubs, other_hubs, EU_countries){
   
-  res <- character(1)
-  
-  if(airport_3letter %in% EU_hubs) {
-    res <- "EU_hub"
-  } else if(airport_country %in% EU_countries) {
-    res <- "EU_nonhub"
-  } else if(airport_3letter %in% Other_hubs){
-    res <- "other_hub"
-  } else {
-    res <- "other_nonhub"
-  }
-  
+    res <- case_when(airport_3letter %in% EU_hubs ~ "EU_hub",
+                   # airport_country %in% EU_countries ~ "EU_nonhub",
+                   airport_3letter %in% other_hubs ~ "other_hub",
+                   TRUE ~ "other_nonhub")
+
   return(res)
 }
 

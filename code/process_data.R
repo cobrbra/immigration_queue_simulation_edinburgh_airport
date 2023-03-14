@@ -68,9 +68,10 @@ check_aircrafts_observed_arrivals <- function(aircrafts_observed_arrivals) {
 process_aircrafts_observed_arrivals <- function(folder_name, 
                                                 airports_reference,
                                                 aircrafts_reference) {
-  files <- map(1:4, 
-              ~ paste0(folder_name, 
-                      "/Q", ., " 2019.xlsx"))
+  files <- map2(.x = rep(1:4, 2),
+                .y = rep(c(" 2019", " 2022"), each = 4),
+                .f = ~ paste0(folder_name, 
+                      "/Q", .x, .y, ".xlsx"))
   
   # bind together files for aircraft arrivals
   aircrafts_observed_arrivals <- map(files,
@@ -141,12 +142,3 @@ process_aircrafts_observed_arrivals <- function(folder_name,
   check_aircrafts_observed_arrivals(aircrafts_observed_arrivals)
   return(aircrafts_observed_arrivals)
 }
-
-get_time_from_numeric <- function(time_numeric_vector) {
-  time_character_vector <- format(as.POSIXct(time_numeric_vector, 
-                                             origin = '1970-01-01'), 
-                                  format = '%H:%M')
-  
-  return(time_character_vector)
-}
-
