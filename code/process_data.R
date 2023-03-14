@@ -70,7 +70,7 @@ process_aircrafts_observed_arrivals <- function(folder_name,
                                                 aircrafts_reference) {
   files <- map(1:4, 
               ~ paste0(folder_name, 
-                      "Q", ., " 2019.xlsx"))
+                      "/Q", ., " 2019.xlsx"))
   
   # bind together files for aircraft arrivals
   aircrafts_observed_arrivals <- map(files,
