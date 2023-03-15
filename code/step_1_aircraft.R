@@ -148,7 +148,7 @@ get_passengers_from_aircrafts <- function(aircrafts,
   
   aircrafts_with_passengers <- aircrafts %>% 
     mutate(n_passengers = get_n_passengers(max_passengers, load_factor_mean, load_factor_sd)) %>% 
-    mutate(coached = get_coached_status(flight_id)) %>% 
+    mutate(coached = if_else(is.na(coached), get_coached_status(flight_id), coached)) %>% 
     get_nationality_split(EU_plus_hubs = tar_read(EU_plus_hubs),
                           other_hubs = tar_read(other_hubs), 
                           prop_nationality = tar_read(nationality_props), 
