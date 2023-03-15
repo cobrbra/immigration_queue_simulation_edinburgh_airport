@@ -42,25 +42,25 @@ list(
   tar_target(airports_raw,
              here("raw_data/airports/GlobalAirportDatabase.txt"),
              format = "file"),
-  tar_target(airports_processed,
+  tar_target(airports,
              process_airports(airports_raw)),
   
   # Making the aircrafts dataset accessible
   tar_target(aircrafts_raw,
              here("raw_data/aircrafts/aircrafts_capacity.txt"),
              format = "file"),
-  tar_target(aircrafts_processed,
+  tar_target(aircrafts,
              process_aircrafts(aircrafts_raw)),
   
   # Making the aircraft arrivals dataset accessible
   tar_target(aircrafts_observed_arrivals_raw,
          here("raw_data/aircrafts_observed_arrivals/"),
          format = "file"),
-  tar_target(aircrafts_observed_arrivals_processed,
+  tar_target(aircrafts_observed_arrivals,
              process_aircrafts_observed_arrivals(
                aircrafts_observed_arrivals_raw,
-               airports_reference = airports_processed,
-               aircrafts_reference = aircrafts_processed)),
+               airports_reference = airports,
+               aircrafts_reference = aircrafts)),
   
   # Simulating passengers getting off aircraft
   tar_target(passengers_from_aircrafts,
@@ -83,7 +83,7 @@ list(
                coached = numeric(),
                taxi_time = numeric(),
                walk_time = numeric())),
-             # get_passengers_from_aircrafts(aircrafts_observed_arrivals_processed)),
+             # get_passengers_from_aircrafts(aircrafts_observed_arrivals)),
   
   # Simulating passengers getting through coach/contact route
   tar_target(passengers_from_route,
@@ -94,24 +94,29 @@ list(
              get_passengers_from_immigration(passengers_from_route)), 
   
   # For passenger count and nationality
-  tar_target(EU_plus_hubs, c("FRA", "AMS", "CDG", "ATL", "ORD", "DFW", "DEN")),
-  tar_target(other_hubs, c("IST", "DBX")),
+  tar_target(EU_plus_hubs_raw, here("params/EU_plus_hubs.txt"), format = "file"),
+  tar_target(EU_plus_hubs, colnames(read_delim(EU_plus_hubs_raw, delim = ","))),
+  
+  tar_target(other_hubs_raw, here("params/other_hubs.txt"), format = "file"),
+  tar_target(other_hubs, colnames(read_delim(other_hubs_raw, delim = ","))),
   
   tar_target(EU_plus_countries_raw,
              here("params/EU_plus_countries.txt"), 
              format = "file"),
   tar_target(EU_plus_countries,
-             colnames(read_delim(EU_plus_countries_raw, delim = ", "))),
+             colnames(read_delim(EU_plus_countries_raw, delim = ","))),
   
   tar_target(UK_plus_countries_raw,
              here("params/UK_plus_countries.txt"), 
              format = "file"),
   tar_target(UK_plus_countries,
-             colnames(read_delim(UK_plus_countries_raw, delim = ", "))),
+             colnames(read_delim(UK_plus_countries_raw, delim = ","))),
   
-  tar_target(nationality_props,
+  tar_target(nationality_props_raw,
              here("params/nationality_proportions.txt"),
              format = "file"),
+  tar_target(nationality_props,
+             read_delim(nationality_props_raw, delim = ";")),
   
   tar_target(load_factor_mean, 0.85),
   tar_target(load_factor_sd, 0.1)
