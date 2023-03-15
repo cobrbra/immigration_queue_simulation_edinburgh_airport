@@ -40,3 +40,6 @@ vignettes/*.pdf
 
 # Raw Data
 raw_data
+
+# Targets meta
+_targets/meta/meta
