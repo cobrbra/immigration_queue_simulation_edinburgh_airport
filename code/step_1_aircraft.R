@@ -85,6 +85,12 @@ get_airport_classification <- function(airport_country,
   return(airport_classification)
 }
 
+get_coached_status <- function(flight_id, prob_coached = .15, seed = NULL) {
+  if (!is.null(seed)) {set.seed(seed)}
+  coached <- as.logical(rbinom(1, length(flight_id), prob = prob_coached))
+  return(coached)
+}
+
 
 get_nationality_split <- function(aircrafts, EU_plus_hubs, other_hubs, prop_nationality, 
                                   UK_plus_countries, EU_plus_countries,
@@ -128,12 +134,6 @@ get_nationality_split <- function(aircrafts, EU_plus_hubs, other_hubs, prop_nati
 }
 
 
-
-
-# prop_nationality <- read.table(file = targets::tar_read(nationality_props), sep = ";", header = TRUE)
-
-
-
 get_passengers_from_aircrafts <- function(aircrafts, 
                                           EU_plus_hubs,
                                           other_hubs,
@@ -148,6 +148,7 @@ get_passengers_from_aircrafts <- function(aircrafts,
   
   aircrafts_with_passengers <- aircrafts %>% 
     mutate(n_passengers = get_n_passengers(max_passengers, load_factor_mean, load_factor_sd)) %>% 
+    mutate(coached = get_coached_status(flight_id)) %>% 
     get_nationality_split(EU_plus_hubs = tar_read(EU_plus_hubs),
                           other_hubs = tar_read(other_hubs), 
                           prop_nationality = tar_read(nationality_props), 
@@ -166,6 +167,7 @@ get_passengers_from_aircrafts <- function(aircrafts,
       select(n_nat_UK_plus, n_nat_EU_plus, n_nat_other_easy, n_nat_other_hard) %>% 
       pivot_longer(cols = everything(), names_to = "nat", values_to = "n_nat") %>% 
       {rep(.$nat, .$n_nat)},
+    airport_classification = rep(aircrafts_with_passengers$airport_classification, n_passengers_aircraft),
     aircraft_arrival = rep(aircrafts_with_passengers$t_actual, n_passengers_aircraft),
     coached = rep(aircrafts_with_passengers$coached, n_passengers_aircraft)
   )
