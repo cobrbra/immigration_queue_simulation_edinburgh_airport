@@ -39,7 +39,7 @@ check_aircrafts_observed_arrivals <- function(aircrafts_observed_arrivals) {
     stop("Aircraft schedule should be dataframe.")
   }
   necessary_columns <- c(
-    "aircraft_id",
+    "flight_id",
     "dep_country",
     "dep_airport",
     "ac_type",
@@ -106,7 +106,7 @@ process_aircrafts_observed_arrivals <- function(folder_name,
                by = c("ac_type" = "long_code"))
   
   aircrafts_observed_arrivals <- aircrafts_observed_arrivals %>% 
-    mutate(aircraft_id = rep(NA, nrow(aircrafts_observed_arrivals)),
+    mutate(flight_id = id,
            dep_country = country,
            dep_airport = iata_code,
            n_passengers = rep(NA, nrow(aircrafts_observed_arrivals)),
@@ -117,7 +117,7 @@ process_aircrafts_observed_arrivals <- function(folder_name,
            n_nat_EU_plus = rep(NA, nrow(aircrafts_observed_arrivals)),
            n_nat_other_easy = rep(NA, nrow(aircrafts_observed_arrivals)),
            n_nat_other_hard = rep(NA, nrow(aircrafts_observed_arrivals))) %>% 
-    select("aircraft_id",
+    select("flight_id",
            "dep_country",
            "dep_airport",
            "ac_type",
