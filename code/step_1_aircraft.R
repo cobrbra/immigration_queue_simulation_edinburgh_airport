@@ -70,15 +70,21 @@ get_n_passengers <- function(max_passengers, load_factor_mean,
 }
 
 
-get_airport_classification <- function(airport_country, airport_3letter, 
-                                       EU_plus_hubs, other_hubs, EU_plus_countries){
+get_airport_classification <- function(airport_country, 
+                                       airport_3letter, 
+                                       EU_plus_hubs, 
+                                       other_hubs, 
+                                       UK_plus_countries,
+                                       EU_plus_countries){
   
-    res <- case_when(airport_3letter %in% EU_plus_hubs ~ "EU_hub",
-                   airport_country %in% EU_plus_countries ~ "EU_nonhub",
-                   airport_3letter %in% other_hubs ~ "other_hub",
-                   TRUE ~ "other_nonhub")
+    airport_classification <- case_when(
+      airport_country %in% UK_plus_countries ~ "UK_plus",
+      airport_3letter %in% EU_plus_hubs ~ "EU_plus_hub",
+      airport_country %in% EU_plus_countries ~ "EU_plus_nonhub",
+      airport_3letter %in% other_hubs ~ "other_hub",
+      TRUE ~ "other_nonhub")
 
-  return(res)
+  return(airport_classification)
 }
 
 
