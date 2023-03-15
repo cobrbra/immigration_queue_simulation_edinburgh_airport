@@ -71,7 +71,7 @@ get_n_passengers <- function(max_passengers, load_factor_mean,
 
 
 get_airport_classification <- function(airport_country, airport_3letter, 
-                                       EU_hubs, other_hubs, EU_countries){
+                                       EU_plus_hubs, other_hubs, EU_plus_countries){
   
     res <- case_when(airport_3letter %in% EU_plus_hubs ~ "EU_hub",
                    airport_country %in% EU_plus_countries ~ "EU_nonhub",
