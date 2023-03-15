@@ -1,4 +1,4 @@
-\documentclass[12pt]{article}
+\documentclass[10pt]{article}
 \textwidth 16.5cm
 \textheight 23.5cm
 \oddsidemargin 0pt
@@ -19,9 +19,9 @@
 \usepackage{hyperref}
 
 % References 
-\usepackage{natbib}
+\usepackage[numbers]{natbib}
 \bibliographystyle{natbib}
-\setcitestyle{authoryear, open={(},close={)}}
+% \setcitestyle{authoryear, open={(},close={)}}
 
 % Inline comments from Jacob and Bella
 \usepackage{xcolor}
@@ -38,77 +38,153 @@
 \maketitle
 
 \section{Introduction}
-This document contains the results of Jacob and Bella's project to submit to the modelling competition. It should be ten pages or fewer.
+
+A large number of passengers arriving in Edinburgh Airport need to pass through immigration. This is either conducted at a \textit{desk} staffed with a Border Force Officer or at an automated \textit{eGate}. This does not apply for anyone arriving from the United Kingdom (including Northern Ireland), the Crown Dependencies, and the Republic of Ireland, as there are no routine passport controls between these countries \cite{common_travel_area}.
+
+Only passengers of certain nationality are eligible to use the eGates, as defined below. There are currently 9 desks and 10 eGates in operation at Edinburgh Airport. As the operations at Edinburgh Airports are changing and growing it is vital to assess the potential impact on queuing time at the border. 
+
+\subsection{Problem Statement}
+what is the task, summarising the problem, maybe  outline from the document
+
+\subsection{Key Performance Indicators}
+take what they have asked for and give it formal definitions
+\begin{itemize}
+    \item \textbf{Queue length}: Number of people in the queue. We report the mean, median, 75\% quantile, and maximum. These are calculated both for the total of the immigration queue, as well as the desk and eGate queues separately.
+    \item \textbf{Queue time}: Minutes between the arrival at queue and arrival at a desk/eGate. We report the mean, median, 75\% quantile, and maximum. These are calculated both for the total of the immigration queue, as well as the desk and eGate queues separately.
+    \item \textbf{Overflow}: Proportion of the day for which the overflow and contingency capacity are used.
+\end{itemize}
 
 
-% At present, we show some results derived from \texttt{R}'s \texttt{mtcars} dataset, to show how a coding and writing workflow integrating with GitHub, RStudio, and Zotero might work.
+\section{Data}
+This section outlines the data used for our analysis. It contains descriptions of both the data provided through the Modelling Competition and additional data we deemed relevant for this project.
 
-% On top of these, I've added some example headings for how a simulation project might look.
+\subsection{Provided Information}
 
-\subsection{Problem statement}
-\subsection{Key performance indicators}
-\subsection{Approaches to queueing problems and simulation}
+We first outline some of the data received through the Modelling Competition. While these represent realistic values, we are aware that they may contain approximations and/or simulated data. Most notably, the arrivals data in Section~\ref{XX} is a fictitious arrivals schedule for five weeks in the future, in namely 2023 to 2027. 
+
+\subsubsection{Operational Data}
+
+\paragraph{Hall Capacity}
+The immigration hall at Edinburgh Airport has a \textit{capacity} of $500$ people. Its \textit{overflow} capacity, which can be used without overly impacting other areas of the operation, is a further $150$ people. There is also a \textit{contingency} capacity for additional $600$ people. However, its usage negatively impacts the operations of the airport.
+
+\paragraph{Coached and Contact}
+Once the aircraft has reached its parking position there are two ways for passengers to reach the terminal building. \textit{Contact} passengers walk by foot to the immigration queue. \textit{Coached} passengers exit the aircraft via stairs and are then loaded onto busses, which bring them to the terminal building. The percentage of contact passengers lies above 80\% and varies across years.
+
+\paragraph{eGates Eligibility for EUplus}
+Passengers of the following nationalities are allowed to use the eGates: EU countries, Australia, Canada, Iceland, Japan, Liechtenstein, New Zealand, Norway, Singapore, South Korea, Switzerland, and the USA. In the following we refer to these countries as \textit{EUplus}. 
+
+\paragraph{Early and Delayed Flights}
+In the summer of 2019 only 58\% of flights arrived on time (measured if arrived within 15 minutes of scheduled arrival), 21\& were late, and 21\% were early. 
+
+\subsubsection{Arrivals Data}
+As part of the competition we have received fictitious arrival data for five weeks (each Monday to Sunday) in the future. They are outlined in Table~\ref{tab_comdat_overview}.
+
+\begin{table}[]
+\caption{Fictitious data sets provided by the modelling competition.}
+\label{tab_comdat_overview}
+\centering
+\begin{tabular}{ccccc}
+\hline
+\multicolumn{1}{c}{\textbf{Data Set}} & \textbf{Year} & \textbf{Start Date} & \textbf{End Date} & \textbf{Number of Flights} \\ \hline
+1  & 2023  & 10/07  & 16/07     & 665   \\
+2  & 2024  & 08/07  & 14/07     & 768   \\
+3  & 2025  & 14/07  & 20/07     & 843   \\
+4  & 2026  & 13/07  & 19/07     & 894   \\
+5  & 2027  & 12/07  & 18/07     & 953   \\ \hline
+\end{tabular}
+\end{table}
 
 
-\section{Methods}
+Describe the 5x7 days they have given us, including some pretty plots \\
+stress that this is simulated data (and it also lies in the future) \\
+no info if flights are all non-UKIE
 
-% \subsection{Example methods: \texttt{mtcars}}
-% The \texttt{mtcars} dataset contains 32 observations of 11 variables. Each of the 32 rows corresponds to a model of car, and the variables contain information about the miles per gallon (mpg) of the model, alongside other features including number of cylinders (cyl), horsepower (hp) and highest gear. We'll pretend our aim is to predict miles per gallon on the basis of the other quantities.
 
-% We'll also pretend that we're only interested in doing this prediction for car models with an mpg less than 20. The only reason to do this is so that later on we can demo how the proposed workflow for data processing $\rightarrow$ modelling $\rightarrow$ results operates by changing it later. With this restriction in mind, the 18 observations that remain in our dataset are given in Table~\ref{tab:mtcars_full}.
+\subsection{Additional Information}
 
-% \input{tables/mtcars_full.tex}
 
-% We take two modelling strategies, both based on linear models. Firstly, we model mpg as a function of number of cylinders alone, and then as a function of all other input covariates.
+\subsubsection{Operational Data}
 
-\subsection{Data sources}
-\subsubsection{Passenger arrivals schedule}
-\subsubsection{External flight schedule data}
-\jbnote{Could come from e.g. flight radar?}
-\subsection{Model specification}
-We divide the flow of passengers through Edinburgh Airport into four stages:
+\paragraph{Aircraft Capacity and Load Factor}
+We obtained a data set indicating the maximum number of passengers for each aircraft type \cite{aircraft_capacity}. The average percentage of occupied seat for a given flight ranges from 86\% in 2019 for international flights in the UK \cite{loading_factor_national} to self-reporter 91\% for a budget airline in 2022 \cite{loading_factor_ryanair}. This is called the \textit{load factor}.
+
+\paragraph{Airport Classification}
+We assume that the split in passenger nationality depends on the departing airport. We therefore group airports into the following categories: 
+\begin{itemize}
+    \item \textbf{UKIE}: All airports in the United Kingdom (including Northern Ireland), the Crown Dependencies, and the Republic of Ireland.
+    \item \textbf{EUplus hubs}: Hub airports in EUplus. These are XXXXXXX \cite{mega_hubs}.
+    \item \textbf{EUplus non-hubs}: Airports, which are not hubs, located in EUplus.
+    \item \textbf{Other hubs}: Hub airports outside of EUplus. These are XXXXXXX \cite{mega_hubs}.
+    \item \textbf{Other non-hubs}: Airports, which are not hubs, located outside of EUplus.
+\end{itemize}
+
+\paragraph{eGate Utilisation}
+The UK government's target of eGate usage among those eligible is at 80\%, which was broadly met on a national level in 2019 and the first quarter of 2020. For airports in the North the uptake was consistently lower at around 70\% for the same period \cite{Inspection_eGates}. While there were no publicly available numbers for Edinburgh Airport, Glasgow Airport's uptake of around 60\% can serve as a reference due to proximity, as well as a lower limit, as it reports some of the lowest utilisation of eGates nationwide \cite{Inspection_eGates}. 
+
+
+\subsubsection{Arrivals Data}
+talk about our fancy arrivals data set we have from 2019 and 2022 \\
+here quite a few plots might be needed 
+
+
+\section{Passenger Processing Model}
+
+Describe the overview of our approach using three steps for a given set of arrivals (provided, real, simulated):
 
 \begin{enumerate}
     \item Aircraft arrive at Edinburgh airport. \label{step:aircraft}
-    \item Passengers are transported from their aircraft to the arrivals hall, either by coach or by contact. \label{step:transport}
-    \item Passengers arrive at the queue for passport control. \label{step:arrival}
-    \item Passengers queue and are processed by passport control. \label{step:queue}
+    \item Passengers are transported from their aircraft to the arrivals hall, either by coach or by contact. \label{step:route}
+    \item Passengers queue and are processed by passport control. \label{step:immigration}
 \end{enumerate}
-In Step~\ref{step:aircraft}, ...
-\subsection{Approximate Bayesian computation}
 
-\section{Results}
+\subsection{Step 1: Aircraft with Passenger on Board Arrives}
+We get arrivals from the aircraft  \\
+Which passengers are on board, nationality split depending on simulation airport
 
-% \subsection{Example results: \texttt{mtcars}}
-% Firstly, we show a negative association between number of cylinders and miles per gallon (Figure~\ref{fig:mt_cars_summary}). We then fitted a linear model for mpg based on all other available covariates (see Table~\ref{tab:mtcars_full}), and show predicted vs actual values of mpg in Figure~\ref{fig:mtcars_model}.
-% \begin{figure}[htbp]
-%     \centering
-%     \includegraphics[width=4in]{figures/mt_cars_summary.png}
-%     \caption{Miles per gallon versus number of cylinders.}
-%     \label{fig:mt_cars_summary}
-% \end{figure}
+\subsection{Step 2: Transport Passengers from Aircraft to Immigration}
+Different for coached and contact
 
-% \begin{figure}[htbp]
-%     \centering
-%     \includegraphics[width=4in]{figures/mpg_model_actual_vs_predicted.png}
-%     \caption{Example figure generated from a model of mtcars data.}
-%     \label{fig:mtcars_model}
-% \end{figure}
+\subsection{Step 3: Immigration at Border}
+from arrival at the hall door, queueing, and through the immigration (desk or eGate)
 
-\subsection{Simulating different eGate scenarios}
 
-\subsection{Distributions of key performance indicators}
 
-\subsubsection{Queue length}
-\subsubsection{Queue time}
-\subsubsection{Hall overflow}
- 
+\section{Simulation Analysis for Provided Data}
 
-\subsection{Recommendation for total number of eGates}
+\subsection{Methodology}
+We explain how we simulate the airports they came from \\
+describe any other simulation input needed, maybe different scenarios \\ 
+be clear that this is (almost) just what they asked for  \\ Assumption: provided flights are all/mostly non-UKIE (compare to Noise data set)
 
-\subsection{Robustness considerations}
+\subsection{Results}
+include KPIs here, as well as some fancy plots
+
+
+\section{Simulation Analysis for Additional Data}
+
+\subsection{Methodology}
+we take real days and simulate worse (but realistic) days and do the analysis again
+
+\subsection{Results}
+include KPIs here, as well as some fancy plots
+
+
+\section{Robustness Considerations}
+relate to service level agreement \\
+talk about working eGates/break down of eGates  \\
 
 \section{Discussion}
-\section{Conclusion}
-% \bibliography{references.bib}
+summary of the project and our approach
+
+
+\subsection{Recommendation for Total Number of eGates}
+we need to put our foot down and come up with a final number
+
+\subsection{Future Work}
+all the assumptions we made \\
+to include limitations \\
+include edge cases, such as all gates closed for high risk flights (see Government doc on eGates) 
+
+\bibliography{report/references.bib}
+
 \end{document}
