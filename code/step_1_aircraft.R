@@ -21,37 +21,6 @@ check_passengers_from_aircraft <- function(passengers_from_aircraft) {
 }
 
 
-
-# get_taxi_time <- function(coached, seed = NULL){
-#   
-#   if (!is.null(seed)) {set.seed(seed)}
-#   
-#   n_aircrafts <- length(coached)
-#   taxi_time <- numeric(n_aircrafts)
-#   coached_taxi_time <- pmax(20, rnorm(n_aircrafts, mean = 300, sd = 120))
-#   contact_taxi_time <- pmax(20, rnorm(n_aircrafts, mean = 500, sd = 240))
-#   taxi_time <- if_else(coached, coached_taxi_time, contact_taxi_time)
-#   
-#   return(taxi_time)
-#   
-# }
-# 
-# get_walk_time <- function(coached, seed = NULL){
-#   # generates minimum walk time
-#   
-#   if (!is.null(seed)) {set.seed(seed)}
-#   
-#   n_aircrafts <- length(coached)
-#   walk_time <- numeric(n_aircrafts)
-#   coached_walk_time <- runif(n_aircrafts, min = 600, max = 900)
-#   contact_walk_time <- pmax(180, rpois(n = n_aircrafts, lambda = 300))
-#   walk_time = if_else(coached, coached_walk_time, contact_walk_time)
-#   
-#   return(walk_time)
-#   
-# }
-
-
 get_n_passengers <- function(max_passengers, load_factor_mean, 
                              load_factor_sd, seed = NULL){
   
