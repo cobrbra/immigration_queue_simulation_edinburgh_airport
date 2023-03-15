@@ -91,7 +91,8 @@ process_aircrafts_observed_arrivals <- function(folder_name,
   
   # bind together with airports data
   aircrafts_observed_arrivals <- aircrafts_observed_arrivals %>% 
-    inner_join(airports_reference, by = c("dep_af" = "icao_code"))
+    inner_join(airports_reference, by = c("dep_af" = "icao_code")) %>% 
+    mutate(country = if_else(country == "ENGALND", "ENGLAND", country))
   
   # bind together with aircraft data
   aircrafts_observed_arrivals <- aircrafts_observed_arrivals %>% 

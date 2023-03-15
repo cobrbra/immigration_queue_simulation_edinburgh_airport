@@ -97,6 +97,18 @@ list(
   tar_target(EU_plus_hubs, c("FRA", "AMS", "CDG", "ATL", "ORD", "DFW", "DEN")),
   tar_target(other_hubs, c("IST", "DBX")),
   
+  tar_target(EU_plus_countries_raw,
+             here("params/EU_plus_countries.txt"), 
+             format = "file"),
+  tar_target(EU_plus_countries,
+             colnames(read_delim(EU_plus_countries_raw, delim = ", "))),
+  
+  tar_target(UK_plus_countries_raw,
+             here("params/UK_plus_countries.txt"), 
+             format = "file"),
+  tar_target(UK_plus_countries,
+             colnames(read_delim(UK_plus_countries_raw, delim = ", "))),
+  
   tar_target(nationality_props,
              here("params/nationality_proportions.txt"),
              format = "file"),
