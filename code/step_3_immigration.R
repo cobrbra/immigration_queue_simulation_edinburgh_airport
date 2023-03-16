@@ -140,7 +140,7 @@ immigration_queue <- function(passengers,
     
   }
   
-  # at this point the queue passengers are processed
+  # at this point the egate passengers are processed
   
   # now deal with the failed passengers
   passengers_failed <- passengers_egate[passengers_egate$egate_failed == "failed", ]
@@ -185,10 +185,10 @@ immigration_queue <- function(passengers,
     
     next_arrival_time <- min(next_desk_arrival_time, next_failed_arrival_time)
     
-    # if a check is idle, update their time
+    # if a desk is idle, update their time
     bordercheck_times <- pmax(bordercheck_times, next_arrival_time)
     
-    # decide which check to send the passenger to
+    # decide which desk to send the passenger to
     next_free_bordercheck <- which(bordercheck_times == min(bordercheck_times))[1] 
     next_free_bordercheck_time <- min(bordercheck_times)
     
@@ -199,7 +199,7 @@ immigration_queue <- function(passengers,
       # no failed passengers yet
       next_passenger <- "desk"
     } else if(next_desk_arrival_time > next_free_bordercheck_time){
-      # no failled passengers yet
+      # no desk passengers yet
       next_passenger <- "failed"
     } else if(is.infinite(next_failed_arrival_time)){
       # all failed already processed
@@ -240,7 +240,7 @@ immigration_queue <- function(passengers,
     }
     
        
-    # update check 
+    # update desks 
     bordercheck_times[next_free_bordercheck] <- bordercheck_times[next_free_bordercheck] + handling_time
     
     
@@ -256,7 +256,8 @@ immigration_queue <- function(passengers,
   passengers_failed$bordercheck_egate_end_time <- NULL
   
   passengers <- rbind(passengers_egate[passengers_egate$egate_failed = "passed", ], 
-                      passengers_desk, passengers_failed)
+                      passengers_desk, 
+                      passengers_failed)
   passengers <- passengers[order(passengers$bordercheck_end_time), ]
   
   
