@@ -63,35 +63,26 @@ list(
                aircrafts_reference = aircrafts)),
   
   # Simulating passengers getting off aircraft
-  tar_target(passengers_from_aircrafts,
-             data.frame(
-               aircraft_id = numeric(),
-               dep_country = numeric(),
-               dep_airport = numeric(),
-               ac_type = numeric(),
-               t_sched = numeric(),
-               t_actual = numeric(),
-               sched_arrival_datetim = numeric(),
-               actual_arrival_datetime = numeric(),
-               sched_arrival_date = numeric(),
-               actual_arrival_date = numeric(),
-               sched_arrival_time = numeric(),
-               actual_arrival_time = numeric(),
-               des_rwy = numeric(),
-               max_passengers = numeric(),
-               n_passengers = numeric(),
-               coached = numeric(),
-               taxi_time = numeric(),
-               walk_time = numeric())),
-             # get_passengers_from_aircrafts(aircrafts_observed_arrivals)),
-  
+  tar_target(example_aircraft_arrivals,
+             simulate_aircrafts(seed = 2)),
+  tar_target(example_passenger_arrivals,
+             get_passengers_after_aircrafts(
+               aircrafts = example_aircraft_arrivals,
+               EU_plus_hubs = EU_plus_hubs,
+               other_hubs = other_hubs,
+               prop_nationality = nationality_props,
+               UK_plus_countries = UK_plus_countries,
+               EU_plus_countries = EU_plus_countries,
+               load_factor_mean = load_factor_mean,
+               load_factor_sd = load_factor_sd)),
+
   # Simulating passengers getting through coach/contact route
-  tar_target(passengers_from_route,
-             get_passengers_from_route(passengers_from_aircrafts)),
+  tar_target(example_passengers_after_route,
+             get_passengers_after_route(example_passenger_arrivals)),
 
   # Simulating passengers getting through immigration
-  tar_target(passengers_from_immigration,
-             get_passengers_from_immigration(passengers_from_route)), 
+  tar_target(passengers_after_immigration,
+             get_passengers_after_immigration(passengers_after_route)), 
   
   # For passenger count and nationality
   tar_target(EU_plus_hubs_raw, here("params/nationality_info/EU_plus_hubs.txt"), format = "file"),

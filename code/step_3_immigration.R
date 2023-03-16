@@ -1,25 +1,32 @@
-check_passengers_from_immigration <- function(passengers_from_immigration) {
-  if (!is.data.frame(passengers_from_immigration)) {
+check_passengers_after_immigration <- function(passengers_after_immigration) {
+  if (!is.data.frame(passengers_after_immigration)) {
     stop("Passengers from immigration should be dataframe.")
   }
   necessary_columns <- c(
     "passenger_id",
-    "aircraft_id",
+    "flight_id",
     "nationality",
-    "aircraft_arrival",
-    "arrival_at_hall",
-    "arrival_at_queue",
-    "arrival_from_immigration",
-    "queue_length",
-    "e_gate"
+    "airport_classification",
+    "route_datetime_int",
+    "route_time_int",
+    "route_datetime_posix",
+    "route_date_posix",
+    "immigration_datetime_int",
+    "immigration_time_int",
+    "immigration_datetime_posix",
+    "immigration_date_posix",
+    "queue_time",
+    "egate_eligible",
+    "egate_used",
+    "egate_failed"
   )
-  if (any(!(necessary_columns %in% colnames(passengers_from_immigration)))) {
+  if (any(!(necessary_columns %in% colnames(passengers_after_immigration)))) {
     stop(
       paste(c("Passengers from immigration should contain columns", necessary_columns), 
             collapse = " "))
   }
   
-  if (length(passengers_from_immigration$passenger_id) != length(unique(passengers_from_immigration$passenger_id))) {
+  if (length(passengers_after_immigration$passenger_id) != length(unique(passengers_after_immigration$passenger_id))) {
     stop("Passenger IDs are not unique.")
   }
   
@@ -79,18 +86,18 @@ immigration_queue <- function(passengers,
   
 }
 
-get_passengers_from_immigration <- function(passengers_from_route) {
-  passengers_from_immigration <- data.frame(
+get_passengers_after_immigration <- function(passengers_after_route) {
+  passengers_after_immigration <- data.frame(
     passenger_id = character(),
     aircraft_id = character(),
     nationality = character(),
     aircraft_arrival = character(),
     arrival_at_hall = character(),
     arrival_at_queue = character(),
-    arrival_from_immigration = character(),
+    arrival_after_immigration = character(),
     queue_length = numeric(),
     e_gate = numeric()
   )
-  check_passengers_from_immigration(passengers_from_immigration)
-  return(passengers_from_immigration)
+  check_passengers_after_immigration(passengers_after_immigration)
+  return(passengers_after_immigration)
 }

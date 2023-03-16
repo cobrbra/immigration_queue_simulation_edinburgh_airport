@@ -1,23 +1,55 @@
-check_passengers_from_aircraft <- function(passengers_from_aircraft) {
-  if (!is.data.frame(passengers_from_aircraft)) {
+check_passengers_after_aircraft <- function(passengers_after_aircraft) {
+  if (!is.data.frame(passengers_after_aircraft)) {
     stop("Passengers from aircraft should be dataframe.")
   }
   necessary_columns <- c(
     "passenger_id",
     "flight_id",
     "nationality",
+    "airport_classification",
     "coached",
-    "aircraft_arrival"
-  )
-  if (any(!(necessary_columns %in% colnames(passengers_from_aircraft)))) {
+    "aircraft_datetime_int",
+    "aircraft_time_int",
+    "aircraft_datetime_posix",
+    "aircrafts_date_posix"
+)
+  if (any(!(necessary_columns %in% colnames(passengers_after_aircraft)))) {
     stop(
       paste(c("Passengers from aircraft should contain columns", necessary_columns), 
             collapse = " "))
   }
   
-  if (length(passengers_from_aircraft$passenger_id) != length(unique(passengers_from_aircraft$passenger_id))) {
+  if (length(passengers_after_aircraft$passenger_id) != length(unique(passengers_after_aircraft$passenger_id))) {
     stop("Passenger IDs are not unique.")
   }
+}
+
+simulate_aircrafts <- function(n_aircrafts = 5, seed = NULL) {
+  if (!is.null(seed)) {set.seed(seed)}
+  
+  aircrafts <- data.frame(
+    flight_id = paste0("F", str_pad(1:n_aircrafts, 10, pad = "0")),
+    dep_country = c("UK", rep("NETHERLANDS", n_aircrafts - 1)),
+    dep_airport = c("LGW", rep("AMS", n_aircrafts - 1)),
+    ac_type = "A320",
+    des_rwy = 1,
+    t_sched = cumsum(rexp(n = n_aircrafts, rate = 1e-4)),
+    max_passengers = 150,
+    n_passengers = round(runif(n_aircrafts, 100, 150)),
+    coached = sample(c(TRUE, FALSE), size = n_aircrafts, replace = TRUE)
+  ) %>% mutate(
+    t_actual = t_sched + rexp(n = n_aircrafts, rate = 5e-4)
+  ) %>% mutate(
+    sched_arrival_datetime = as.POSIXct(t_sched, origin = '2019-03-10 00:00:00'),
+    actual_arrival_datetime = as.POSIXct(t_actual, origin = '2019-03-10 00:00:00'),
+    sched_arrival_time = t_sched,
+    actual_arrival_time = t_actual,
+  ) %>% mutate(
+    sched_arrival_date = as.Date(sched_arrival_datetime),
+    actual_arrival_date = as.Date(actual_arrival_datetime)
+  ) 
+  
+  return(aircrafts)
 }
 
 
@@ -103,7 +135,7 @@ get_nationality_split <- function(aircrafts, EU_plus_hubs, other_hubs, prop_nati
 }
 
 
-get_passengers_from_aircrafts <- function(aircrafts, 
+get_passengers_after_aircrafts <- function(aircrafts, 
                                           EU_plus_hubs,
                                           other_hubs,
                                           prop_nationality,
@@ -141,6 +173,6 @@ get_passengers_from_aircrafts <- function(aircrafts,
     coached = rep(aircrafts_with_passengers$coached, n_passengers_aircraft)
   )
   
-  check_passengers_from_aircraft(passengers)
+  check_passengers_after_aircraft(passengers)
   return(passengers)
 }

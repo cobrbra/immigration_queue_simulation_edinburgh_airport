@@ -43,20 +43,18 @@ check_aircrafts_observed_arrivals <- function(aircrafts_observed_arrivals) {
     "dep_country",
     "dep_airport",
     "ac_type",
-    "t_sched",
-    "t_actual",
-    "sched_arrival_datetime",
-    "actual_arrival_datetime",
-    "sched_arrival_date",
-    "actual_arrival_date",
-    "sched_arrival_time",
-    "actual_arrival_time",
+    "aircraft_datetime_int",
+    "aircraft_time_int",
+    "aircraft_datetime_posix",
+    "aircraft_date_posix",
+    "sched_aircraft_datetime_int",
+    "sched_aircraft_time_int",
+    "sched_aircraft_datetime_posix",
+    "sched_aircraft_date_posix",
     "des_rwy",
     "max_passengers",
     "n_passengers",
-    "coached",
-    "taxi_time",
-    "walk_time"
+    "coached"
   )
   if (any(!(necessary_columns %in% colnames(aircrafts_observed_arrivals)))) {
     stop(
