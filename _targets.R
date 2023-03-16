@@ -62,19 +62,19 @@ list(
                airports_reference = airports,
                aircrafts_reference = aircrafts)),
   
-  # Simulate passengers from observed arrivals
-  tar_target(observed_aircrafts_passengers_from_aircrafts,
-             get_passengers_after_aircrafts(
-               aircrafts = aircrafts_observed_arrivals,
-               EU_plus_hubs = EU_plus_hubs,
-               other_hubs = other_hubs,
-               prop_nationality = prop_nationality,
-               UK_plus_countries = UK_plus_countries,
-               EU_plus_countries = EU_plus_countries,
-               load_factor_mean = load_factor_mean,
-               load_factor_sd = load_factor_sd)),
-    tar_target(observed_aircrafts_passengers_after_route,
-             get_passengers_after_route(observed_aircrafts_passengers_from_aircrafts)),
+  # # Simulate passengers from observed arrivals
+  # tar_target(observed_aircrafts_passengers_from_aircrafts,
+  #            get_passengers_after_aircrafts(
+  #              aircrafts = aircrafts_observed_arrivals,
+  #              EU_plus_hubs = EU_plus_hubs,
+  #              other_hubs = other_hubs,
+  #              prop_nationality = prop_nationality,
+  #              UK_plus_countries = UK_plus_countries,
+  #              EU_plus_countries = EU_plus_countries,
+  #              load_factor_mean = load_factor_mean,
+  #              load_factor_sd = load_factor_sd)),
+  #   tar_target(observed_aircrafts_passengers_after_route,
+  #            get_passengers_after_route(observed_aircrafts_passengers_from_aircrafts)),
   
   # Simulating passengers from simulated arrivals
   tar_target(example_aircraft_arrivals,
