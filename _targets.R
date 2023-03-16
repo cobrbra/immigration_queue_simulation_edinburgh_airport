@@ -78,7 +78,7 @@ list(
   
   # Simulating passengers from simulated arrivals
   tar_target(example_aircraft_arrivals,
-             simulate_aircrafts_arrivals(seed = 2)),
+             simulate_aircrafts_arrivals(seed = 8)),
   tar_target(example_passenger_arrivals,
              get_passengers_after_aircrafts(
                aircrafts = example_aircraft_arrivals,
