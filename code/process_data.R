@@ -73,12 +73,12 @@ simulate_aircrafts_arrivals <- function(n_aircrafts = 5, seed = NULL) {
     dep_airport = c("LGW", rep("AMS", n_aircrafts - 1)),
     ac_type = "A320",
     des_rwy = 1,
-    sched_aircraft_datetime_int = 800000 + cumsum(rexp(n = n_aircrafts, rate = 1e-4)),
+    sched_aircraft_datetime_int = 800000 + cumsum(rexp(n = n_aircrafts, rate = 1e-3)),
     max_passengers = 150,
     n_passengers = round(runif(n_aircrafts, 100, 150)),
     coached = sample(c(TRUE, FALSE), size = n_aircrafts, replace = TRUE)
   ) %>% mutate(
-    aircraft_datetime_int = sched_aircraft_datetime_int + rexp(n = n_aircrafts, rate = 5e-4)
+    aircraft_datetime_int = sched_aircraft_datetime_int + rexp(n = n_aircrafts, rate = 5e-3)
   ) %>% mutate(
     sched_aircraft_datetime_posix = as.POSIXct(sched_aircraft_datetime_int, origin = '1970-01-01 00:00:00'),
     aircraft_datetime_posix = as.POSIXct(aircraft_datetime_int, origin = '1970-01-01 00:00:00')
