@@ -94,31 +94,31 @@ list(
              get_passengers_from_immigration(passengers_from_route)), 
   
   # For passenger count and nationality
-  tar_target(EU_plus_hubs_raw, here("params/EU_plus_hubs.txt"), format = "file"),
+  tar_target(EU_plus_hubs_raw, here("params/nationality_info/EU_plus_hubs.txt"), format = "file"),
   tar_target(EU_plus_hubs, colnames(read_delim(EU_plus_hubs_raw, delim = ","))),
   
-  tar_target(other_hubs_raw, here("params/other_hubs.txt"), format = "file"),
+  tar_target(other_hubs_raw, here("params/nationality_info/other_hubs.txt"), format = "file"),
   tar_target(other_hubs, colnames(read_delim(other_hubs_raw, delim = ","))),
   
   tar_target(EU_plus_countries_raw,
-             here("params/EU_plus_countries.txt"), 
+             here("params/nationality_info/EU_plus_countries.txt"), 
              format = "file"),
   tar_target(EU_plus_countries,
              colnames(read_delim(EU_plus_countries_raw, delim = ","))),
   
   tar_target(UK_plus_countries_raw,
-             here("params/UK_plus_countries.txt"), 
+             here("params/nationality_info/UK_plus_countries.txt"), 
              format = "file"),
   tar_target(UK_plus_countries,
              colnames(read_delim(UK_plus_countries_raw, delim = ","))),
   
   tar_target(nationality_props_raw,
-             here("params/nationality_proportions.txt"),
+             here("params/nationality_info/nationality_proportions.txt"),
              format = "file"),
   tar_target(nationality_props,
              read_delim(nationality_props_raw, delim = ";")),
   
-  tar_target(load_factor_mean, 0.85),
+  tar_target(load_factor_mean, 0.95),
   tar_target(load_factor_sd, 0.1)
   
   
