@@ -31,7 +31,7 @@
 \FXRegisterAuthor{bd}{abd}{\color{red} BD}
 
 \title{Simulations of Immigration Queues at Edinburgh Airport: Report}
- \author{Isabella Deustch, Jacob R. Bradley
+ \author{Isabella Deutsch, Jacob R. Bradley
  \\ \emph{School of Mathematics, University of Edinburgh}}
 
 \begin{document}
@@ -47,12 +47,16 @@ Only passengers of certain nationality are eligible to use the eGates, as define
 what is the task, summarising the problem, maybe  outline from the document
 
 \subsection{Key Performance Indicators}
-take what they have asked for and give it formal definitions
+
+Three key performance indicators were identified in the competition brief. We define them as follows.
+
 \begin{itemize}
-    \item \textbf{Queue length}: Number of people in the queue. We report the mean, median, 75\% quantile, and maximum. These are calculated both for the total of the immigration queue, as well as the desk and eGate queues separately.
-    \item \textbf{Queue time}: Minutes between the arrival at queue and arrival at a desk/eGate. We report the mean, median, 75\% quantile, and maximum. These are calculated both for the total of the immigration queue, as well as the desk and eGate queues separately.
+    \item \textbf{Queue length}: Number of people in the queue at any given point in time. We report the mean, median, 75\% quantile, and maximum. These are calculated both for the total of the immigration queue, as well as the desk and eGate queues separately.
+    \item \textbf{Queue time}: Minutes between the arrival at queue and arrival at a desk/eGate for each arriving passenger. We report the mean, median, 75\% quantile, and maximum. These are calculated both for the total of the immigration queue, as well as the desk and eGate queues separately.
     \item \textbf{Overflow}: Proportion of the day for which the overflow and contingency capacity are used.
 \end{itemize}
+
+Note that \textit{Queue length} is measured as a function over time, i.e. we record the queue length every second, even if no passengers are arriving. Based on this granular data we then compute average and maxima statistics. The \textit{queue time}, however, is measured for each arriving passenger.
 
 
 \section{Data}
@@ -74,30 +78,29 @@ Once the aircraft has reached its parking position there are two ways for passen
 Passengers of the following nationalities are allowed to use the eGates: EU countries, Australia, Canada, Iceland, Japan, Liechtenstein, New Zealand, Norway, Singapore, South Korea, Switzerland, and the USA. In the following we refer to these countries as \textit{EUplus}. 
 
 \paragraph{Early and Delayed Flights}
-In the summer of 2019 only 58\% of flights arrived on time (measured if arrived within 15 minutes of scheduled arrival), 21\& were late, and 21\% were early. 
+In the summer of 2019 only 58\% of flights arrived on time (measured if arrived within 15 minutes of scheduled arrival), 21\% were late, and 21\% were early. 
 
 \subsubsection{Arrivals Data}
-As part of the competition we have received fictitious arrival data for five weeks (each Monday to Sunday) in the future. They are outlined in Table~\ref{tab_comdat_overview}.
+As part of the competition we have received fictitious scheduled arrival data for five weeks (each Monday to Sunday) in the future, containg a total of $4,123$ flights. They are outlined in Table~\ref{tab_comdat_overview}.
 
-\begin{table}[]
+
+\begin{table}[!ht]
 \caption{Fictitious data sets provided by the modelling competition.}
 \label{tab_comdat_overview}
 \centering
 \begin{tabular}{ccccc}
 \hline
 \multicolumn{1}{c}{\textbf{Data Set}} & \textbf{Year} & \textbf{Start Date} & \textbf{End Date} & \textbf{Number of Flights} \\ \hline
-1  & 2023  & 10/07  & 16/07     & 665   \\
-2  & 2024  & 08/07  & 14/07     & 768   \\
-3  & 2025  & 14/07  & 20/07     & 843   \\
-4  & 2026  & 13/07  & 19/07     & 894   \\
-5  & 2027  & 12/07  & 18/07     & 953   \\ \hline
+1  & 2023  & 10/07  & 16/07     & $665$   \\
+2  & 2024  & 08/07  & 14/07     & $768$   \\
+3  & 2025  & 14/07  & 20/07     & $843$   \\
+4  & 2026  & 13/07  & 19/07     & $894$   \\
+5  & 2027  & 12/07  & 18/07     & $953$   \\ \hline
 \end{tabular}
 \end{table}
 
+As these dates lie, in parts quite far, in the future we can confidently assume that these were simulated for the purpose of this competition. The data sets also include the number of passengers on each flight, but there is no information on their nationalities. In addition, there is also no indication of the departing airport for each flight. This is relevant as only passengers arriving from outside the Common Travel Area need to go through the immigration process \cite{common_travel_area}.
 
-Describe the 5x7 days they have given us, including some pretty plots \\
-stress that this is simulated data (and it also lies in the future) \\
-no info if flights are all non-UKIE
 
 
 \subsection{Additional Information}
@@ -121,32 +124,47 @@ We assume that the split in passenger nationality depends on the departing airpo
 \paragraph{eGate Utilisation}
 The UK government's target of eGate usage among those eligible is at 80\%, which was broadly met on a national level in 2019 and the first quarter of 2020. For airports in the North the uptake was consistently lower at around 70\% for the same period \cite{Inspection_eGates}. While there were no publicly available numbers for Edinburgh Airport, Glasgow Airport's uptake of around 60\% can serve as a reference due to proximity, as well as a lower limit, as it reports some of the lowest utilisation of eGates nationwide \cite{Inspection_eGates}. 
 
+\paragraph{Average Queue Time eGates}
+The average queue time at eGates at UK airports for the financial years 2017-18, 2018-19, 2019-20 and Q1 2020 was six minutes and one second \cite{Inspection_eGates}. Stansted and Luton reported averages just below the three minute mark. Glasgow Airport's average waiting time at the eGates was over $8.5$ minutes. However, their calculation was based a shorter time period (December 2017, January 2018 and February 2019), and may therefore be unrepresentative \cite{Inspection_eGates}.
+
 
 \subsubsection{Arrivals Data}
 talk about our fancy arrivals data set we have from 2019 and 2022 \\
 here quite a few plots might be needed 
 
 
+\begin{table}[!ht]
+\caption{Historic data sets of Edinburgh Airport Arrivals.}
+\label{tab_comdat_overview}
+\centering
+\begin{tabular}{ccccc}
+\hline
+\multicolumn{1}{c}{\textbf{Data Set}} & \textbf{Year} & \textbf{Start Date} & \textbf{End Date} & \textbf{Number of Flights} \\ \hline
+1  & 2019  & 01/01  & 31/12    &  $51,669$  \\
+2  & 2022  & 01/01  & 31/12    &  $31,983$  \\
+ \hline
+\end{tabular}
+\end{table}
+
+
 \section{Passenger Processing Model}
 
-Describe the overview of our approach using three steps for a given set of arrivals (provided, real, simulated):
+For our analysis we are using a passenger processing model. It provides an overview over the steps an arriving passenger experiences at Edinburgh airport. It lies in the nature of such a model that it is a simplified view of the world, but we are confident that the chosen level of abstraction is nevertheless informative of the real-world processes at the airport. The passenger processing model consist of three steps, which are outline in detail in the subsequent sections.
 
+The three steps divide the passenger epxerience as as follows:
 \begin{enumerate}
-    \item Aircraft arrive at Edinburgh airport. \label{step:aircraft}
-    \item Passengers are transported from their aircraft to the arrivals hall, either by coach or by contact. \label{step:route}
-    \item Passengers queue and are processed by passport control. \label{step:immigration}
+    \item \textbf{Aircraft}: Aircraft with passengers on board arrive at Edinburgh Airport. The aircraft taxis to its parking position and the doors are opened. \label{step:aircraft}
+    \item \textbf{Route}: Passengers make their way from their aircraft to the immigration hall, either by walking to the building (contact) or via a bus (coached). \label{step:route}
+    \item \textbf{Immigration}: Passengers queue in the immigration hall and are processed at the boarder, either at a desk by a Border Force Officer or at an automated eGate. \label{step:immigration}
 \end{enumerate}
 
-\subsection{Step 1: Aircraft with Passenger on Board Arrives}
-We get arrivals from the aircraft  \\
-Which passengers are on board, nationality split depending on simulation airport
+ Figure~\ref{PPM_threesteps} visualises the flow of information from a data perspective. We start with a data set of arriving flights and generate a data set of passengers (\textit{Aircraft} step). In the \textit{Route} step these passengers are then brought from the aircraft to the immigration hall. Finally, in the \textit{Immigration} step they queue up and are subsequently processes at the border.
 
-\subsection{Step 2: Transport Passengers from Aircraft to Immigration}
-Different for coached and contact
-
-\subsection{Step 3: Immigration at Border}
-from arrival at the hall door, queueing, and through the immigration (desk or eGate)
-
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=0.7\textwidth]{figures/ThreeSteps.png}
+     \caption{Three steps that make up the passenger processing model. } \label{PPM_threesteps}
+\end{figure}
 
 
 \section{Simulation Analysis for Provided Data}
@@ -172,6 +190,7 @@ include KPIs here, as well as some fancy plots
 \section{Robustness Considerations}
 relate to service level agreement \\
 talk about working eGates/break down of eGates  \\
+what if there are more non-UKIE flights 
 
 \section{Discussion}
 summary of the project and our approach
