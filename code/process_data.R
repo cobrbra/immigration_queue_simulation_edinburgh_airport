@@ -34,7 +34,7 @@ process_aircrafts <- function(file) {
 }
 
 
-check_aircrafts_observed_arrivals <- function(aircrafts_observed_arrivals) {
+check_aircrafts_arrivals <- function(aircrafts_observed_arrivals) {
   if (!is.data.frame(aircrafts_observed_arrivals)) {
     stop("Aircraft schedule should be dataframe.")
   }
@@ -63,7 +63,38 @@ check_aircrafts_observed_arrivals <- function(aircrafts_observed_arrivals) {
   }
 }
 
-process_aircrafts_observed_arrivals <- function(folder_name, 
+
+simulate_aircrafts_arrivals <- function(n_aircrafts = 5, seed = NULL) {
+  if (!is.null(seed)) {set.seed(seed)}
+  
+  aircrafts <- data.frame(
+    flight_id = paste0("F", str_pad(1:n_aircrafts, 10, pad = "0")),
+    dep_country = c("UK", rep("NETHERLANDS", n_aircrafts - 1)),
+    dep_airport = c("LGW", rep("AMS", n_aircrafts - 1)),
+    ac_type = "A320",
+    des_rwy = 1,
+    sched_aircraft_datetime_int = 800000 + cumsum(rexp(n = n_aircrafts, rate = 1e-4)),
+    max_passengers = 150,
+    n_passengers = round(runif(n_aircrafts, 100, 150)),
+    coached = sample(c(TRUE, FALSE), size = n_aircrafts, replace = TRUE)
+  ) %>% mutate(
+    aircraft_datetime_int = sched_aircraft_datetime_int + rexp(n = n_aircrafts, rate = 5e-4)
+  ) %>% mutate(
+    sched_aircraft_datetime_posix = as.POSIXct(sched_aircraft_datetime_int, origin = '1970-01-01 00:00:00'),
+    aircraft_datetime_posix = as.POSIXct(aircraft_datetime_int, origin = '1970-01-01 00:00:00')
+  ) %>% mutate(
+    sched_aircraft_date_posix = as.Date(sched_aircraft_datetime_posix),
+    aircraft_date_posix = as.Date(aircraft_datetime_posix)
+  ) %>% mutate(
+    sched_aircraft_time_int = sched_aircraft_datetime_int - as.numeric(sched_aircraft_date_posix - as.Date('1970-01-01 00:00:00')) * 86400,
+    aircraft_time_int = aircraft_datetime_int - as.numeric(aircraft_date_posix - as.Date('1970-01-01 00:00:00')) * 86400
+  )
+  
+  check_aircrafts_arrivals(aircrafts)
+  return(aircrafts)
+}
+
+process_aircrafts_arrivals <- function(folder_name, 
                                                 airports_reference,
                                                 aircrafts_reference) {
   files <- map2(.x = rep(1:4, 2),
@@ -78,14 +109,14 @@ process_aircrafts_observed_arrivals <- function(folder_name,
     as.data.frame() %>% 
     select(-c(des_time,t)) %>% 
     drop_na() %>% 
-    mutate(sched_arrival_datetime = t_sched,
-           actual_arrival_datetime = t_actual,
-           sched_arrival_date = as.Date(t_sched),
-           actual_arrival_date = as.Date(t_actual),
-           t_sched = as.numeric(t_sched),
-           t_actual = as.numeric(t_actual)) %>% 
-    mutate(sched_arrival_time = t_sched - 86400 * as.numeric(sched_arrival_date),
-           actual_arrival_time = t_actual - 86400 * as.numeric(actual_arrival_date))
+    mutate(sched_aircraft_datetime_posix = t_sched,
+           aircraft_datetime_posix = t_actual,
+           sched_aircraft_date_posix = as.Date(sched_aircraft_datetime_posix),
+           aircraft_date_posix = as.Date(aircraft_datetime_posix),
+           sched_aircraft_datetime_int = as.numeric(t_sched),
+           aircraft_datetime_int = as.numeric(aircraft_datetime_posix)) %>% 
+    mutate(sched_aircraft_time_int = sched_aircraft_datetime_int - 86400 * as.numeric(sched_aircraft_date_posix),
+           aircraft_time_int = aircraft_datetime_int - 86400 * as.numeric(aircraft_date_posix))
   
   # bind together with airports data
   aircrafts_observed_arrivals <- aircrafts_observed_arrivals %>% 
@@ -119,14 +150,14 @@ process_aircrafts_observed_arrivals <- function(folder_name,
            "dep_country",
            "dep_airport",
            "ac_type",
-           "t_sched",
-           "t_actual",
-           "sched_arrival_datetime",
-           "actual_arrival_datetime",
-           "sched_arrival_date",
-           "actual_arrival_date",
-           "sched_arrival_time",
-           "actual_arrival_time",
+           "sched_aircraft_datetime_int",
+           "aircraft_datetime_int",
+           "sched_aircraft_datetime_posix",
+           "aircraft_datetime_posix",
+           "sched_aircraft_date_posix",
+           "aircraft_date_posix",
+           "sched_aircraft_time_int",
+           "aircraft_time_int",
            "des_rwy",
            "max_passengers",
            "n_passengers",
@@ -138,6 +169,6 @@ process_aircrafts_observed_arrivals <- function(folder_name,
            "n_nat_other_easy",
            "n_nat_other_hard")
   
-  check_aircrafts_observed_arrivals(aircrafts_observed_arrivals)
+  check_aircrafts_arrivals(aircrafts_observed_arrivals)
   return(aircrafts_observed_arrivals)
 }

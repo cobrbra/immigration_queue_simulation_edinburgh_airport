@@ -57,32 +57,44 @@ list(
          here("raw_data/aircrafts_observed_arrivals/"),
          format = "file"),
   tar_target(aircrafts_observed_arrivals,
-             process_aircrafts_observed_arrivals(
+             process_aircrafts_arrivals(
                aircrafts_observed_arrivals_raw,
                airports_reference = airports,
                aircrafts_reference = aircrafts)),
   
-  # Simulating passengers getting off aircraft
+  # Simulate passengers from observed arrivals
+  tar_target(observed_aircrafts_passengers_from_aircrafts,
+             get_passengers_after_aircrafts(
+               aircrafts = aircrafts_observed_arrivals,
+               EU_plus_hubs = EU_plus_hubs,
+               other_hubs = other_hubs,
+               prop_nationality = prop_nationality,
+               UK_plus_countries = UK_plus_countries,
+               EU_plus_countries = EU_plus_countries,
+               load_factor_mean = load_factor_mean,
+               load_factor_sd = load_factor_sd)),
+    tar_target(observed_aircrafts_passengers_after_route,
+             get_passengers_after_route(observed_aircrafts_passengers_from_aircrafts)),
+  
+  # Simulating passengers from simulated arrivals
   tar_target(example_aircraft_arrivals,
-             simulate_aircrafts(seed = 2)),
+             simulate_aircrafts_arrivals(seed = 2)),
   tar_target(example_passenger_arrivals,
              get_passengers_after_aircrafts(
                aircrafts = example_aircraft_arrivals,
                EU_plus_hubs = EU_plus_hubs,
                other_hubs = other_hubs,
-               prop_nationality = nationality_props,
+               prop_nationality = prop_nationality,
                UK_plus_countries = UK_plus_countries,
                EU_plus_countries = EU_plus_countries,
                load_factor_mean = load_factor_mean,
                load_factor_sd = load_factor_sd)),
-
-  # Simulating passengers getting through coach/contact route
   tar_target(example_passengers_after_route,
              get_passengers_after_route(example_passenger_arrivals)),
 
   # Simulating passengers getting through immigration
-  tar_target(passengers_after_immigration,
-             get_passengers_after_immigration(passengers_after_route)), 
+  # tar_target(passengers_after_immigration,
+  #            get_passengers_after_immigration(passengers_after_route)), 
   
   # For passenger count and nationality
   tar_target(EU_plus_hubs_raw, here("params/nationality_info/EU_plus_hubs.txt"), format = "file"),
@@ -103,11 +115,11 @@ list(
   tar_target(UK_plus_countries,
              colnames(read_delim(UK_plus_countries_raw, delim = ","))),
   
-  tar_target(nationality_props_raw,
+  tar_target(prop_nationality_raw,
              here("params/nationality_info/nationality_proportions.txt"),
              format = "file"),
-  tar_target(nationality_props,
-             read_delim(nationality_props_raw, delim = ";")),
+  tar_target(prop_nationality,
+             read_delim(prop_nationality_raw, delim = ";")),
   
   tar_target(load_factor_mean, 0.95),
   tar_target(load_factor_sd, 0.1)
