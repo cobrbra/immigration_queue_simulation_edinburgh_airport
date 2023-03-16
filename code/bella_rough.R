@@ -65,15 +65,21 @@ passengers <- data.frame(passenger_id = paste0("P", str_pad(1:N_passenger, 6, pa
                          e_gate = character(N_passenger)) 
 
 
-n_checks <- 6
-handling_rates <- pmax(0.5, rnorm(n_checks, mean = 1, sd = 0.2))
-check_ids <- paste0("CD", str_pad(1:n_checks, 2, pad = "0"))
+n_desks <- 6
+desk_rates <- pmax(30, rnorm(n_desks, mean = 60, sd = 20))
+desk_ids <- paste0("D", str_pad(1:n_desks, 2, pad = "0"))
 
-checks <- list(n_checks = n_checks, 
-              handling_rates = handling_rates,
-              check_ids = check_ids)
+bordercheck_desks <- list(n_borderchecks = n_desks, 
+              bordercheck_rates = desk_rates,
+              bordercheck_ids = desk_ids)
 
+n_egates <- 10
+eGate_rates <- pmax(10, rnorm(n_egates, mean = 30, sd = 10))
+eGate_ids <- paste0("E", str_pad(1:n_egates, 2, pad = "0"))
 
+bordercheck_egates <- list(n_borderchecks = n_egates, 
+                           bordercheck_rates = eGate_rates,
+                           bordercheck_ids = eGate_ids)
 
 # check if passengers passes
 check_passengers_from_immigration(passengers)
