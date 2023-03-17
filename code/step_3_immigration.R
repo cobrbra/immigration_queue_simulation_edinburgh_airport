@@ -145,6 +145,8 @@ immigration_queue <- function(passengers,
   # now deal with the failed passengers
   passengers_failed <- passengers_egate[passengers_egate$egate_failed == "failed", ]
   passengers_failed$bordercheck_egate_end_time <- passengers_failed$bordercheck_end_time
+  passengers_failed <- passengers_failed[order(passengers_failed$bordercheck_end_time), ]
+  
   n_passengers_failed <- dim(passengers_failed)[1]
   
   
