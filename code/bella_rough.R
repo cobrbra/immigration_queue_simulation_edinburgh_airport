@@ -214,4 +214,64 @@ plot(table(dat1$weekend, dat1$nonUKIE), main = "Split per Weekday")
 
 
 
+
+##### Play around with waiting times #####
+
+
+n_desks <- 5
+# desk_rates <- pmax(1/200, rnorm(n_desks, mean = 1/60, sd = 0.01))
+desk_rates <- pmax(40, rnorm(n_desks, mean = 45, sd = 10))
+desk_ids <- paste0("D", str_pad(1:n_desks, 2, pad = "0"))
+
+bordercheck_desks <- list(n_borderchecks = n_desks, 
+                          bordercheck_rates = desk_rates,
+                          bordercheck_ids = desk_ids)
+
+n_egates <- 5
+# eGate_rates <- pmax(1/120, rnorm(n_egates, mean = 1/30, sd = 0.01))
+eGate_rates <- pmax(30, rnorm(n_egates, mean = 25, sd = 5))
+eGate_ids <- paste0("E", str_pad(1:n_egates, 2, pad = "0"))
+
+bordercheck_egates <- list(n_borderchecks = n_egates, 
+                           bordercheck_rates = eGate_rates,
+                           bordercheck_ids = eGate_ids)
+
+passengers_im <- immigration_queue(passengers = passengers, bordercheck_desks = bordercheck_desks, 
+                                   bordercheck_egates = bordercheck_egates, egate_uptake_prop = 0.8, 
+                                   egate_failure_prop = 0.05, egate_failed_passenger_next = 0.75, seed = 4)
+passengers <- passengers_im
+
+
+
+checktimes <- passengers$bordercheck_start_time - passengers$route_time_int
+
+
+plot(y = checktimes, pch = 16, col = ifelse(passengers$egate_used == "egate", "pink", "grey40"), 
+     ylab = "wait time (sec)", x = passengers$route_time_int)
+legend("topleft", pch = 16, col = c("pink", "grey40"), legend = c("eGate", "Desk"))
+
+
+
+
+
+waittimes <- get_wait_times_raw(passengers)
+
+
+get_wait_times_summary(passengers)
+
+
+
+input_times <- seq(from = 800980 , to =  805750, length.out = 500)
+
+
+
+
+ql <- get_queue_length(passengers = passengers, input_times = input_times)
+
+plot(x = ql$input_times, y = ql$desk, type = "l", lwd = 2, col = "grey40", xlab = "time", ylab = "queue length")
+lines(x = ql$input_times, y = ql$egate, type = "l", lwd = 2, col = "pink",)
+legend("topleft", lwd = 2, col = c("pink", "grey40"), legend = c("eGate", "Desk"))
+
+
+
      
