@@ -36,7 +36,8 @@ get_egate_handling_time <- function(borderchecks, bordercheck_id, seed = NULL) {
   
   if (!is.null(seed)) {set.seed(seed)}
   
-  bordercheck_handling_time <- rexp(1, borderchecks$bordercheck_rates[bordercheck_id])
+  # bordercheck_handling_time <- rexp(1, borderchecks$bordercheck_rates[bordercheck_id])
+  bordercheck_handling_time <- pmax(20, rnorm(1, mean = borderchecks$bordercheck_rates[bordercheck_id]), sd = 5)
   
   return (bordercheck_handling_time)
 }
@@ -47,7 +48,8 @@ get_desk_handling_time <- function(borderchecks, bordercheck_id, seed = NULL) {
   # TODO: input nationality as well
   # TODO: differentiate egate and desk
   if (!is.null(seed)) {set.seed(seed)}
-  bordercheck_handling_time <- rexp(1, borderchecks$bordercheck_rates[bordercheck_id])
+  # bordercheck_handling_time <- rexp(1, borderchecks$bordercheck_rates[bordercheck_id])
+  bordercheck_handling_time <- pmax(30, rnorm(1, mean = borderchecks$bordercheck_rates[bordercheck_id]), sd = 10)
   
   return (bordercheck_handling_time)
 }
@@ -77,7 +79,7 @@ get_egate_usage <- function(passengers, egate_uptake_prop){
 get_egate_failure <- function(passengers, egate_failure_prop){
   
   n_passengers <- dim(passengers)[1]
-  egate_failed <- rep(NA, times = n_passengers)
+  egate_failed <- rep("no_egate", times = n_passengers)
   
   bool_usage <- passengers$egate_used == "egate"
   n_usage <- sum(bool_usage)
@@ -257,10 +259,10 @@ immigration_queue <- function(passengers,
   
   passengers_failed$bordercheck_egate_end_time <- NULL
   
-  passengers <- rbind(passengers_egate[passengers_egate$egate_failed = "passed", ], 
+  passengers <- rbind(passengers_egate[passengers_egate$egate_failed == "passed", ], 
                       passengers_desk, 
                       passengers_failed)
-  passengers <- passengers[order(passengers$bordercheck_end_time), ]
+  passengers <- passengers[order(passengers$route_time_int), ]
   
   
   
@@ -273,6 +275,7 @@ immigration_queue <- function(passengers,
 
 
 get_passengers_after_immigration <- function(passengers_after_route) {
+  # TODO: this function needs to be adapted with the big immigration_queue 
   passengers_after_immigration <- data.frame(
     passenger_id = character(),
     aircraft_id = character(),
@@ -287,3 +290,10 @@ get_passengers_after_immigration <- function(passengers_after_route) {
   check_passengers_after_immigration(passengers_after_immigration)
   return(passengers_after_immigration)
 }
+
+
+
+
+
+
+
