@@ -8,7 +8,7 @@ theme_edi_airport <- function() {
     theme(
       plot.title = element_text(             #title
         family = font,            #set font family
-        size = 50,                #set font size
+        size = 40,                #set font size
         # face = 'bold',            #bold typeface
         hjust = 0,                #left align
         vjust = 1),               #raise slightly
@@ -24,7 +24,7 @@ theme_edi_airport <- function() {
       
       axis.title = element_text(             #axis titles
         family = font,            #font family
-        size = 40),               #font size
+        size = 30),               #font size
       
       axis.text = element_text(              #axis text
         family = font,            #axis family
@@ -42,6 +42,7 @@ get_figures <- function(future_aircrafts_arrivals, ...) {
   edi_airport_colours <- c("#7D0C6E", "#A19384", "#F2D6EA", "#2D0255", "#","#")
   
   figures <- list()
+  figure_sizes <- list()
   
   figures$future_passenger_burden_fig <- future_aircrafts_arrivals %>% # targets::tar_read(future_aircrafts_arrivals) %>% #
     mutate(Year = format(sched_aircraft_datetime_posix, format = "%Y")) %>% 
@@ -53,6 +54,8 @@ get_figures <- function(future_aircrafts_arrivals, ...) {
     theme_edi_airport() +
     scale_fill_manual(values = edi_airport_colours) + 
     scale_colour_manual(values = edi_airport_colours)
+  figure_sizes$future_passenger_burden_fig <- c(6, 3)
+  
   
   # figures$figure_1 <- ...  + 
     # theme_edi_airport() +
@@ -61,8 +64,14 @@ get_figures <- function(future_aircrafts_arrivals, ...) {
   
   
   for (figure_index in seq_len(length(figures))) {
-    ggsave(paste0(here("figures/"), names(figures)[figure_index], ".png"), 
-           figures[[figure_index]])
+    figure_name <- names(figures)[figure_index[]]
+    if (is.null(figure_sizes[[figure_name]])) {
+      figure_sizes[[figure_name]] <- c(7,7)
+    }
+    ggsave(paste0(here("figures/"), figure_name, ".png"), 
+           figures[[figure_name]],
+           width = figure_sizes[[figure_name]][1],
+           height = figure_sizes[[figure_name]][2])
   }
   return(figures)
 }
