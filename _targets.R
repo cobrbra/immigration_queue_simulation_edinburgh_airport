@@ -27,10 +27,10 @@ tar_source(files = c(
   # here("code/simulate_data.R"),
   here("code/step_1_aircraft.R"),
   here("code/step_2_route.R"),
-  here("code/step_3_immigration.R")
+  here("code/step_3_immigration.R"),
   # here("code/model_data.R"),
   # here("code/get_results.R"),
-  # here("code/get_figures.R"),
+  here("code/get_figures.R")
   # here("code/get_tables.R")
   )
 )
@@ -61,6 +61,13 @@ list(
                aircrafts_observed_arrivals_raw,
                airports_reference = airports,
                aircrafts_reference = aircrafts)),
+  
+  # Making the future aircraft arrivals dataset accessible
+  tar_target(future_aircrafts_arrivals_raw,
+             here("raw_data/EAL International Arrivals Data.xlsx"),
+             format = "file"),
+  tar_target(future_aircrafts_arrivals,
+             process_future_aircrafts_arrivals(future_aircrafts_arrivals_raw)),
   
   # # Simulate passengers from observed arrivals
   # tar_target(observed_aircrafts_passengers_from_aircrafts,
@@ -122,7 +129,10 @@ list(
              read_delim(prop_nationality_raw, delim = ";")),
   
   tar_target(load_factor_mean, 0.95),
-  tar_target(load_factor_sd, 0.1)
+  tar_target(load_factor_sd, 0.1),
+  
+  tar_target(figures,
+             get_figures(future_aircrafts_arrivals))
   
   
   
