@@ -58,7 +58,7 @@ get_figures <- function(future_aircrafts_arrivals, future_coached_levels, ...) {
     mutate(`Total Passengers` = `Total Passengers` * Percent) %>% 
     ggplot(aes(x = Year, y = `Total Passengers`, fill = coached_status)) + 
     geom_col(position = position_stack(reverse = TRUE)) +
-    labs(title = "Increased passenger burden in years 2023 through 2027") + 
+    labs(title = "Future passenger pressure forecasted to increase") + 
     theme_edi_airport() +
     theme(legend.title = element_blank()) +
     scale_fill_manual(values = edi_airport_colours) 
