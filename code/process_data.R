@@ -172,3 +172,39 @@ process_aircrafts_arrivals <- function(folder_name,
   check_aircrafts_arrivals(aircrafts_observed_arrivals)
   return(aircrafts_observed_arrivals)
 }
+
+process_future_aircrafts_arrivals <- function(file) {
+  future_aircraft_arrivals <- 3:7 %>% 
+    map(~read_xlsx(file, 
+                   sheet = .)) %>% 
+    bind_rows() %>% 
+    mutate(flight_date = format(`flight date`, format = "%Y-%m-%d"),
+           arrival_time = format(`arrival time`, format  = "%H:%M:%S"),
+           n_passengers = passengers) %>% 
+    mutate(sched_aircraft_datetime_posix = as.POSIXct(paste(flight_date, arrival_time))) %>% 
+    mutate(sched_aircraft_datetime_int = as.numeric(sched_aircraft_datetime_posix)) %>% 
+    mutate(sched_aircraft_date_posix = as.Date(sched_aircraft_datetime_posix)) %>% 
+    mutate(sched_aircraft_time_int = sched_aircraft_datetime_int - as.numeric(sched_aircraft_date_posix - as.Date('1970-01-01 00:00:00')) * 86400)
+  
+  n_future_flights <- nrow(future_aircraft_arrivals)
+  
+  future_aircraft_arrivals <- future_aircraft_arrivals %>%
+    mutate(flight_id = paste0("F", str_pad(1:n_future_flights, 10, pad = "0")),
+           dep_country = rep(NA, n_future_flights),
+           dep_airport = rep(NA, n_future_flights),
+           ac_type = rep(NA, n_future_flights),
+           aircraft_datetime_int = rep(NA, n_future_flights),
+           aircraft_time_int = rep(NA, n_future_flights),
+           aircraft_datetime_posix = rep(NA, n_future_flights),
+           aircraft_date_posix = rep(NA, n_future_flights),
+           des_rwy = rep(NA, n_future_flights),
+           max_passengers = n_passengers,
+           coached = rep(NA, n_future_flights)) %>% 
+    select(flight_id, dep_country, dep_airport, ac_type,
+           aircraft_datetime_int,aircraft_time_int, aircraft_datetime_posix, aircraft_date_posix,
+           sched_aircraft_datetime_int, sched_aircraft_time_int, sched_aircraft_datetime_posix, sched_aircraft_date_posix,
+           des_rwy, max_passengers, n_passengers, coached)
+  
+  check_aircrafts_arrivals(future_aircraft_arrivals)
+  return(future_aircraft_arrivals)
+}
