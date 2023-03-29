@@ -30,12 +30,17 @@ theme_edi_airport <- function() {
         family = font,            #axis family
         size = 30),                #font size
       
+      legend.text = element_text(
+        family = font,
+        size = 30
+      ),
+      
       axis.text.x = element_text(            #margin for axis text
         margin=margin(5, b = 10))
     ) 
 }
 
-get_figures <- function(future_aircrafts_arrivals, ...) {
+get_figures <- function(future_aircrafts_arrivals, future_coached_levels, ...) {
   # results <- targets::tar_read(example_results) # Use for debugging, COMMENT WHEN RUNNING TARGETS
   font_add_google("Lato")
   showtext_auto()
@@ -44,16 +49,19 @@ get_figures <- function(future_aircrafts_arrivals, ...) {
   figures <- list()
   figure_sizes <- list()
   
-  figures$future_passenger_burden_fig <- future_aircrafts_arrivals %>% # targets::tar_read(future_aircrafts_arrivals) %>% #
+  figures$future_passenger_burden_fig <- future_aircrafts_arrivals %>% # future_aircrafts_arrivals %>% # 
     mutate(Year = format(sched_aircraft_datetime_posix, format = "%Y")) %>% 
     group_by(Year) %>% 
     summarise(`Total Passengers` = sum(n_passengers)) %>% 
-    ggplot(aes(x = Year, y = `Total Passengers`)) + 
-    geom_col(fill = edi_airport_colours[1]) +
+    inner_join(future_coached_levels, by = "Year") %>% 
+    mutate(coached_status = factor(coached_status, levels = c("Contact", "Coached"))) %>%
+    mutate(`Total Passengers` = `Total Passengers` * Percent) %>% 
+    ggplot(aes(x = Year, y = `Total Passengers`, fill = coached_status)) + 
+    geom_col(position = position_stack(reverse = TRUE)) +
     labs(title = "Increased passenger burden in years 2023 through 2027") + 
     theme_edi_airport() +
-    scale_fill_manual(values = edi_airport_colours) + 
-    scale_colour_manual(values = edi_airport_colours)
+    theme(legend.title = element_blank()) +
+    scale_fill_manual(values = edi_airport_colours) 
   figure_sizes$future_passenger_burden_fig <- c(6, 3)
   
   

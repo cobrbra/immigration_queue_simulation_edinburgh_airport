@@ -68,6 +68,8 @@ list(
              format = "file"),
   tar_target(future_aircrafts_arrivals,
              process_future_aircrafts_arrivals(future_aircrafts_arrivals_raw)),
+  tar_target(future_coached_levels,
+             process_future_coached_levels(future_aircrafts_arrivals_raw)),
   
   # # Simulate passengers from observed arrivals
   # tar_target(observed_aircrafts_passengers_from_aircrafts,
@@ -132,10 +134,8 @@ list(
   tar_target(load_factor_sd, 0.1),
   
   tar_target(figures,
-             get_figures(future_aircrafts_arrivals))
-  
-  
-  
+             get_figures(future_aircrafts_arrivals,
+                         future_coached_levels))
   
   # # Generating simulated arrivals data
   # tar_target(arrivals_sim_params,
