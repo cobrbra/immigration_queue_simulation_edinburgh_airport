@@ -56,7 +56,7 @@ Three key performance indicators were identified in the competition brief. We de
     \item \textbf{Overflow}: Proportion of the day for which the overflow and contingency capacity are used.
 \end{itemize}
 
-Note that \textit{Queue length} is measured as a function over time, i.e. we record the queue length every second, even if no passengers are arriving. Based on this granular data we then compute average and maxima statistics. The \textit{queue time}, however, is measured for each arriving passenger.
+Note that \textit{Queue length} is measured as a function over time, i.e. we record the queue length every minute, even if no passengers are arriving. Based on this granular data we then compute average and maxima statistics. The \textit{queue time}, however, is measured for each arriving passenger and we calculate averages over the passengers.
 
 
 \section{Data}
@@ -80,12 +80,12 @@ Passengers of the following nationalities are allowed to use the eGates: EU coun
 \paragraph{Early and Delayed Flights}
 In the summer of 2019 only 58\% of flights arrived on time (measured if arrived within 15 minutes of scheduled arrival), 21\% were late, and 21\% were early. 
 
-\subsubsection{Arrivals Data}
-As part of the competition we have received fictitious scheduled arrival data for five weeks (each Monday to Sunday) in the future, containg a total of $4,123$ flights. They are outlined in Table~\ref{tab_comdat_overview}.
+\subsubsection{Simulated Arrivals Data}
+As part of the competition we have received fictitious scheduled arrival data for five weeks (each Monday to Sunday) in the future, contaning a total of $4,123$ flights. They are outlined in Table~\ref{tab_comdat_overview}.
 
 
 \begin{table}[!ht]
-\caption{Fictitious data sets provided by the modelling competition.}
+\caption{Simulated data sets provided by the modelling competition.}
 \label{tab_comdat_overview}
 \centering
 \begin{tabular}{ccccc}
@@ -105,30 +105,14 @@ As these dates lie, in parts quite far, in the future we can confidently assume 
 
 \subsection{Additional Information}
 
-
-\subsubsection{Operational Data}
-
-\paragraph{Aircraft Capacity and Load Factor}
-We obtained a data set indicating the maximum number of passengers for each aircraft type \cite{aircraft_capacity}. The average percentage of occupied seat for a given flight ranges from 86\% in 2019 for international flights in the UK \cite{loading_factor_national} to self-reporter 91\% for a budget airline in 2022 \cite{loading_factor_ryanair}. This is called the \textit{load factor}.
-
-\paragraph{Airport Classification}
-We assume that the split in passenger nationality depends on the departing airport. We therefore group airports into the following categories: 
-\begin{itemize}
-    \item \textbf{UKIE}: All airports in the United Kingdom (including Northern Ireland), the Crown Dependencies, and the Republic of Ireland.
-    \item \textbf{EUplus hubs}: Hub airports in EUplus. These are XXXXXXX \cite{mega_hubs}.
-    \item \textbf{EUplus non-hubs}: Airports, which are not hubs, located in EUplus.
-    \item \textbf{Other hubs}: Hub airports outside of EUplus. These are XXXXXXX \cite{mega_hubs}.
-    \item \textbf{Other non-hubs}: Airports, which are not hubs, located outside of EUplus.
-\end{itemize}
-
 \paragraph{eGate Utilisation}
-The UK government's target of eGate usage among those eligible is at 80\%, which was broadly met on a national level in 2019 and the first quarter of 2020. For airports in the North the uptake was consistently lower at around 70\% for the same period \cite{Inspection_eGates}. While there were no publicly available numbers for Edinburgh Airport, Glasgow Airport's uptake of around 60\% can serve as a reference due to proximity, as well as a lower limit, as it reports some of the lowest utilisation of eGates nationwide \cite{Inspection_eGates}. 
+The UK government's target of eGate usage among those eligible is 80\%, which was broadly met on a national level in 2019 and the first quarter of 2020. For airports in the North the uptake was consistently lower at around 70\% for the same period \cite{Inspection_eGates}. While there were no publicly available numbers for Edinburgh Airport, Glasgow Airport's uptake of around 60\% can serve as a reference due to proximity, as well as a lower limit, as it reports some of the lowest utilisation of eGates nationwide \cite{Inspection_eGates}. 
 
 \paragraph{Average Queue Time eGates}
 The average queue time at eGates at UK airports for the financial years 2017-18, 2018-19, 2019-20 and Q1 2020 was six minutes and one second \cite{Inspection_eGates}. Stansted and Luton reported averages just below the three minute mark. Glasgow Airport's average waiting time at the eGates was over $8.5$ minutes. However, their calculation was based a shorter time period (December 2017, January 2018 and February 2019), and may therefore be unrepresentative \cite{Inspection_eGates}.
 
 
-\subsubsection{Arrivals Data}
+\paragraph{Historical Arrival Data}
 talk about our fancy arrivals data set we have from 2019 and 2022 \\
 here quite a few plots might be needed 
 
@@ -147,6 +131,22 @@ here quite a few plots might be needed
 \end{table}
 
 
+we don't have passengers on board, but we do have the airplane type. \\
+We obtained a data set indicating the maximum number of passengers for each aircraft type \cite{aircraft_capacity}. The average percentage of occupied seat for a given flight ranges from 86\% in 2019 for international flights in the UK \cite{loading_factor_national} to self-reporter 91\% for a budget airline in 2022 \cite{loading_factor_ryanair}. This is called the \textit{load factor}.
+
+\paragraph{Airport Classification}
+We assume that the split in passenger nationality depends on the departing airport. We therefore group airports into the following categories: 
+\begin{itemize}
+    \item \textbf{UKIE}: All airports in the United Kingdom (including Northern Ireland), the Crown Dependencies, and the Republic of Ireland.
+    \item \textbf{EUplus hubs}: Hub airports in EUplus. These are XXXXXXX \cite{mega_hubs}.
+    \item \textbf{EUplus non-hubs}: Airports, which are not hubs, located in EUplus.
+    \item \textbf{Other hubs}: Hub airports outside of EUplus. These are XXXXXXX \cite{mega_hubs}.
+    \item \textbf{Other non-hubs}: Airports, which are not hubs, located outside of EUplus.
+\end{itemize}
+
+
+
+
 \section{Passenger Processing Model}
 
 For our analysis we are using a passenger processing model. It provides an overview over the steps an arriving passenger experiences at Edinburgh airport. It lies in the nature of such a model that it is a simplified view of the world, but we are confident that the chosen level of abstraction is nevertheless informative of the real-world processes at the airport. The passenger processing model consist of three steps, which are outline in detail in the subsequent sections.
@@ -163,38 +163,76 @@ The three steps divide the passenger epxerience as as follows:
 \begin{figure}[!ht]
     \centering
     \includegraphics[width=0.7\textwidth]{figures/ThreeSteps.png}
-     \caption{Three steps that make up the passenger processing model. } \label{PPM_threesteps}
+     \caption{Three steps that make up the passenger processing model.  } \label{PPM_threesteps}
 \end{figure}
 
+\subsection{Parameters and Choices for Each Step}
+these are slightly different for competition and noise data
 
-\section{Simulation Analysis for Provided Data}
+\subsubsection{Aircraft}
+
+\paragraph{eGate eligibility}
+describe how this interlinks with Passenger nationality Departure Airport Classification, relevant for egate eligibility \\
+ departure airport is known in the noise set but not in the competition data, UKIE arrivals do not need any passport control
+
+\paragraph{Number of Passengers}
+Known in the competition data set, unknown in the noise data (but we know the max passengers for the aircraft type and load factor)
+
+\paragraph{Coached or Contact}
+no info apart from split, important to know if it is small or large planes that are more likely to be coached
+
+\subsubsection{Route}
+
+\paragraph{Bulk Profile} 
+What does the bulk profile exactly look like, they don't all arrive in the same second 
+
+\paragraph{Coach Availability}
+might have to talk about the fact that we always assume enough busses available
+
+
+\subsubsection{Immigration}
+
+\paragraph{Number of eGates}
+
+\paragraph{eGate uptake}
+
+\paragraph{eGate failure rate}
+
+\paragraph{Priority for failed eGate passengers}
+
+\paragraph{Capacity Split}
+Which percentage of the hall capacity, overflow, and contingency is allocated to the desk queue
+\bdnote{maybe this only gets discussed later, not sure if we want to mention it here}
+
+
+\section{Analysis}
+\bdnote{this should get a better title}
 
 \subsection{Methodology}
 We explain how we simulate the airports they came from \\
 describe any other simulation input needed, maybe different scenarios \\ 
 be clear that this is (almost) just what they asked for  \\ Assumption: provided flights are all/mostly non-UKIE (compare to Noise data set)
 
+
+
 \subsection{Results}
 include KPIs here, as well as some fancy plots
 
-
-\section{Simulation Analysis for Additional Data}
-
-\subsection{Methodology}
-we take real days and simulate worse (but realistic) days and do the analysis again
-
-\subsection{Results}
-include KPIs here, as well as some fancy plots
 
 
 \section{Robustness Considerations}
 relate to service level agreement \\
 talk about working eGates/break down of eGates  \\
-what if there are more non-UKIE flights 
+what if there are more non-UKIE flights  \\ 
+need to also talk about the hall setup here?
+
+
 
 \section{Discussion}
-summary of the project and our approach
+summary of the project and our approach \\
+the number of contact spaces is fixed at the airport so if you want more flights you need to coach them (unless you want to undertake big building works)
 
+\subsection{Recommendation for Capacity Split}
 
 \subsection{Recommendation for Total Number of eGates}
 we need to put our foot down and come up with a final number
