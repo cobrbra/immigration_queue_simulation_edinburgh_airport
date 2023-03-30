@@ -60,7 +60,7 @@ get_airport_classification <- function(airport_country,
 
 get_coached_status <- function(flight_id, prob_coached = .15, seed = NULL) {
   if (!is.null(seed)) {set.seed(seed)}
-  coached <- as.logical(rbinom(1, length(flight_id), prob = prob_coached))
+  coached <- as.logical(rbinom(length(flight_id), 1, prob = prob_coached))
   return(coached)
 }
 
