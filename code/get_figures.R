@@ -40,7 +40,7 @@ theme_edi_airport <- function() {
     ) 
 }
 
-get_figures <- function(future_aircrafts_arrivals, future_coached_levels, ...) {
+get_figures <- function(future_aircrafts_arrivals, future_coached_levels, aircrafts_observed_arrivals, UK_plus_countries, ...) {
   # results <- targets::tar_read(example_results) # Use for debugging, COMMENT WHEN RUNNING TARGETS
   font_add_google("Lato")
   showtext_auto()
@@ -49,13 +49,28 @@ get_figures <- function(future_aircrafts_arrivals, future_coached_levels, ...) {
   figures <- list()
   figure_sizes <- list()
   
+  observed_max_passengers_per_year <- aircrafts_observed_arrivals %>% 
+    mutate(Year = format(sched_aircraft_datetime_posix, format = "%Y")) %>% 
+    filter(((Year == 2022) & 
+              (sched_aircraft_date_posix >= as.Date("2022-07-11")) &
+              (sched_aircraft_date_posix <= as.Date("2022-07-17"))) |
+             ((Year == 2019) &
+                (sched_aircraft_date_posix >= as.Date("2019-07-08")) &
+                (sched_aircraft_date_posix <= as.Date("2019-07-14")))) %>% 
+    filter(!(dep_country %in% UK_plus_countries)) %>% 
+    group_by(Year) %>% 
+    summarise(`Total Passengers` = sum(max_passengers)) %>% 
+    mutate(coached_status = "Unknown")
+  
   figures$future_passenger_burden_fig <- future_aircrafts_arrivals %>% # future_aircrafts_arrivals %>% # 
     mutate(Year = format(sched_aircraft_datetime_posix, format = "%Y")) %>% 
     group_by(Year) %>% 
     summarise(`Total Passengers` = sum(n_passengers)) %>% 
     inner_join(future_coached_levels, by = "Year") %>% 
-    mutate(coached_status = factor(coached_status, levels = c("Contact", "Coached"))) %>%
     mutate(`Total Passengers` = `Total Passengers` * Percent) %>% 
+    select(Year, `Total Passengers`, coached_status) %>% 
+    bind_rows(observed_max_passengers_per_year) %>% 
+    mutate(coached_status = factor(coached_status, levels = c("Contact", "Coached", "Unknown"))) %>%
     ggplot(aes(x = Year, y = `Total Passengers`, fill = coached_status)) + 
     geom_col(position = position_stack(reverse = TRUE)) +
     labs(title = "Future passenger pressure forecasted to increase") + 

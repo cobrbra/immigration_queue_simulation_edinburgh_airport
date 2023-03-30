@@ -134,8 +134,10 @@ list(
   tar_target(load_factor_sd, 0.1),
   
   tar_target(figures,
-             get_figures(future_aircrafts_arrivals,
-                         future_coached_levels))
+             get_figures(future_aircrafts_arrivals = future_aircrafts_arrivals,
+                         future_coached_levels = future_coached_levels,
+                         aircrafts_observed_arrivals = aircrafts_observed_arrivals,
+                         UK_plus_countries = UK_plus_countries))
   
   # # Generating simulated arrivals data
   # tar_target(arrivals_sim_params,
