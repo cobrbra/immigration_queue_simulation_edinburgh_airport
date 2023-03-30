@@ -5,7 +5,12 @@
 \topmargin -2cm
 % \usepackage{epsf}
 
+% Draft watermark
+\usepackage{draftwatermark}
+
+% Font
 \usepackage[default]{lato}
+
 
 % Writing maths
 \usepackage{
@@ -18,12 +23,24 @@
 \usepackage{graphicx}
 
 % References
-\usepackage{hyperref}
-
-% References 
-\usepackage[numbers]{natbib}
-\bibliographystyle{natbib}
+\usepackage[colorlinks,linkcolor=black,citecolor=blue,urlcolor=blue,breaklinks = true]{hyperref}
+\usepackage[sort&compress, numbers]{natbib}
+\bibliographystyle{unsrtnat}
 % \setcitestyle{authoryear, open={(},close={)}}
+
+% Acronyms
+\usepackage[acronym, toc]{glossaries-extra}
+
+\setabbreviationstyle[acronym]{long-short}
+\glssetcategoryattribute{acronym}{nohyperfirst}{true}
+\renewcommand*{\glsdonohyperlink}[2]{%
+ {\glsxtrprotectlinks \glsdohypertarget{#1}{#2}}}
+
+ \newacronym{bfo}{BFO}{Border Force Officer}
+ \newacronym[plural=SLAs, firstplural=Service Level Agreements]{sla}{SLA}{Service Level Agreement}
+ \newacronym[plural=eGates, firstplural=electronic passport Gates]{egate}{eGate}{electronic passport Gate}
+ \newacronym{eal}{EAL}{Edinburgh Airport}
+ \newacronym[plural=KPIs, firstplural=Key Performance Indicators]{kpi}{KPI}{Key Performance Indicator}
 
 % Inline comments from Jacob and Bella
 \usepackage{xcolor}
@@ -32,63 +49,74 @@
 \FXRegisterAuthor{jb}{ajb}{\color{blue} JB}
 \FXRegisterAuthor{bd}{abd}{\color{red} BD}
 
-\title{Simulations of Immigration Queues at Edinburgh Airport: Report}
- \author{Isabella Deutsch, Jacob R. Bradley
- \\ \emph{School of Mathematics, University of Edinburgh}}
+\title{Planning for future immigration demand at Edinburgh Airport}
+% Simulations of Immigration Queues at Edinburgh Airport: Report}
+ \author{Isabella Deutsch and Jacob R. Bradley}
+ % \\ \emph{School of Mathematics, University of Edinburgh}}
+ \date{}
 
 \begin{document}
 \maketitle
 
 \section{Introduction}
 
-A large number of passengers arriving in Edinburgh Airport need to pass through immigration. This is either conducted at a \textit{desk} staffed with a Border Force Officer or at an automated \textit{eGate}. This does not apply for anyone arriving from the United Kingdom (including Northern Ireland), the Crown Dependencies, and the Republic of Ireland, as there are no routine passport controls between these countries \cite{common_travel_area}.
-
-Only passengers of certain nationality are eligible to use the eGates, as defined below. There are currently 9 desks and 10 eGates in operation at Edinburgh Airport. As the operations at Edinburgh Airports are changing and growing it is vital to assess the potential impact on queuing time at the border. 
+A large number of passengers arriving internationally at \gls{eal} need to pass through immigration. These passengers are either processed at a desk staffed by a \gls{bfo} or, for passengers of certain nationalities, at an automated \gls{egate}. With overall passenger footfall expected to increase substantially over the next five years, pressure on immigration services is also growing, and the airport will need to adapt its operations in order to accommodate its international arrivals safely and efficiently. In particular, the airport has committed to several \glspl{sla} ensuring quality of experience for arrivals. One avenue being explored to meet \glspl{sla} is the expanded use of \glspl{egate} both through increased construction of \glspl{egate} and measures encouraging increased uptake \cite{UK_border_2025}. In this report we investigate the likely performance of these measures, providing clear recommendations for \gls{egate} construction and usage over the next five years (2023-2027).
+% This does not apply for anyone arriving from the United Kingdom (including Northern Ireland), the Crown Dependencies, and the Republic of Ireland, as there are no routine passport controls between these countries \cite{common_travel_area}.
+% Only passengers of certain nationality are eligible to use the \glspl{egate}, as defined below. There are currently 9 desks and 10 \glspl{egate} in operation at \gls{eal}. 
 
 \subsection{Problem Statement}
-what is the task, summarising the problem, maybe  outline from the document
+The task set by \gls{eal} is to develop a simulation model of immigration queueing that can be used to test a variety of demand scenarios, including overall and demographic changes in passenger arrivals, process enhancements, and increased \gls{egate} availabilty. 
+Additionally, sensitivity analysis is required to assess the robustness of these recommendations under a variety of pertubation scenarios.
+The overall performance of \gls{eal}'s immigration queueing operation is measured via three \glspl{kpi}, defined below.
 
 \subsection{Key Performance Indicators}
 
-Three key performance indicators were identified in the competition brief. We define them as follows.
+Three \glspl{kpi} have been identified to form the basis of the airport's \glspl{sla}. We define them as follows.
 
 \begin{itemize}
-    \item \textbf{Queue length}: Number of people in the queue at any given point in time. We report the mean, median, 75\% quantile, and maximum. These are calculated both for the total of the immigration queue, as well as the desk and eGate queues separately.
-    \item \textbf{Queue time}: Minutes between the arrival at queue and arrival at a desk/eGate for each arriving passenger. We report the mean, median, 75\% quantile, and maximum. These are calculated both for the total of the immigration queue, as well as the desk and eGate queues separately.
-    \item \textbf{Overflow}: Proportion of the day for which the overflow and contingency capacity are used.
+    \item \textbf{Queue length(s)}: The number of passengers queuing for a desk or \gls{egate} in the immigration hall/overflow zone at any given time.
+    % We report the mean, median, 75\% quantile, and maximum. This is considered for both desk and \gls{egate}-specific queues.
+    \item \textbf{Queue time}: Minutes between arrival at the immigration hall/overflow zone and arrival at a desk/\gls{egate} for a given passenger arriving at \gls{eal}. 
+    % We report the mean, median, 75\% quantile, and maximum. 
+    % This are calculated both for the total of the immigration queue, as well as the desk and \gls{egate} queues separately.
+    \item \textbf{Overflow usage}: The proportion of a given day for which immigration hall overflow capacity was in use.
 \end{itemize}
 
-Note that \textit{Queue length} is measured as a function over time, i.e. we record the queue length every minute, even if no passengers are arriving. Based on this granular data we then compute average and maxima statistics. The \textit{queue time}, however, is measured for each arriving passenger and we calculate averages over the passengers.
+Note that \textit{queue length} is measured as a function over time, i.e. we record the queue length every minute, even if no passengers are arriving. Based on this granular data we can then compute average and maxima statistics. The \textit{queue time}, however, is measured for each arriving passenger and we calculate averages over the passengers. The relationship between queue length and \textit{overflow usage} may be determined in part by the physical division of the immigration hall into desk and \gls{egate} queueing regions.
 
 
 \section{Data}
-This section outlines the data used for our analysis. It contains descriptions of both the data provided through the Modelling Competition and additional data we deemed relevant for this project.
+This section outlines the datasets used throughout this report. The majority of the data used for the core components of our analysis were provided by \gls{eal} via the Edinburgh SIAM \& IMA Student Chapter Modelling Competition \cite{modelling_competition}. Occasionally, it has been useful to make use of some external datasets, which have also been described here. These are all either in the public domain, or are accessible to all researchers participating in the modelling competition. 
 
-\subsection{Provided Information}
+\subsection{Competition Data}
 
-We first outline some of the data received through the Modelling Competition. While these represent realistic values, we are aware that they may contain approximations and/or simulated data. Most notably, the arrivals data in Section~\ref{XX} is a fictitious arrivals schedule for five weeks in the future, in namely 2023 to 2027. 
+We first outline the data received through the modelling competition. This data, informed by real arrivals data at \gls{eal}, is intended to provide a baseline set of assumptions for the composition of airport arrivals across five busy future weeks, each in early July of the years 2023-207 respectively.
+% While these represent realistic values, we are aware that they may contain approximations and/or simulated data. 
+% Most notably, the arrivals data in Section~\ref{XX} is a fictitious arrivals schedule for five weeks in the future, in namely 2023 to 2027. 
 
 \subsubsection{Operational Data}
 
 \paragraph{Hall Capacity}
-The immigration hall at Edinburgh Airport has a \textit{capacity} of 500 people. Its \textit{overflow} capacity, which can be used without overly impacting other areas of the operation, is a further 150 people. There is also a \textit{contingency} capacity for additional 600 people. However, its usage negatively impacts the operations of the airport.
+The immigration hall at \gls{eal} has a \textit{capacity} of 500 people. Its \textit{overflow} capacity, which can be used without overly impacting other areas of the operation, is a further 150 people. There is also a \textit{contingency} capacity for additional 600 people. However, its usage negatively impacts the operations of the airport.
 
-\paragraph{Coached and Contact}
-Once the aircraft has reached its parking position there are two ways for passengers to reach the terminal building. \textit{Contact} passengers walk by foot to the immigration queue. \textit{Coached} passengers exit the aircraft via stairs and are then loaded onto busses, which bring them to the terminal building. The percentage of contact passengers lies above 80\% and varies across years.
+\paragraph{Coached vs. Contact}
+Once an aircraft has reached its parking position there are two ways for passengers to reach the terminal building. \textit{Contact} passengers walk by foot to the immigration queue. \textit{Coached} passengers exit the aircraft via stairs and are loaded onto buses, which bring them to the terminal building. The percentage of contact passengers lies above 80\% and varies across years.
 
-\paragraph{eGates Eligibility for EUplus}
-Passengers of the following nationalities are allowed to use the eGates: EU countries, Australia, Canada, Iceland, Japan, Liechtenstein, New Zealand, Norway, Singapore, South Korea, Switzerland, and the USA. In the following we refer to these countries as \textit{EUplus}. 
+\paragraph{eGate Eligibility for EU+ Passengers}
+Passengers of the following nationalities are allowed to use \glspl{egate}: EU countries, Australia, Canada, Iceland, Japan, Liechtenstein, New Zealand, Norway, Singapore, South Korea, Switzerland, and the USA. In the following we refer to these countries as \textit{EU+}. 
+
+\paragraph{Domestic and UK+ Flights} Flights arriving from the United Kingdom (including Northern Ireland), the Crown Dependencies, and the Republic of Ireland (referred throughout as UK+) do not need to be processed by immigration services, as there are currently no routine passport controls between these countries \cite{common_travel_area}.
 
 \paragraph{Early and Delayed Flights}
 In the summer of 2019 only 58\% of flights arrived on time (measured if arrived within 15 minutes of scheduled arrival), 21\% were late, and 21\% were early. 
 
 \subsubsection{Simulated Arrivals Data}
-As part of the competition we have received fictitious scheduled arrival data for five weeks (each Monday to Sunday) in the future, contaning a total of 4,123 flights. They are outlined in Table~\ref{tab_comdat_overview}.
+As part of the competition we have received fictitious scheduled arrival data for five weeks (each Monday to Sunday) in the future, contaning a total of 4,123 flights. They are outlined in Table~\ref{tab:future_arrivals_overview}.
 
 
 \begin{table}[!ht]
 \caption{Simulated data sets provided by the modelling competition.}
-\label{tab_comdat_overview}
+\label{tab:future_arrivals_overview}
 \centering
 \begin{tabular}{ccccc}
 \hline
@@ -106,16 +134,16 @@ As these dates lie, in parts quite far, in the future we can confidently assume 
 \begin{figure}[!ht]
     \centering
     \includegraphics[width=0.7\textwidth]{figures/future_passenger_burden_fig.png}
-     \caption{Three steps that make up the passenger processing model.  } \label{fig:future_passenger_burden}
+     \caption{Anticipated future contact and coached passenger arrivals in the next five years.  } \label{fig:future_passenger_burden}
 \end{figure}
 
-\subsection{Additional Information}
+\subsection{External Datasets}
 
 \paragraph{eGate Utilisation}
-The UK government's target of eGate usage among those eligible is 80\%, which was broadly met on a national level in 2019 and the first quarter of 2020. For airports in the North the uptake was consistently lower at around 70\% for the same period \cite{Inspection_eGates}. While there were no publicly available numbers for Edinburgh Airport, Glasgow Airport's uptake of around 60\% can serve as a reference due to proximity, as well as a lower limit, as it reports some of the lowest utilisation of eGates nationwide \cite{Inspection_eGates}. 
+The UK government's target of \gls{egate} usage among those eligible is 80\%, which was broadly met on a national level in 2019 and the first quarter of 2020. For airports in the North the uptake was consistently lower at around 70\% for the same period \cite{Inspection_eGates}. While there were no publicly available numbers for \gls{eal}, Glasgow Airport's uptake of around 60\% can serve as a reference due to proximity, as well as a lower limit, as it reports some of the lowest utilisation of \glspl{egate} nationwide \cite{Inspection_eGates}. 
 
 \paragraph{Average Queue Time eGates}
-The average queue time at eGates at UK airports for the financial years 2017-18, 2018-19, 2019-20 and Q1 2020 was six minutes and one second \cite{Inspection_eGates}. Stansted and Luton reported averages just below the three minute mark. Glasgow Airport's average waiting time at the eGates was over 8.5 minutes. However, their calculation was based a shorter time period (December 2017, January 2018, and February 2019), and may therefore be unrepresentative \cite{Inspection_eGates}.
+The average queue time at \glspl{egate} at UK airports for the financial years 2017-18, 2018-19, 2019-20 and Q1 2020 was six minutes and one second \cite{Inspection_eGates}. Stansted and Luton reported averages just below the three minute mark. Glasgow Airport's average waiting time at the \glspl{egate} was over 8.5 minutes. However, their calculation was based a shorter time period (December 2017, January 2018, and February 2019), and may therefore be unrepresentative \cite{Inspection_eGates}.
 
 
 \paragraph{Historical Arrival Data}
@@ -125,7 +153,7 @@ here quite a few plots might be needed
 
 \begin{table}[!ht]
 \caption{Historic data sets of Edinburgh Airport Arrivals.}
-\label{tab_comdat_overview}
+\label{tab:observed_arrivals_overview}
 \centering
 \begin{tabular}{ccccc}
 \hline
@@ -144,10 +172,10 @@ We obtained a data set indicating the maximum number of passengers for each airc
 We assume that the split in passenger nationality depends on the departing airport. We therefore group airports into the following categories: 
 \begin{itemize}
     \item \textbf{UKIE}: All airports in the United Kingdom (including Northern Ireland), the Crown Dependencies, and the Republic of Ireland.
-    \item \textbf{EUplus hubs}: Hub airports in EUplus. These are XXXXXXX \cite{mega_hubs}.
-    \item \textbf{EUplus non-hubs}: Airports, which are not hubs, located in EUplus.
-    \item \textbf{Other hubs}: Hub airports outside of EUplus. These are XXXXXXX \cite{mega_hubs}.
-    \item \textbf{Other non-hubs}: Airports, which are not hubs, located outside of EUplus.
+    \item \textbf{EU+ hubs}: Hub airports in EU+. These are XXXXXXX \cite{mega_hubs}.
+    \item \textbf{EU+ non-hubs}: Airports, which are not hubs, located in EU+.
+    \item \textbf{Other hubs}: Hub airports outside of EU+. These are XXXXXXX \cite{mega_hubs}.
+    \item \textbf{Other non-hubs}: Airports, which are not hubs, located outside of EU+.
 \end{itemize}
 
 
@@ -155,13 +183,13 @@ We assume that the split in passenger nationality depends on the departing airpo
 
 \section{Passenger Processing Model}
 
-For our analysis we are using a passenger processing model. It provides an overview over the steps an arriving passenger experiences at Edinburgh airport. It lies in the nature of such a model that it is a simplified view of the world, but we are confident that the chosen level of abstraction is nevertheless informative of the real-world processes at the airport. The passenger processing model consist of three steps, which are outline in detail in the subsequent sections.
+For our analysis we are using a passenger processing model. It provides an overview over the steps an arriving passenger experiences at \gls{eal}. It lies in the nature of such a model that it is a simplified view of the world, but we are confident that the chosen level of abstraction is nevertheless informative of the real-world processes at the airport. The passenger processing model consist of three steps, which are outline in detail in the subsequent sections.
 
 The three steps divide the passenger epxerience as as follows:
 \begin{enumerate}
-    \item \textbf{Aircraft}: Aircraft with passengers on board arrive at Edinburgh Airport. The aircraft taxis to its parking position and the doors are opened. \label{step:aircraft}
+    \item \textbf{Aircraft}: Aircraft with passengers on board arrive at \gls{eal}. The aircraft taxis to its parking position and the doors are opened. \label{step:aircraft}
     \item \textbf{Route}: Passengers make their way from their aircraft to the immigration hall, either by walking to the building (contact) or via a bus (coached). \label{step:route}
-    \item \textbf{Immigration}: Passengers queue in the immigration hall and are processed at the boarder, either at a desk by a Border Force Officer or at an automated eGate. \label{step:immigration}
+    \item \textbf{Immigration}: Passengers queue in the immigration hall and are processed at the boarder, either at a desk by a Border Force Officer or at an automated \gls{egate}. \label{step:immigration}
 \end{enumerate}
 
  Figure~\ref{fig:PPM_threesteps} visualises the flow of information from a data perspective. We start with a data set of arriving flights and generate a data set of passengers (\textit{Aircraft} step). In the \textit{Route} step these passengers are then brought from the aircraft to the immigration hall. Finally, in the \textit{Immigration} step they queue up and are subsequently processes at the border.
@@ -178,7 +206,7 @@ these are slightly different for competition and noise data
 \subsubsection{Aircraft}
 
 \paragraph{eGate eligibility}
-describe how this interlinks with Passenger nationality Departure Airport Classification, relevant for egate eligibility \\
+describe how this interlinks with Passenger nationality Departure Airport Classification, relevant for \gls{egate} eligibility \\
  departure airport is known in the noise set but not in the competition data, UKIE arrivals do not need any passport control
 
 \paragraph{Number of Passengers}
@@ -228,7 +256,7 @@ include KPIs here, as well as some fancy plots
 
 \section{Robustness Considerations}
 relate to service level agreement \\
-talk about working eGates/break down of eGates  \\
+talk about working \glspl{egate}/break down of \glspl{egate}  \\
 what if there are more non-UKIE flights  \\ 
 need to also talk about the hall setup here?
 
@@ -246,8 +274,10 @@ we need to put our foot down and come up with a final number
 \subsection{Future Work}
 all the assumptions we made \\
 to include limitations \\
-include edge cases, such as all gates closed for high risk flights (see Government doc on eGates) 
+include edge cases, such as all gates closed for high risk flights (see Government doc on \glspl{egate}) 
 
-\bibliography{report/references.bib}
+{\footnotesize
+\bibliography{report/references}}
+% \bibliography{report/references.bib}
 
 \end{document}
