@@ -106,6 +106,28 @@ get_nationality_split <- function(aircrafts, EU_plus_hubs, other_hubs, prop_nati
   return(aircrafts_with_simmed_nationality)
 }
 
+simulate_delay_times <- function(flight_id, 
+                                 prop_flights_delayed, 
+                                 prop_flights_on_time, 
+                                 prop_flights_early,
+                                 mean_delay_time,
+                                 mean_early_time,
+                                 on_time_window = 30*60) {
+  n_flights <- length(flight_id)
+  simulated_delay_status <- sample(c("delayed", "on-time", "early"), 
+                                   size = n_flights,
+                                   prob = c(prop_flights_delayed,
+                                            prop_flights_on_time,
+                                            prop_flights_early),
+                                   replace = TRUE)
+  simulated_delay <- case_when(
+    simulated_delay_status == "early" ~ - on_time_window/2 - rexp(n = n_flights, rate = 1/(mean_early_time - on_time_window/2)),
+    simulated_delay_status == "on-time" ~ runif(n = n_flights, -on_time_window/2, on_time_window/2),
+    simulated_delay_status == "delayed" ~ on_time_window/2 + rexp(n = n_flights, rate = 1/(mean_delay_time-on_time_window/2))
+  ) 
+  return(simulated_delay)
+}
+
 
 get_passengers_after_aircrafts <- function(aircrafts, 
                                           EU_plus_hubs,
