@@ -120,7 +120,9 @@ get_passengers_after_aircrafts <- function(aircrafts,
   if (!is.null(seed)) {set.seed(seed)}
   
   aircrafts_with_passengers <- aircrafts %>% 
-    mutate(n_passengers = get_n_passengers(max_passengers, load_factor_mean, load_factor_sd)) %>% 
+    mutate(n_passengers = if_else(is.na(n_passengers),
+                                  get_n_passengers(max_passengers, load_factor_mean, load_factor_sd),
+                                  n_passengers)) %>% 
     mutate(coached = if_else(is.na(coached), get_coached_status(flight_id), coached)) %>% 
     get_nationality_split(EU_plus_hubs = EU_plus_hubs,
                           other_hubs = other_hubs, 
