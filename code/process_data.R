@@ -63,6 +63,18 @@ check_aircrafts_arrivals <- function(aircrafts_observed_arrivals) {
   }
 }
 
+get_datetime_alternates <- function(events_with_datetime_int, column_prefixes = c("aircraft")) {
+  for (column_prefix in column_prefixes) {
+    print(paste0(column_prefix, "_datetime_int"))
+    events_with_datetime_int[[paste0(column_prefix, "_datetime_posix")]] <- events_with_datetime_int[[paste0(column_prefix, "_datetime_int")]] %>% 
+      as.POSIXct(origin = "1970-01-01 00:00:00")
+    events_with_datetime_int[[paste0(column_prefix, "_date_posix")]] <- events_with_datetime_int[[paste0(column_prefix, "_datetime_posix")]] %>% 
+      as.Date()
+    events_with_datetime_int[[paste0(column_prefix, "_time_int")]] <- events_with_datetime_int[[paste0(column_prefix, "_datetime_int")]] -
+      86400 * as.numeric(events_with_datetime_int[[paste0(column_prefix, "_date_posix")]] - as.Date('1970-01-01 00:00:00'))
+  }
+  return(events_with_datetime_int)
+}
 
 simulate_aircrafts_arrivals <- function(n_aircrafts = 5, seed = NULL) {
   if (!is.null(seed)) {set.seed(seed)}
@@ -79,16 +91,7 @@ simulate_aircrafts_arrivals <- function(n_aircrafts = 5, seed = NULL) {
     coached = sample(c(TRUE, FALSE), size = n_aircrafts, replace = TRUE)
   ) %>% mutate(
     aircraft_datetime_int = sched_aircraft_datetime_int + rexp(n = n_aircrafts, rate = 5e-3)
-  ) %>% mutate(
-    sched_aircraft_datetime_posix = as.POSIXct(sched_aircraft_datetime_int, origin = '1970-01-01 00:00:00'),
-    aircraft_datetime_posix = as.POSIXct(aircraft_datetime_int, origin = '1970-01-01 00:00:00')
-  ) %>% mutate(
-    sched_aircraft_date_posix = as.Date(sched_aircraft_datetime_posix),
-    aircraft_date_posix = as.Date(aircraft_datetime_posix)
-  ) %>% mutate(
-    sched_aircraft_time_int = sched_aircraft_datetime_int - as.numeric(sched_aircraft_date_posix - as.Date('1970-01-01 00:00:00')) * 86400,
-    aircraft_time_int = aircraft_datetime_int - as.numeric(aircraft_date_posix - as.Date('1970-01-01 00:00:00')) * 86400
-  )
+  ) %>% get_datetime_alternates(column_prefixes = c("aircraft", "sched_aircraft"))
   
   check_aircrafts_arrivals(aircrafts)
   return(aircrafts)
@@ -181,10 +184,8 @@ process_future_aircrafts_arrivals <- function(file) {
     mutate(flight_date = format(`flight date`, format = "%Y-%m-%d"),
            arrival_time = format(`arrival time`, format  = "%H:%M:%S"),
            n_passengers = passengers) %>% 
-    mutate(sched_aircraft_datetime_posix = as.POSIXct(paste(flight_date, arrival_time))) %>% 
-    mutate(sched_aircraft_datetime_int = as.numeric(sched_aircraft_datetime_posix)) %>% 
-    mutate(sched_aircraft_date_posix = as.Date(sched_aircraft_datetime_posix)) %>% 
-    mutate(sched_aircraft_time_int = sched_aircraft_datetime_int - as.numeric(sched_aircraft_date_posix - as.Date('1970-01-01 00:00:00')) * 86400)
+    mutate(sched_aircraft_datetime_int = as.numeric(as.POSIXct(paste(flight_date, arrival_time)))) %>% 
+    get_datetime_alternates(column_prefixes = c("sched_aircraft")) 
   
   n_future_flights <- nrow(future_aircraft_arrivals)
   

@@ -53,9 +53,7 @@ get_passengers_after_route <- function(passengers_after_aircraft) {
     get_coach_time() %>% 
     get_walk_time() %>% 
     mutate(route_datetime_int = aircraft_datetime_int + coach_time + walk_time) %>%
-    mutate(route_datetime_posix = as.POSIXct(route_datetime_int, origin = '1970-01-01 00:00:00')) %>% 
-    mutate(route_date_posix = as.Date(route_datetime_posix)) %>% 
-    mutate(route_time_int = route_datetime_int - as.numeric(route_date_posix - as.Date('1970-01-01 00:00:00'))) %>% 
+    get_datetime_alternates(column_prefixes = c("route")) %>% 
     select(-c(coach_time, walk_time, 
               aircraft_datetime_int, aircraft_datetime_posix, 
               aircraft_time_int, aircraft_date_posix)) %>%
