@@ -6,7 +6,7 @@ aircraft_schedule_raw|stem|ef46db3751d8e999|a9e7739058f4c040|4e3739ef91745af0|-2
 aircrafts|stem|f843850f9f26f488|576e9fcf25301d4d|97bff7b582926fb8|-806070692||t19432.5461511126s|9bec8d9b374094da|3801|rds|local|vector|||0.08||
 aircrafts_observed_arrivals|stem|18a744dd85412ca8|07fc1b845852a802|111afef2fd97eefa|-1737348217||t19432.5473693258s|18819f8c3379fa40|2073944|rds|local|vector|||2.42|1m22mThere was 1 warning in mutate.1m22m36mℹ39m In argument max_passengers  as.integermax_passengers.Caused by warning33m39m NAs introduced by coercion|
 aircrafts_observed_arrivals_processed|stem|5c7d91cd05807856|aa56d215a3197d92|68db53dcaa965a77|1845573049||t19430.4560179342s|ca169f41ae0598ee|1118711|rds|local|vector|||1.48|1m22mThere was 1 warning in mutate.1m22m36mℹ39m In argument max_passengers  as.integermax_passengers.Caused by warning33m39m NAs introduced by coercion|
-aircrafts_observed_arrivals_raw|stem|8912a34821f03bbe|d4f33fcd775b0aba|4e3739ef91745af0|-1173286036|C:/Users/s1989890/Documents/modellinglocal/immigration_queue_simulation_edinburgh_airport/raw_data/aircrafts_observed_arrivals|t19432.5471900649s|a75e104011428481|4096|file|local|vector|||0.02||
+aircrafts_observed_arrivals_raw|stem|c42aac3c4755478c|d4f33fcd775b0aba|4e3739ef91745af0|-1173286036|C:/Users/s1989890/Documents/modellinglocal/immigration_queue_simulation_edinburgh_airport/raw_data/aircrafts_observed_arrivals|t19429.73599949s||4096|file|local|vector|||||_paths_ 31mmissing files UsersjacobbradleyDocumentsimmigration_queue_simulation_edinburgh_airportraw_dataaircrafts_observed_arrivals39m
 aircrafts_processed|stem|f843850f9f26f488|576e9fcf25301d4d|97bff7b582926fb8|-1192089391||t19430.3826961696s|9bec8d9b374094da|3801|rds|local|vector|||0.4||
 aircrafts_raw|stem|4a87737f7a4233c4|4d41e7fbd3b11163|4e3739ef91745af0|2037142243|C:/Users/s1989890/Documents/modellinglocal/immigration_queue_simulation_edinburgh_airport/raw_data/aircrafts/aircrafts_capacity.txt|t19429.6535849449s|32329b9b28f80444|10843|file|local|vector|||0||
 airports|stem|6d7f10c9b09a6ee4|a612defb13e9835f|02b4aa4524b5e49b|1391412521||t19432.5461557987s|4a751d21e95b14ee|238764|rds|local|vector|||0.11||
@@ -25,11 +25,7 @@ check_passengers_from_immigration|function|7f1f1fe171ba5a2d|||||||||||||||
 check_passengers_from_route|function|57ad983c9b62d58d|||||||||||||||
 data|stem|6afcb05a96a54f6c|43fae4011a0626f4|136bf5e07fbd9b1c|1588979285||t19408.8231332049s|d07e2e962de596ec|1750|rds|local|vector|||0.006||
 EU_hubs|stem|cac810872fad8ade|cbb8daeed2e1540b|a3dad144c40657ed|1729895199||t19430.3826909729s|e0224cf10db1a05d|62|rds|local|vector|||0||
-EU_plus_countries|stem|1385016ba549834f|fd95ec47098bdfe5|3d0b4062d5bc3feb|-336151201||t19432.54615768s|e5d2926a8e144e03|390|rds|local|vector|||0.15||
-EU_plus_countries_raw|stem|b9d0a23d375f242b|03f540e7fac58326|4e3739ef91745af0|-42142448|C:/Users/s1989890/Documents/modellinglocal/immigration_queue_simulation_edinburgh_airport/params/nationality_info/EU_plus_countries.txt|t19432.5452408368s|31332efc7bb99c56|441|file|local|vector|||0||
-EU_plus_hubs|stem|2ce4333714e754e8|3407e5b32fbaa23f|4a3ade698d2a0793|-270672927||t19432.5461498661s|0b52c5847220add9|82|rds|local|vector|||0.11||
-EU_plus_hubs_raw|stem|71865c9f8fda3deb|c25bc4c787a4f1f6|4e3739ef91745af0|1840175802|C:/Users/s1989890/Documents/modellinglocal/immigration_queue_simulation_edinburgh_airport/params/nationality_info/EU_plus_hubs.txt|t19432.5452408484s|c0356b4edb5c0c6b|27|file|local|vector|||0||
-example_aircraft_arrivals|stem|b63d7e1ce26ef22c|60b3f08d8c5a9304|68accfcc2f7a0a31|1480801838||t19440.3940110946s|5b1027f2a4ed5890|597|rds|local|vector|||0.32||
+EU_plus_hubs_raw|stem|71865c9f8fda3deb|c25bc4c787a4f1f6|4e3739ef91745af0|1840175802|/Users/jacobbradley/Documents/immigration_queue_simulation_edinburgh_airport/params/nationality_info/EU_plus_hubs.txt|t19445.816375966s|c0356b4edb5c0c6b|27|file|local|vector|||0||
 example_figures|stem|fa6cb4c0bf38d758|4cf3e7994928321a|03e94b74f4a5cc79|186214781||t19410.7186766201s|c1514e3cc29eeeef|52495|rds|local|vector|||0.759||
 example_models|stem|b65b97bc0ed06d82|3f5e034ebe6af739|76f2834533ce4c52|525081452||t19410.7186674859s|4f12b392d38a3cf9|4858|rds|local|vector|||0.011||
 example_passenger_arrivals|stem|9eb865aa3c85d600|46ef8b65c000302f|251d7e5fb3eb06c3|1906013252||t19440.3940161372s|0131d98b4b4dc9f6|2527|rds|local|vector|||0.17||
@@ -40,16 +36,14 @@ example_results|stem|f27d626a4329c10d|a08541f7f6379100|7909ff2dbe9141e0|31092496
 example_simulated_data|stem|9dab10bb2afb5f5a|395e8f4ee51f0c0d|8982207d98f0657f|1408151031||t19408.8508816359s|985da00faf3c8820|976|rds|local|vector|||0.109||
 example_tables|stem|39e35e2eff42c9ae|76dca0c604fc0e9d|bbaf4182a0739f0b|2136085811||t19410.7186767611s|8f19145563e08cbb|781|rds|local|vector|||0.009||
 get_airport_classification|function|1d6290de84c71fce|||||||||||||||
-get_bordercheck_handling_time|function|11f61fefb0d99ae5|||||||||||||||
 get_check_handling_time|function|c6d47269270cd4cc|||||||||||||||
 get_coach_time|function|8896d9a5d19deae6|||||||||||||||
 get_coached_status|function|56e95583d5f21a0a|||||||||||||||
-get_desk_handling_time|function|845819141006abc8|||||||||||||||
+get_desk_handling_time|function|e7d2ef150274ae10|||||||||||||||
 get_egate_eligible|function|ffc0a32b755009e4|||||||||||||||
-get_egate_failure|function|abb5aeda84ca8332|||||||||||||||
-get_egate_handling_time|function|845819141006abc8|||||||||||||||
+get_egate_failure|function|07f4b3df12d3a0d3|||||||||||||||
+get_egate_handling_time|function|d88c8ca84585f77a|||||||||||||||
 get_egate_usage|function|831d8909a32991f5|||||||||||||||
-get_eGate_usage|function|2e70a7ceac435ece|||||||||||||||
 get_figures|function|2ea87f0f65f08dfb|||||||||||||||
 get_n_passengers|function|c955c8a2c6f325f9|||||||||||||||
 get_nationality|function|c0eb0556680a75b1|||||||||||||||
@@ -69,15 +63,15 @@ get_tables|function|91740aa9017e9fb5|||||||||||||||
 get_taxi_time|function|4226ed3077e72906|||||||||||||||
 get_time_from_numeric|function|41883df7e5540d30|||||||||||||||
 get_walk_time|function|89818a52be67933a|||||||||||||||
-immigration_queue|function|f01273722012c628|||||||||||||||
-load_factor_mean|stem|4ee2ad9b5584e82a|0d7dbdaa510049ce|ef46db3751d8e999|-593818277||t19432.5461408405s|b6d2e014b07bc296|51|rds|local|vector|||0||
+immigration_queue|function|c77c93a6d0033236|||||||||||||||
+load_factor_mean|stem|3702da4a2d9d3fac|0d7dbdaa510049ce|ef46db3751d8e999|-593818277||t19445.8168937033s|b6d2e014b07bc296|51|rds|local|vector|||0||
 load_factor_sd|stem|626e3e3e098b3e82|57985dbe837787da|ef46db3751d8e999|-1525446501||t19430.3826906951s|c9aaea90a821e608|53|rds|local|vector|||0||
 model|stem|d8e1fb9dc5567626|ae83bc723fe2997c|326e0a6129599004|1816327236||t19408.8231333432s|1254f8a9a0ffbd1f|107|rds|local|vector|||0.003||
 model_data|function|355a4f782e7eaae5|||||||||||||||
 nationality_props|stem|ff1f89373ad9ab45|ea9e93e764aecbe3|4e3739ef91745af0|1683561564|C:/Users/s1989890/Documents/modellinglocal/immigration_queue_simulation_edinburgh_airport/params/nationality_proportions.txt|t19430.384684686s|8c237f5c678b0a48|160|file|local|vector|||0.02||
 other_hubs|stem|2db877e02e86356f|099778a9a735d16f|4564ea0bac1f6a0f|1052342474||t19432.5461485157s|a44f74ecaf054496|60|rds|local|vector|||0.3||
 Other_hubs|stem|54324757cbd33cc0|cf543aac3f30692f|a3dad144c40657ed|-100759825||t19430.382690834s|dff9495c51b724c1|77|rds|local|vector|||0||
-other_hubs_raw|stem|92aca90e9f87201c|b4a4866dee3f9c25|4e3739ef91745af0|1207641963|C:/Users/s1989890/Documents/modellinglocal/immigration_queue_simulation_edinburgh_airport/params/nationality_info/other_hubs.txt|t19432.5452408599s|b5ba56d93279eb83|7|file|local|vector|||0.03||
+other_hubs_raw|stem|92aca90e9f87201c|b4a4866dee3f9c25|4e3739ef91745af0|1207641963|/Users/jacobbradley/Documents/immigration_queue_simulation_edinburgh_airport/params/nationality_info/other_hubs.txt|t19445.8163759681s|b5ba56d93279eb83|7|file|local|vector|||0.014||
 passengers_from_aircraft|stem|1125943382a9721b|d973c786b3ee5c0b|31a2a8418ef3d7d6|-1014272765||t19418.6702960394s||167|rds|local|vector|||0.003||could not find function get_passengers_from_aircraft
 passengers_from_aircrafts|stem|33a3e59d32c588ef|119915b9225489c7|7a33c030a2725175|-1183135713||t19430.3826905215s|bd9cdb2e6c3ecc89|253|rds|local|vector|||0||
 passengers_from_hall|stem|fba6ce12b929817d|4225491174f7f5fb|0290a5fbe5cacb7a|2060253316||t19418.6787434789s|1d5c59973993a867|194|rds|local|vector|||0||
