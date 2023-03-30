@@ -60,7 +60,10 @@ get_figures <- function(future_aircrafts_arrivals, future_coached_levels, aircra
     filter(!(dep_country %in% UK_plus_countries)) %>% 
     group_by(Year) %>% 
     summarise(`Total Passengers` = sum(max_passengers)) %>% 
-    mutate(coached_status = "Unknown")
+    mutate(coached_status = "Unknown") %>% 
+    bind_rows(data.frame(Year = c("2020", "2021"),
+                         coached_status = "Unknown") %>% 
+                mutate(`Total Passengers` = 0))
   
   figures$future_passenger_burden_fig <- future_aircrafts_arrivals %>% # future_aircrafts_arrivals %>% # 
     mutate(Year = format(sched_aircraft_datetime_posix, format = "%Y")) %>% 
