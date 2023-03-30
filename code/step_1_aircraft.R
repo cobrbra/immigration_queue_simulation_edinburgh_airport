@@ -149,7 +149,8 @@ get_passengers_after_aircrafts <- function(aircrafts,
     aircraft_time_int = rep(aircrafts_with_passengers$aircraft_time_int, n_passengers_aircraft),
     aircraft_date_posix = rep(aircrafts_with_passengers$aircraft_date_posix, n_passengers_aircraft),
     coached = rep(aircrafts_with_passengers$coached, n_passengers_aircraft)
-  )
+  ) %>% 
+    sample_frac(1)
   
   check_passengers_after_aircraft(passengers)
   return(passengers)
