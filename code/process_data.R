@@ -172,3 +172,62 @@ process_aircrafts_arrivals <- function(folder_name,
   check_aircrafts_arrivals(aircrafts_observed_arrivals)
   return(aircrafts_observed_arrivals)
 }
+
+process_future_aircrafts_arrivals <- function(file) {
+  future_aircraft_arrivals <- 3:7 %>% 
+    map(~read_xlsx(file, 
+                   sheet = .)) %>% 
+    bind_rows() %>% 
+    mutate(flight_date = format(`flight date`, format = "%Y-%m-%d"),
+           arrival_time = format(`arrival time`, format  = "%H:%M:%S"),
+           n_passengers = passengers) %>% 
+    mutate(sched_aircraft_datetime_posix = as.POSIXct(paste(flight_date, arrival_time))) %>% 
+    mutate(sched_aircraft_datetime_int = as.numeric(sched_aircraft_datetime_posix)) %>% 
+    mutate(sched_aircraft_date_posix = as.Date(sched_aircraft_datetime_posix)) %>% 
+    mutate(sched_aircraft_time_int = sched_aircraft_datetime_int - as.numeric(sched_aircraft_date_posix - as.Date('1970-01-01 00:00:00')) * 86400)
+  
+  n_future_flights <- nrow(future_aircraft_arrivals)
+  
+  future_aircraft_arrivals <- future_aircraft_arrivals %>%
+    mutate(flight_id = paste0("F", str_pad(1:n_future_flights, 10, pad = "0")),
+           dep_country = rep(NA, n_future_flights),
+           dep_airport = rep(NA, n_future_flights),
+           ac_type = rep(NA, n_future_flights),
+           aircraft_datetime_int = rep(NA, n_future_flights),
+           aircraft_time_int = rep(NA, n_future_flights),
+           aircraft_datetime_posix = rep(NA, n_future_flights),
+           aircraft_date_posix = rep(NA, n_future_flights),
+           des_rwy = rep(NA, n_future_flights),
+           max_passengers = n_passengers,
+           coached = rep(NA, n_future_flights)) %>% 
+    select(flight_id, dep_country, dep_airport, ac_type,
+           aircraft_datetime_int,aircraft_time_int, aircraft_datetime_posix, aircraft_date_posix,
+           sched_aircraft_datetime_int, sched_aircraft_time_int, sched_aircraft_datetime_posix, sched_aircraft_date_posix,
+           des_rwy, max_passengers, n_passengers, coached)
+  
+  check_aircrafts_arrivals(future_aircraft_arrivals)
+  return(future_aircraft_arrivals)
+}
+
+filter_arrivals_for_equivalent_weeks <- function(aircrafts_observed_arrivals, UK_plus_countries) {
+  aircrafts_observed_arrivals %>% 
+    mutate(Year = format(sched_aircraft_datetime_posix, format = "%Y")) %>% 
+    filter(((Year == 2022) & 
+              (sched_aircraft_date_posix >= as.Date("2022-07-11")) &
+              (sched_aircraft_date_posix <= as.Date("2022-07-17"))) |
+             ((Year == 2019) &
+                (sched_aircraft_date_posix >= as.Date("2019-07-08")) &
+                (sched_aircraft_date_posix <= as.Date("2019-07-14")))) %>% 
+    filter(!(dep_country %in% UK_plus_countries)) %>% 
+    return()
+}
+
+process_future_coached_levels <- function(file) {
+  future_coached_levels <- read_xlsx(file, 
+            range = "assumptions!B21:G22",
+            col_names = c("coached_status", "2023", "2024", "2025", "2026", "2027")) %>% 
+    mutate(coached_status = if_else(coached_status == "% of arriving flights coached", "Coached", "Contact")) %>% 
+    pivot_longer(cols = - coached_status, names_to = "Year", values_to = "Percent")
+  
+  return(future_coached_levels)
+}
