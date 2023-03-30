@@ -39,7 +39,6 @@
  \newacronym{bfo}{BFO}{Border Force Officer}
  \newacronym[plural=SLAs, firstplural=Service Level Agreements]{sla}{SLA}{Service Level Agreement}
  \newacronym[plural=eGates, firstplural=electronic passport Gates]{egate}{eGate}{electronic passport Gate}
- \newacronym{eal}{EAL}{Edinburgh Airport}
  \newacronym[plural=KPIs, firstplural=Key Performance Indicators]{kpi}{KPI}{Key Performance Indicator}
 
 % Inline comments from Jacob and Bella
@@ -49,7 +48,8 @@
 \FXRegisterAuthor{jb}{ajb}{\color{blue} JB}
 \FXRegisterAuthor{bd}{abd}{\color{red} BD}
 
-\title{Planning for future immigration demand at Edinburgh Airport}
+\title{Anticipating demand on immigration at Edinburgh Airport}
+% Planning for future immigration demand at Edinburgh Airport
 % Simulations of Immigration Queues at Edinburgh Airport: Report}
  \author{Isabella Deutsch and Jacob R. Bradley}
  % \\ \emph{School of Mathematics, University of Edinburgh}}
@@ -60,14 +60,14 @@
 
 \section{Introduction}
 
-A large number of passengers arriving internationally at \gls{eal} need to pass through immigration. These passengers are either processed at a desk staffed by a \gls{bfo} or, for passengers of certain nationalities, at an automated \gls{egate}. With overall passenger footfall expected to increase substantially over the next five years, pressure on immigration services is also growing, and the airport will need to adapt its operations in order to accommodate its international arrivals safely and efficiently. In particular, the airport has committed to several \glspl{sla} ensuring quality of experience for arrivals. One avenue being explored to meet \glspl{sla} is the expanded use of \glspl{egate}, both through additional construction and measures encouraging increased uptake \cite{UK_border_2025}. In this report we investigate the outcomes of these measures, providing clear recommendations for \gls{egate} construction and usage over the next five years (2023-2027). For key results, see our one page high-level summary.
+A large number of passengers arriving internationally at Edinburgh Airport need to pass through immigration. These passengers are either processed at a desk staffed by a \gls{bfo} or, for passengers of certain nationalities, at an automated \gls{egate}. With overall passenger footfall expected to increase substantially over the next five years, pressure on immigration services is also growing, and the airport will need to adapt its operations in order to accommodate its international arrivals safely and efficiently. In particular, the airport has committed to several \glspl{sla} ensuring quality of experience for arrivals. One avenue being explored to meet \glspl{sla} under increased demand is the expanded use of \glspl{egate}, both through additional construction and measures encouraging increased uptake \cite{UK_border_2025}. In this report we investigate the outcomes of these measures, providing clear recommendations for \gls{egate} construction and usage over the next five years (2023-2027). For key results, see our one page high-level summary.
 % This does not apply for anyone arriving from the United Kingdom (including Northern Ireland), the Crown Dependencies, and the Republic of Ireland, as there are no routine passport controls between these countries \cite{common_travel_area}.
-% Only passengers of certain nationality are eligible to use the \glspl{egate}, as defined below. There are currently 9 desks and 10 \glspl{egate} in operation at \gls{eal}. 
+% Only passengers of certain nationality are eligible to use the \glspl{egate}, as defined below. There are currently 9 desks and 10 \glspl{egate} in operation at Edinburgh Airport. 
 
 \subsection{Problem Statement}
-The task set by \gls{eal} is to develop a simulation model of immigration queueing that can be used to test a variety of demand scenarios, including overall and demographic changes in passenger arrivals, process enhancements, and increased \gls{egate} availabilty. 
-Additionally, sensitivity analysis is required to assess the robustness of these recommendations under a variety of pertubation scenarios.
-The overall performance of \gls{eal}'s immigration queueing operation is measured via three \glspl{kpi}, defined below.
+The task set by Edinburgh Airport is to develop a simulation model of immigration queuing that can be used to test a variety of demand scenarios, including overall and demographic changes in passenger arrivals, process enhancements, and increased \gls{egate} availability. 
+Additionally, sensitivity analysis is required to assess the robustness of these recommendations under a variety of perturbation scenarios.
+The overall performance of Edinburgh Airport's immigration queuing operation is measured via three \glspl{kpi}, defined below.
 
 \subsection{Key Performance Indicators}
 
@@ -76,7 +76,7 @@ Three \glspl{kpi} have been identified to form the basis of the airport's \glspl
 \begin{itemize}
     \item \textbf{Queue length(s)}: The number of passengers queuing for a desk or \gls{egate} in the immigration hall/overflow zone at any given time.
     % We report the mean, median, 75\% quantile, and maximum. This is considered for both desk and \gls{egate}-specific queues.
-    \item \textbf{Queue time}: Minutes between arrival at the immigration hall/overflow zone and arrival at a desk/\gls{egate} for a given passenger arriving at \gls{eal}. 
+    \item \textbf{Queue time}: Minutes between arrival at the immigration hall/overflow zone and arrival at a desk/\gls{egate} for a given passenger arriving at Edinburgh Airport. 
     % We report the mean, median, 75\% quantile, and maximum. 
     % This are calculated both for the total of the immigration queue, as well as the desk and \gls{egate} queues separately.
     \item \textbf{Overflow usage}: The proportion of a given day for which immigration hall overflow capacity was in use.
@@ -86,18 +86,18 @@ Note that \textit{queue length} is measured as a function over time, i.e. we rec
 
 
 \section{Data}
-This section outlines the datasets used throughout this report. The majority of the data used for the core components of our analysis were provided by \gls{eal} via the Edinburgh SIAM \& IMA Student Chapter Modelling Competition \cite{modelling_competition}. Occasionally, it has been useful to make use of some external datasets, which have also been described here. These are all either in the public domain, or are accessible to all researchers participating in the modelling competition. 
+This section outlines the datasets used throughout this report. The majority of the data used for the core components of our analysis were provided by Edinburgh Airport via the Edinburgh SIAM \& IMA Student Chapter Modelling Competition \cite{modelling_competition}. Occasionally, it has been useful to make use of some external datasets, which have also been described here. These are all either in the public domain, or are accessible to all researchers participating in the modelling competition. 
 
 \subsection{Competition Data}
 
-We first outline the data received through the modelling competition. This data, informed by real arrivals data at \gls{eal}, is intended to provide a baseline set of assumptions for the composition of airport arrivals across five busy future weeks, each in early July of the years 2023-207 respectively.
+We first outline the data received through the modelling competition. This data, informed by real arrivals data at Edinburgh Airport, is intended to provide a baseline set of assumptions for the composition of airport arrivals across five busy future weeks, each in early July of the years 2023-2027 respectively.
 % While these represent realistic values, we are aware that they may contain approximations and/or simulated data. 
 % Most notably, the arrivals data in Section~\ref{XX} is a fictitious arrivals schedule for five weeks in the future, in namely 2023 to 2027. 
 
 \subsubsection{Operational Data}
 
 \paragraph{Hall Capacity}
-The immigration hall at \gls{eal} has a \textit{capacity} of 500 people. Its \textit{overflow} capacity, which can be used without overly impacting other areas of the operation, is a further 150 people. There is also a \textit{contingency} capacity for additional 600 people. However, its usage negatively impacts the operations of the airport.
+The immigration hall at Edinburgh Airport has a \textit{initial capacity} of 500 people. Its \textit{overflow capacity}, which can be used without overly impacting other areas of the operation, is a further 150 people. There is also a \textit{contingency capacity} for additional 600 people. However, its usage negatively impacts the operations of the airport.
 
 \paragraph{Coached vs. Contact}
 Once an aircraft has reached its parking position there are two ways for passengers to reach the terminal building. \textit{Contact} passengers walk by foot to the immigration queue. \textit{Coached} passengers exit the aircraft via stairs and are loaded onto buses, which bring them to the terminal building. The percentage of contact passengers lies around 80\% and varies across years.
@@ -111,7 +111,7 @@ Passengers of the following nationalities are allowed to use \glspl{egate}: EU c
 In the summer of 2019 only 58\% of flights arrived on time (measured if arrived within 15 minutes of scheduled arrival), 21\% were late, and 21\% were early. 
 
 \subsubsection{Future Arrivals Data}
-Via the modelling competition, we have been provided with an anticipated future arrivals schedule and passenger counts for five July weeks (each Monday to Sunday) over the next five years (2023-2027). These comprise a total of 4,123 flights and represent increasing aircrafts arrivals over time (Table~\ref{tab:future_arrivals_overview}). These are reflected in an increased passenger throughput over the same time period, comprising increases in both coached and contact arrivals (Figure~\ref{fig:future_passenger_burden}).
+Via the modelling competition, we have been provided with an anticipated future arrivals schedule and passenger counts for five July weeks (each Monday to Sunday) over the next five years (2023-2027). These comprise a total of 4,123 flights and represent increasing aircraft arrivals over time (Table~\ref{tab:future_arrivals_overview}). These are reflected in an increased passenger throughput over the same time period, comprising increases in both coached and contact arrivals (Figure~\ref{fig:future_passenger_burden}).
 \begin{table}[!ht]
 \caption{Anticipated flight schedule, 2023-2027.}
 \label{tab:future_arrivals_overview}
@@ -139,7 +139,7 @@ We are not provided with informaion on passenger nationalities, or airports of d
 \subsection{External Datasets}
 
 \paragraph{eGate Utilisation}
-The UK government's target for \gls{egate} usage among those eligible is 80\% \cite{UK_border_2025}, which was broadly met on a national level in 2019 and the first quarter of 2020. For airports in the North the uptake was consistently lower at around 70\% for the same period \cite{Inspection_eGates}. While there were no publicly available data for \gls{eal}, Glasgow Airport's uptake of around 60\% represents some of the lowest utilisation of \glspl{egate} nationwide \cite{Inspection_eGates}, and may serve as a reference/lower band due to its proximity.
+The UK government's target for \gls{egate} usage among those eligible is 80\% \cite{UK_border_2025}, which was broadly met on a national level in 2019 and the first quarter of 2020. For airports in the North the uptake was consistently lower at around 70\% for the same period \cite{Inspection_eGates}. While there were no publicly available data for Edinburgh Airport, Glasgow Airport's uptake of around 60\% represents some of the lowest utilisation of \glspl{egate} nationwide \cite{Inspection_eGates}, and may serve as a reference/lower band due to its proximity.
 
 \paragraph{Average Queue Time eGates}
 The average queue time at \glspl{egate} at UK airports for the financial years 2017-18, 2018-19, 2019-20 and Q1 2020 was six minutes and one second \cite{Inspection_eGates}. Stansted and Luton reported averages just below the three minute mark. Glasgow Airport's average waiting time at the \glspl{egate} was over 8.5 minutes. However, their calculation was based a shorter time period (December 2017, January 2018, and February 2019), and may therefore be unrepresentative \cite{Inspection_eGates}.
@@ -176,11 +176,11 @@ We assume that the passenger nationality split depends on departure airport, and
 
 \section{Passenger Processing Model}
 
-For our analysis we are using a passenger processing model. It provides an overview over the steps an arriving passenger experiences at \gls{eal}. It lies in the nature of such a model that it is a simplified view of the world, but we are confident that the chosen level of abstraction is nevertheless informative of the real-world processes at the airport. The passenger processing model consist of three steps, which are outline in detail in the subsequent sections.
+For our analysis we are using a passenger processing model. It provides an overview over the steps an arriving passenger experiences at Edinburgh Airport. It lies in the nature of such a model that it is a simplified view of the world, but we are confident that the chosen level of abstraction is nevertheless informative of the real-world processes at the airport. The passenger processing model consist of three steps, which are outline in detail in the subsequent sections.
 
 The three steps divide the passenger epxerience as as follows:
 \begin{enumerate}
-    \item \textbf{Aircraft}: Aircraft with passengers on board arrive at \gls{eal}. The aircraft taxis to its parking position and the doors are opened. \label{step:aircraft}
+    \item \textbf{Aircraft}: Aircraft with passengers on board arrive at Edinburgh Airport. The aircraft taxis to its parking position and the doors are opened. \label{step:aircraft}
     \item \textbf{Route}: Passengers make their way from their aircraft to the immigration hall, either by walking to the building (contact) or via a bus (coached). \label{step:route}
     \item \textbf{Immigration}: Passengers queue in the immigration hall and are processed at the boarder, either at a desk by a Border Force Officer or at an automated \gls{egate}. \label{step:immigration}
 \end{enumerate}
@@ -198,37 +198,44 @@ these are slightly different for competition and noise data
 
 \subsubsection{Aircraft}
 
-\paragraph{eGate eligibility}
-describe how this interlinks with Passenger nationality Departure Airport Classification, relevant for \gls{egate} eligibility \\
- departure airport is known in the noise set but not in the competition data, UKIE arrivals do not need any passport control
+\paragraph{Departing Airport Classification}
+The competition data set does not contain info in the departing airport. As this is provided in the additional data set we can sample airport classifications for the competition data set conditional on the number of passengers on the flight. We assume that all flights in the competition data come from outside UK+ and hence their passengers need to pass through immigration.
+
+\paragraph{eGate eligibility} 
+As only passengers from certain countries are can use \glspl{egate}, we make the percentage of passengers eligible for \glspl{egate} per aircraft dependent on the classification of the airport. For example, we assume that an aircraft from a hub is more likely to carry a variety of international passengers, of which fewer can use \glspl{egate} compared to a flight from a EU+ non-hub. 
 
 \paragraph{Number of Passengers}
-Known in the competition data set, unknown in the noise data (but we know the max passengers for the aircraft type and load factor)
+The competition data set contains the number of passengers on board each flight. This information is not available for the additional historical data, but can be simulated with the aircraft type, its maximum capacity, and the load factor.
 
 \paragraph{Coached or Contact}
-no info apart from split, important to know if it is small or large planes that are more likely to be coached
+The competition data gives an overall split of flights that are coached or contact for each year. As there was no additional information available we assume that the decision between coached or contact is independent of all flight characteristics. 
+
 
 \subsubsection{Route}
 
 \paragraph{Bulk Profile} 
-What does the bulk profile exactly look like, they don't all arrive in the same second 
+When passengers are brought to the immigration hall by a bus they are arriving at the queue in rapid succession. We choose a XXX distribution  here.
 
 \paragraph{Coach Availability}
-might have to talk about the fact that we always assume enough busses available
+For this project we assume that there are always enough coaches available to transport passengers from the aircraft to the airport building. While this might not be always the case, it provides us with a ``worst case'' scenario from the perspective of the immigration hall, which is most interesting for us. Any delay in passengers due to unavailability of coaches would smooth out peaks. 
 
 
 \subsubsection{Immigration}
 
-\paragraph{Number of eGates}
+\paragraph{Number of \glspl{egate} and desks} There are currently 10 \glspl{egate} and 10 staffed desks in use at Edinburgh Airport. As part of our simulations, these numbers will be increased.
 
-\paragraph{eGate uptake}
+\paragraph{\gls{egate} uptake} 
+Not all passengers who are eligible to use eGates choose to do so for a variety of reasons. We vary the percentage of \gls{egate} uptake between XX and XX. 
 
-\paragraph{eGate failure rate}
+\paragraph{\gls{egate} failure rate}
+A small percentage of passengers who use an \gls{egate} fail to pass through it successfully. This is set to kie between XX and XX.
 
-\paragraph{Priority for failed eGate passengers}
+\paragraph{Priority for failed \gls{egate} passengers}
+Passengers who used an \gls{egate}, but failed to use it successfully, need to exit the \gls{egate} back into the immigration hall to complete their immigration at a staffed desk. They join a separate queue towards the desks, which is located next to the general desk queue. Whenever a desk can handle a new person, priority is given to the passenger from the failed \gls{egate} queue with a probability of XX to XX.
 
 \paragraph{Capacity Split}
-Which percentage of the hall capacity, overflow, and contingency is allocated to the desk queue
+
+Which percentage of the hall capacity, overflow , and contingency is allocated to the desk queue
 
 
 
@@ -259,7 +266,7 @@ need to also talk about the hall setup here?
 summary of the project and our approach \\
 the number of contact spaces is fixed at the airport so if you want more flights you need to coach them (unless you want to undertake big building works)
 
-\subsection{Recommendation for Capacity Split}
+\subsection{Recommendation for Hall Layout}
 
 \subsection{Recommendation for Total Number of eGates}
 we need to put our foot down and come up with a final number
