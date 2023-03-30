@@ -61,6 +61,9 @@ list(
                aircrafts_observed_arrivals_raw,
                airports_reference = airports,
                aircrafts_reference = aircrafts)),
+  tar_target(filtered_aircrafts_observed_arrivals,
+             filter_arrivals_for_equivalent_weeks(aircrafts_observed_arrivals = aircrafts_observed_arrivals,
+                                                  UK_plus_countries = UK_plus_countries)),
   
   # Making the future aircraft arrivals dataset accessible
   tar_target(future_aircrafts_arrivals_raw,
@@ -136,8 +139,7 @@ list(
   tar_target(figures,
              get_figures(future_aircrafts_arrivals = future_aircrafts_arrivals,
                          future_coached_levels = future_coached_levels,
-                         aircrafts_observed_arrivals = aircrafts_observed_arrivals,
-                         UK_plus_countries = UK_plus_countries))
+                         filtered_aircrafts_observed_arrivals = filtered_aircrafts_observed_arrivals))
   
   # # Generating simulated arrivals data
   # tar_target(arrivals_sim_params,

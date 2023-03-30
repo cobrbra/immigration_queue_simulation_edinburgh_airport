@@ -209,6 +209,19 @@ process_future_aircrafts_arrivals <- function(file) {
   return(future_aircraft_arrivals)
 }
 
+filter_arrivals_for_equivalent_weeks <- function(aircrafts_observed_arrivals, UK_plus_countries) {
+  aircrafts_observed_arrivals %>% 
+    mutate(Year = format(sched_aircraft_datetime_posix, format = "%Y")) %>% 
+    filter(((Year == 2022) & 
+              (sched_aircraft_date_posix >= as.Date("2022-07-11")) &
+              (sched_aircraft_date_posix <= as.Date("2022-07-17"))) |
+             ((Year == 2019) &
+                (sched_aircraft_date_posix >= as.Date("2019-07-08")) &
+                (sched_aircraft_date_posix <= as.Date("2019-07-14")))) %>% 
+    filter(!(dep_country %in% UK_plus_countries)) %>% 
+    return()
+}
+
 process_future_coached_levels <- function(file) {
   future_coached_levels <- read_xlsx(file, 
             range = "assumptions!B21:G22",
