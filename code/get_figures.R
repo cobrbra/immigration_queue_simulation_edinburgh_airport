@@ -81,7 +81,7 @@ get_figures <- function(future_aircrafts_arrivals, future_coached_levels, aircra
     theme(legend.title = element_blank()) +
     scale_fill_manual(values = edi_airport_colours) +
     scale_y_continuous(labels = scales::comma)
-  figure_sizes$future_passenger_burden_fig <- c(6, 3)
+  figure_sizes$future_passenger_burden_fig <- c(7, 3)
   
   
   # figures$figure_1 <- ...  + 
