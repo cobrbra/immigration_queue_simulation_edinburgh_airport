@@ -75,15 +75,22 @@ get_nationality_split <- function(aircrafts, EU_plus_hubs, other_hubs, prop_nati
   
   n_aircrafts <- dim(aircrafts)[1]
   
-  aircrafts_with_airport_class <- aircrafts %>% 
-    mutate(airport_classification = get_airport_classification(
-      airport_country = dep_country,
-      airport_3letter = dep_airport,
-      EU_plus_hubs = EU_plus_hubs, 
-      other_hubs = other_hubs, 
-      UK_plus_countries = UK_plus_countries, 
-      EU_plus_countries = EU_plus_countries
-    ))
+  if (!("airport_classification" %in% colnames(aircrafts)) | 
+      (("airport_classification" %in% colnames(aircrafts)) & 
+       any(is.na(aircrafts[["airport_classification"]])))) {
+    aircrafts_with_airport_class <- aircrafts %>% 
+      mutate(airport_classification = get_airport_classification(
+        airport_country = dep_country,
+        airport_3letter = dep_airport,
+        EU_plus_hubs = EU_plus_hubs, 
+        other_hubs = other_hubs, 
+        UK_plus_countries = UK_plus_countries, 
+        EU_plus_countries = EU_plus_countries
+      ))
+  }
+  else{
+    aircrafts_with_airport_class <- aircrafts
+  }
   
   sim_passengers <- function(n_passenegers, airport_classification) {
     sample(x = colnames(prop_nationality)[-1],
