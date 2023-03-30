@@ -57,7 +57,8 @@ get_passengers_after_route <- function(passengers_after_aircraft) {
     select(-c(coach_time, walk_time, 
               aircraft_datetime_int, aircraft_datetime_posix, 
               aircraft_time_int, aircraft_date_posix)) %>%
-    arrange(route_datetime_int)
+    arrange(route_datetime_int) %>% 
+    as.data.frame()
   
   check_passengers_after_route(passengers_after_route)
   return(passengers_after_route)
