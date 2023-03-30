@@ -61,7 +61,8 @@ get_figures <- function(future_aircrafts_arrivals, future_coached_levels, ...) {
     labs(title = "Future passenger pressure forecasted to increase") + 
     theme_edi_airport() +
     theme(legend.title = element_blank()) +
-    scale_fill_manual(values = edi_airport_colours) 
+    scale_fill_manual(values = edi_airport_colours) +
+    scale_y_continuous(labels = scales::comma)
   figure_sizes$future_passenger_burden_fig <- c(6, 3)
   
   
