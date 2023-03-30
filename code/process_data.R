@@ -231,3 +231,70 @@ process_future_coached_levels <- function(file) {
   
   return(future_coached_levels)
 }
+
+
+
+
+
+process_aircrafts_quantiles <- function(aircrafts, 
+                                        EU_plus_hubs, other_hubs, UK_plus_countries,
+                                        EU_plus_countries, load_factor_mean, load_factor_sd, 
+                                        seed
+){
+  ac <- aircrafts
+  
+  ac <- ac[!ac$dep_country %in% targets::tar_read(UK_plus_countries), ]
+  
+  ac_class <- get_airport_classification(airport_country = ac$dep_country, 
+                                         airport_3letter = ac$dep_airport, 
+                                         EU_plus_hubs = EU_plus_hubs, 
+                                         other_hubs = other_hubs,
+                                         UK_plus_countries =  UK_plus_countries,
+                                         EU_plus_countries = EU_plus_countries)
+  
+  ac_pass <- get_n_passengers(max_passengers = ac$max_passengers, 
+                              load_factor_mean = load_factor_mean,
+                              load_factor_sd = load_factor_sd,
+                              seed = seed)
+  
+  
+  quants_pass <- quantile(ac_pass, probs = seq(from = 0.2, to = 1, by = 0.2))
+  
+  ac_pass_quantile <- sapply(lapply(ac_pass, FUN = `>`, quants_pass), sum) + 1
+  
+  tab_ac <- table(ac_class, ac_pass_quantile)
+  
+  tab_ac_prop <- prop.table(tab_ac, margin = 2)
+  
+  res_list <- list(quantiles = quants_pass, table = tab_ac_prop)
+  
+  return(res_list)
+}
+
+
+simulate_future_airport_classification <- function(aircrafts, quantile_list, seed = NULL){
+  
+  if (!is.null(seed)) {set.seed(seed)}
+  
+  n_aircrafts <- dim(aircrafts)[1]
+  quantiles <- quantile_list[[1]]
+  table_for_sampling <- quantile_list[[2]]
+  
+  ap_classifications <- rownames(table_for_sampling)
+  
+  res <- numeric(n_aircrafts)
+  
+  for(i in seq_len(n_aircrafts)) {
+    
+    selected_quantile <- sum(aircrafts$n_passenger[i] > quantiles) + 1
+    res[i] <- sample(x = ap_classifications, size = 1, prob = table_for_sampling[, selected_quantile])
+    
+  }
+  
+  return(res)
+  
+}
+
+
+
+
