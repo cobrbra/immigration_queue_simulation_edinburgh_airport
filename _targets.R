@@ -74,6 +74,11 @@ list(
   tar_target(future_coached_levels,
              process_future_coached_levels(future_aircrafts_arrivals_raw)),
   
+  tar_target(n_passenger_quantiles, 
+             process_aircrafts_quantiles(aircrafts_observed_arrivals, 
+                                         EU_plus_hubs, other_hubs, UK_plus_countries,
+                                         EU_plus_countries, load_factor_mean, load_factor_sd)),
+  
   # # Simulate passengers from observed arrivals
   # tar_target(observed_aircrafts_passengers_from_aircrafts,
   #            get_passengers_after_aircrafts(

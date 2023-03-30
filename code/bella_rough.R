@@ -217,6 +217,7 @@ plot(table(dat1$weekend, dat1$nonUKIE), main = "Split per Weekday")
 
 ##### Play around with waiting times #####
 
+passengers <- as.data.frame(targets::tar_read(example_passengers_after_route))
 
 n_desks <- 5
 # desk_rates <- pmax(1/200, rnorm(n_desks, mean = 1/60, sd = 0.01))
@@ -274,4 +275,11 @@ legend("topleft", lwd = 2, col = c("pink", "grey40"), legend = c("eGate", "Desk"
 
 
 
-     
+
+### generate the airport classification for a flight from the competitiond data ###
+
+
+
+
+melt(tab_ac_prop) %>%
+  ggplot(aes(x = ac_pass_quantile, fill = ac_class, y = value)) + geom_col(position = "fill")
