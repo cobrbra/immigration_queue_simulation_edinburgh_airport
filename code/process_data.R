@@ -239,8 +239,11 @@ process_future_coached_levels <- function(file) {
 process_aircrafts_quantiles <- function(aircrafts, 
                                         EU_plus_hubs, other_hubs, UK_plus_countries,
                                         EU_plus_countries, load_factor_mean, load_factor_sd, 
-                                        seed
+                                        seed = NULL
 ){
+  
+  if (!is.null(seed)) {set.seed(seed)}
+  
   ac <- aircrafts
   
   ac <- ac[!ac$dep_country %in% targets::tar_read(UK_plus_countries), ]
