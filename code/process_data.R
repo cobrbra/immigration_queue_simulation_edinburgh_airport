@@ -65,7 +65,6 @@ check_aircrafts_arrivals <- function(aircrafts_observed_arrivals) {
 
 get_datetime_alternates <- function(events_with_datetime_int, column_prefixes = c("aircraft")) {
   for (column_prefix in column_prefixes) {
-    print(paste0(column_prefix, "_datetime_int"))
     events_with_datetime_int[[paste0(column_prefix, "_datetime_posix")]] <- events_with_datetime_int[[paste0(column_prefix, "_datetime_int")]] %>% 
       as.POSIXct(origin = "1970-01-01 00:00:00")
     events_with_datetime_int[[paste0(column_prefix, "_date_posix")]] <- events_with_datetime_int[[paste0(column_prefix, "_datetime_posix")]] %>% 
@@ -286,16 +285,16 @@ simulate_future_airport_classification <- function(aircrafts, quantile_list, see
   
   ap_classifications <- rownames(table_for_sampling)
   
-  res <- numeric(n_aircrafts)
+  airport_classification <- numeric(n_aircrafts)
   
   for(i in seq_len(n_aircrafts)) {
     
     selected_quantile <- sum(aircrafts$n_passengers[i] > quantiles) + 1
-    res[i] <- sample(x = ap_classifications, size = 1, prob = table_for_sampling[, selected_quantile])
+    airport_classification[i] <- sample(x = ap_classifications, size = 1, prob = table_for_sampling[, selected_quantile])
     
   }
   
-  return(res)
+  return(aircrafts %>% mutate(airport_classification = airport_classification))
   
 }
 
