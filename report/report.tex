@@ -6,7 +6,7 @@
 % \usepackage{epsf}
 
 % Draft watermark
-\usepackage{draftwatermark}
+% \usepackage{draftwatermark}
 
 % Font
 \usepackage[default]{lato}
@@ -60,7 +60,7 @@
 
 \section{Introduction}
 
-A large number of passengers arriving internationally at \gls{eal} need to pass through immigration. These passengers are either processed at a desk staffed by a \gls{bfo} or, for passengers of certain nationalities, at an automated \gls{egate}. With overall passenger footfall expected to increase substantially over the next five years, pressure on immigration services is also growing, and the airport will need to adapt its operations in order to accommodate its international arrivals safely and efficiently. In particular, the airport has committed to several \glspl{sla} ensuring quality of experience for arrivals. One avenue being explored to meet \glspl{sla} is the expanded use of \glspl{egate} both through increased construction of \glspl{egate} and measures encouraging increased uptake \cite{UK_border_2025}. In this report we investigate the likely performance of these measures, providing clear recommendations for \gls{egate} construction and usage over the next five years (2023-2027).
+A large number of passengers arriving internationally at \gls{eal} need to pass through immigration. These passengers are either processed at a desk staffed by a \gls{bfo} or, for passengers of certain nationalities, at an automated \gls{egate}. With overall passenger footfall expected to increase substantially over the next five years, pressure on immigration services is also growing, and the airport will need to adapt its operations in order to accommodate its international arrivals safely and efficiently. In particular, the airport has committed to several \glspl{sla} ensuring quality of experience for arrivals. One avenue being explored to meet \glspl{sla} is the expanded use of \glspl{egate}, both through additional construction and measures encouraging increased uptake \cite{UK_border_2025}. In this report we investigate the outcomes of these measures, providing clear recommendations for \gls{egate} construction and usage over the next five years (2023-2027). For key results, see our one page high-level summary.
 % This does not apply for anyone arriving from the United Kingdom (including Northern Ireland), the Crown Dependencies, and the Republic of Ireland, as there are no routine passport controls between these countries \cite{common_travel_area}.
 % Only passengers of certain nationality are eligible to use the \glspl{egate}, as defined below. There are currently 9 desks and 10 \glspl{egate} in operation at \gls{eal}. 
 
@@ -133,7 +133,7 @@ We are not provided with informaion on passenger nationalities, or airports of d
 \begin{figure}[!ht]
     \centering
     \includegraphics[width=0.8\textwidth]{figures/future_passenger_burden_fig.png}
-     \caption{Anticipated future contact/coached passenger arrivals in designated weeks over the next five years.  } \label{fig:future_passenger_burden}
+     \caption{Anticipated future contact/coached passenger arrivals in designated weeks over the next five years, alongside historical levels (note no data for 2020 or 2021).} \label{fig:future_passenger_burden}
 \end{figure}
 
 \subsection{External Datasets}
@@ -145,13 +145,10 @@ The UK government's target for \gls{egate} usage among those eligible is 80\% \c
 The average queue time at \glspl{egate} at UK airports for the financial years 2017-18, 2018-19, 2019-20 and Q1 2020 was six minutes and one second \cite{Inspection_eGates}. Stansted and Luton reported averages just below the three minute mark. Glasgow Airport's average waiting time at the \glspl{egate} was over 8.5 minutes. However, their calculation was based a shorter time period (December 2017, January 2018, and February 2019), and may therefore be unrepresentative \cite{Inspection_eGates}.
 
 
-\paragraph{Historical Arrival Data}
-talk about our fancy arrivals data set we have from 2019 and 2022 \\
-here quite a few plots might be needed 
-
-
+\paragraph{Historical Arrivals Data}
+We accessed complementary historical historical flight arrivals data from the Edinburgh Airport Noise Lab \cite{noise_lab}. For these 83,652 passenger flight arrivals, spread Q1-4 for the years 2019 and 2022 (Table~\ref{tab:observed_arrivals_overview}), we were able to recover airport of origin, aircraft type (and therefore a proxy for passenger count), and scheduled vs. actual arrival time. We were not, however (unlike for anticipated future arrivals) able to recover coached vs. contact status (Figure~\ref{fig:future_passenger_burden}). We see this dataset, therefore, as useful for validating distributional assumptions around aircraft arrival times and passenger demographics. 
 \begin{table}[!ht]
-\caption{Historic data sets of Edinburgh Airport Arrivals.}
+\caption{Historic datasets of Edinburgh Airport Arrivals.}
 \label{tab:observed_arrivals_overview}
 \centering
 \begin{tabular}{ccccc}
@@ -162,19 +159,16 @@ here quite a few plots might be needed
  \hline
 \end{tabular}
 \end{table}
-
-
-we don't have passengers on board, but we do have the airplane type. \\
-We obtained a data set indicating the maximum number of passengers for each aircraft type \cite{aircraft_capacity}. The average percentage of occupied seat for a given flight ranges from 86\% in 2019 for international flights in the UK \cite{loading_factor_national} to self-reporter 91\% for a budget airline in 2022 \cite{loading_factor_ryanair}. This is called the \textit{load factor}.
+Aircraft type and maximum passenger capacity were established by cross-linking with another publicly available dataset \cite{aircraft_capacity}. The average percentage of occupied seat for a given flight ranges from 86\% in 2019 for international flights in the UK \cite{loading_factor_national} to self-reported 91\% for a budget airline in 2022 \cite{loading_factor_ryanair}. This is called the \textit{load factor}.
 
 \paragraph{Airport Classification}
-We assume that the split in passenger nationality depends on the departing airport. We therefore group airports into the following categories: 
+We assume that the passenger nationality split depends on departure airport, and therefore group airports into the following categories: 
 \begin{itemize}
-    \item \textbf{UKIE}: All airports in the United Kingdom (including Northern Ireland), the Crown Dependencies, and the Republic of Ireland.
-    \item \textbf{EU+ hubs}: Hub airports in EU+. These are XXXXXXX \cite{mega_hubs}.
-    \item \textbf{EU+ non-hubs}: Airports, which are not hubs, located in EU+.
-    \item \textbf{Other hubs}: Hub airports outside of EU+. These are XXXXXXX \cite{mega_hubs}.
-    \item \textbf{Other non-hubs}: Airports, which are not hubs, located outside of EU+.
+    \item \textbf{UK+}: All airports in the United Kingdom (including Northern Ireland), the Crown Dependencies, and the Republic of Ireland.
+    \item \textbf{EU+ hubs}: Hub airports in EU+. These are Amsterdam Schiphol (AMS), Atlanta International (ATL), Paris Charles de Gaulle (CDG), Dallas (DFW), Denver (DEN), Frankfurt (FRA), and Chicago O'Hare (ORD) \cite{mega_hubs}.
+    \item \textbf{EU+ non-hubs}: Airports which are not hubs but are located in EU+.
+    \item \textbf{Other hubs}: Hub airports outside of EU+. These are Dubai (DBX) and Istanbul (IST) \cite{mega_hubs}.
+    \item \textbf{Other non-hubs}: Airports which are not hubs and are located outside of EU+.
 \end{itemize}
 
 
@@ -235,7 +229,7 @@ might have to talk about the fact that we always assume enough busses available
 
 \paragraph{Capacity Split}
 Which percentage of the hall capacity, overflow, and contingency is allocated to the desk queue
-\bdnote{maybe this only gets discussed later, not sure if we want to mention it here}
+
 
 
 \section{Analysis}
