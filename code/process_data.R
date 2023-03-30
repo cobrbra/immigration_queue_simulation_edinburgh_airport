@@ -289,7 +289,7 @@ simulate_future_airport_classification <- function(aircrafts, quantile_list, see
   
   for(i in seq_len(n_aircrafts)) {
     
-    selected_quantile <- sum(aircrafts$n_passenger[i] > quantiles) + 1
+    selected_quantile <- sum(aircrafts$n_passengers[i] > quantiles) + 1
     res[i] <- sample(x = ap_classifications, size = 1, prob = table_for_sampling[, selected_quantile])
     
   }
