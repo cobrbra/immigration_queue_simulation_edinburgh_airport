@@ -1,91 +1,74 @@
 library(tidyverse)
+library(here) 
 library(scales)
 library(readxl)
 
-future_aircraft_arrivals <- 3:7 %>% 
-  map(~read_xlsx(here("raw_data/EAL International Arrivals Data.xlsx"), 
-                 sheet = .)) %>% 
-  bind_rows() %>% 
-  mutate(flight_date = format(`flight date`, format = "%Y-%m-%d"),
-         arrival_time = format(`arrival time`, format  = "%H:%M:%S"),
-         n_passengers = passengers) %>% 
-  mutate(sched_aircraft_datetime_posix = as.POSIXct(paste(flight_date, arrival_time))) %>% 
-  mutate(sched_aircraft_datetime_int = as.numeric(sched_aircraft_datetime_posix)) %>%
-  mutate()
-  select(sched_aircraft_datetime_posix, sched_aircraft_datetime_int, n_passengers) %>% 
-  mutate()
+ex_week_2023_aircrafts <- tar_read(future_aircrafts_arrivals) %>% 
+  filter(format(sched_aircraft_datetime_posix, format = "%Y") == 2023) %>%
+  mutate(aircraft_datetime_int = simulate_delay_times(flight_id, .21, .58, .21, 50*60, 21*60) + sched_aircraft_datetime_int) %>% 
+  get_datetime_alternates(column_prefixes = c("aircraft", "sched_aircraft")) %>% 
+  mutate(coached = get_coached_status(flight_id)) %>% 
+  simulate_future_airport_classification(tar_read(n_passenger_quantiles))
 
-future_aircraft_arrivals %>% 
-  mutate(Year = format(sched_aircraft_datetime_posix, format = "%Y")) %>% 
-  group_by(Year) %>% 
-  summarise(`Total Passengers` = sum(n_passengers)) %>% 
-  ggplot(aes(x = Year, y = `Total Passengers`)) + 
-  geom_col() +
-  theme_minimal()
+ex_week_2023_passengers <- get_passengers_after_aircrafts(ex_week_2023_aircrafts,
+                                                      tar_read(EU_plus_hubs), tar_read(other_hubs),
+                                                      tar_read(prop_nationality), tar_read(UK_plus_countries),
+                                                      tar_read(EU_plus_countries), tar_read(load_factor_mean), 
+                                                      tar_read(load_factor_sd))
+
+
+ex_week_2023_routes <- get_passengers_after_route(ex_week_2023_passengers)
+
+n_desks <- 9
+# desk_rates <- pmax(1/200, rnorm(n_desks, mean = 1/60, sd = 0.01))
+desk_rates <- pmax(40, rnorm(n_desks, mean = 45, sd = 10))
+desk_ids <- paste0("D", str_pad(1:n_desks, 2, pad = "0"))
+
+bordercheck_desks <- list(n_borderchecks = n_desks, 
+                          bordercheck_rates = desk_rates,
+                          bordercheck_ids = desk_ids)
+
+n_egates <- 10
+# eGate_rates <- pmax(1/120, rnorm(n_egates, mean = 1/30, sd = 0.01))
+eGate_rates <- rep(45, n_egates)#pmax(30, rnorm(n_egates, mean = 25, sd = 5))
+eGate_ids <- paste0("E", str_pad(1:n_egates, 2, pad = "0"))
+
+bordercheck_egates <- list(n_borderchecks = n_egates, 
+                           bordercheck_rates = eGate_rates,
+                           bordercheck_ids = eGate_ids)
+
+
+original_ex_week_2023_immigration <- immigration_queue(ex_week_2023_routes, bordercheck_desks = bordercheck_desks, 
+                                              bordercheck_egates = bordercheck_egates, egate_uptake_prop = 0.8, 
+                                              egate_failure_prop = 0.05, egate_failed_passenger_next = 0.75, seed = 4)
+
+input_times <- seq(from = 1688948394 , to =  1689548711 + 3600, by = 300)
+ql <- get_queue_length(passengers = ex_week_2023_immigration, input_times = input_times) %>% 
+  mutate(input_datetime_int = input_times) %>% 
+  get_datetime_alternates(column_prefixes = c("input"))
+
+ql %>% 
+  pivot_longer(cols = c(desk, egate), names_to = "check_type", values_to = "queue_length") %>%  
+  ggplot(aes(x = input_datetime_posix, y = queue_length, colour = check_type)) + geom_point()
   
-future_aircraft_arrivals %>% 
-  mutate(Year = format(sched_aircraft_datetime_posix, format = "%Y"),
-         time_of_day = as.POSIXct(paste("1970-01-01", 
-                                        format(sched_aircraft_datetime_posix, 
-                                               format = "%H:%M:%S")))) %>% 
-  ggplot(aes(x = time_of_day, fill = Year)) + geom_density(alpha = 0.2) + 
-  theme_minimal() + 
-  labs(x = "", y = "Density ") + 
-  scale_x_datetime(labels = date_format('%H:%M'), 
-                   breaks = as.POSIXct(c("1970-01-01 00:00", 
-                                         "1970-01-01 06:00", 
-                                         "1970-01-01 12:00",
-                                         "1970-01-01 18:00"), tz = "GMT"))
-
-future_aircraft_arrivals %>% 
-  mutate(Year = format(sched_aircraft_datetime_posix, format = "%Y"),
-         time_of_day = as.POSIXct(paste0("1970", 
-                                        format(sched_aircraft_datetime_posix, 
-                                               format = "-%m-%d %H:%M:%S")))) %>% 
-  ggplot(aes(x = time_of_day)) + geom_density(alpha = 0.8) + 
-  facet_wrap(~Year, ncol = 1) +
-  theme_minimal() + 
-  labs(x = "", y = "Number of Aircraft") + 
-  scale_x_datetime(labels = date_format('%b %d, %H:%M'))
-
-future_aircraft_arrivals %>% 
-  ggplot(aes(x = sched_aircraft_datetime_posix)) + geom_histogram() + 
-  labs(x = "", y = "Number of flights", title = "Flights ")
-  theme_minimal()
 
 
-sla_targets <- read_xlsx(here("raw_data/EAL International Arrivals Data.xlsx"), 
-                      range = "assumptions!B3:D16", 
-                      col_names = c("quantity", "value", "notes")) %>% 
-  mutate(quantity = tolower(quantity)) %>% 
-  mutate(quantity = str_replace_all(quantity, "# ", "n_")) %>% 
-  mutate(quantity = str_replace_all(quantity, "% ", "percent_")) %>% 
-  mutate(quantity = str_replace_all(quantity, " ", "_"))
 
-tar_read(example_passengers_after_route) %>% 
-  mutate(`Flight ID` = flight_id) %>% 
-  ggplot(aes(x = route_datetime_posix, fill = `Flight ID`)) + geom_histogram(binwidth = 200, position = "stack") +
-  scale_x_datetime(labels = date_format('%H:%M')) + 
-  theme_minimal() + 
-  labs(x = "", 
-       y = "Number of passengers arriving at immigration hall", 
-       title = "Coached passengers produce stronger peaks")
 
-coached_levels <- aircrafts %>% 
-  arrange(desc(coached)) %>% 
-  pull(aircraft_id)
 
-arrivals_at_hall %>% 
-  mutate(`Aircraft ID` = aircraft_id,
-         coached = if_else(coached, "Coached", "Contact"),
-         stack_group = factor(aircraft_id, levels = coached_levels)) %>% 
-  ggplot(aes(x = arrival_at_hall, 
-             fill = `Aircraft ID`,
-             group = stack_group,
-             linetype = coached)) + 
-  geom_density(position = "stack") +
-  labs(x= "Arrival time in Hall", 
-       y = "Arrival Density",
-       title = "Coached arrivals occur in bulk; contact passengers are spread out") + 
-  theme_light() +
-  scale_linetype_discrete(name = "")
+delay_times <- tar_read(aircrafts_observed_arrivals) %>% 
+  mutate(Year = format(sched_aircraft_datetime_posix, format = "%Y")) %>% 
+  filter(Year == 2019,
+         sched_aircraft_date_posix >= as.Date("2019-06-01"),
+         sched_aircraft_date_posix <= as.Date("2019-08-31")) %>% 
+  mutate(actual_delay = as.numeric(aircraft_datetime_posix - sched_aircraft_datetime_posix)) %>% 
+  select(flight_id, sched_aircraft_datetime_posix, actual_delay) %>% 
+  mutate(simulated_delay = simulate_delay_times(flight_id, prop_flights_delayed = .21, 
+                                                prop_flights_on_time = .58, prop_flights_early = .21, 
+                                                mean_delay_time = 50*60,
+                                                mean_early_time = 21*60)) %>% 
+  pivot_longer(col = c(simulated_delay, actual_delay), names_to = "delay_type", values_to = "delay_time")
+
+delay_times %>% 
+  ggplot(aes(x = delay_time, colour = delay_type)) + geom_density() + #+ facet_wrap(~delay_type, scales = "free")
+    theme_minimal()
