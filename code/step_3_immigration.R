@@ -37,9 +37,25 @@ get_egate_handling_time <- function(borderchecks, bordercheck_id, seed = NULL) {
   if (!is.null(seed)) {set.seed(seed)}
   
   # bordercheck_handling_time <- rexp(1, borderchecks$bordercheck_rates[bordercheck_id])
-  bordercheck_handling_time <- pmax(20, rnorm(1, mean = borderchecks$bordercheck_rates[bordercheck_id]), sd = 5)
+  bordercheck_handling_time <- pmax(20, rnorm(1, mean = borderchecks$bordercheck_rates[bordercheck_id], sd = 5))
   
   return (bordercheck_handling_time)
+}
+
+alt_get_egate_handling_times <- function(handling_time_mean = 45, 
+                                         handling_time_sd = 5, 
+                                         handling_time_lower_bound = 20, 
+                                         n_passengers = 1, 
+                                         seed = NULL) {
+  
+  if (!is.null(seed)) {set.seed(seed)}
+  
+  bordercheck_handling_times <- pmax(handling_time_lower_bound, 
+                                     rnorm(n_passengers, 
+                                           mean = handling_time_mean, 
+                                           sd = handling_time_sd))
+  
+  return (bordercheck_handling_times)
 }
 
 
@@ -55,20 +71,20 @@ get_desk_handling_time <- function(borderchecks, bordercheck_id, seed = NULL) {
 }
 
 
-get_egate_eligible <- function(passengers){
+get_egate_eligible <- function(nationality){
   
-  egate_eligibility <- ifelse(passengers$nationality %in% c("nat_UK_plus", "nat_EU_plus"), "eligible", "not_eligible")
+  egate_eligibility <- if_else(nationality %in% c("nat_UK_plus", "nat_EU_plus"), "eligible", "not_eligible")
   return(egate_eligibility)
   
 }
 
 
-get_egate_usage <- function(passengers, egate_uptake_prop){
+get_egate_usage <- function(egate_eligibility, egate_uptake_prop){
   
   n_passengers <- dim(passengers)[1]
   egate_usage <- rep("desk", times = n_passengers)
   
-  bool_eligible <- passengers$egate_eligibility == "eligible"
+  bool_eligible <- egate_eligibility == "eligible"
   n_eligible <- sum(bool_eligible)
   egate_usage[bool_eligible] <- ifelse(runif(n = n_eligible) < egate_uptake_prop, "egate", "desk")
   
@@ -76,12 +92,12 @@ get_egate_usage <- function(passengers, egate_uptake_prop){
 }
 
 
-get_egate_failure <- function(passengers, egate_failure_prop){
+get_egate_failure <- function(egate_used, egate_failure_prop){
   
   n_passengers <- dim(passengers)[1]
   egate_failed <- rep("no_egate", times = n_passengers)
   
-  bool_usage <- passengers$egate_used == "egate"
+  bool_usage <- egate_used == "egate"
   n_usage <- sum(bool_usage)
   egate_failed[bool_usage] <- ifelse(runif(n = n_usage) < egate_failure_prop, "failed", "passed")
   
@@ -89,9 +105,7 @@ get_egate_failure <- function(passengers, egate_failure_prop){
   
 }
 
-
-
-
+passengers <- ex_week_2023_routes
 
 immigration_queue <- function(passengers, 
                   bordercheck_desks, bordercheck_egates, 
@@ -100,26 +114,46 @@ immigration_queue <- function(passengers,
                   seed = NULL){
   
   if (!is.null(seed)) {set.seed(seed)}
+  message("getting egate eligibilities")
+  passengers <- passengers %>% 
+    mutate(egate_eligibility = get_egate_eligible(nationality)) %>% 
+    mutate(egate_used = get_egate_usage(egate_eligibility, egate_uptake_prop)) %>% 
+    mutate(egate_failed = get_egate_failure(egate_used, egate_failure_prop)) %>% 
+    mutate(bordercheck_start_time = numeric(n()), 
+           bordercheck_end_time = numeric(n()),
+           bordercheck_handled = numeric(n()))
   
-  passengers$egate_eligibility <- get_egate_eligible(passengers)
-  passengers$egate_used <- get_egate_usage(passengers, egate_uptake_prop)
-  passengers$egate_failed <- get_egate_failure(passengers, egate_failure_prop)
-  
-  
-  passengers_egate <- passengers[passengers$egate_used == "egate", ]
-  passengers_desk <- passengers[passengers$egate_used == "desk", ]
+  egate_numeric_columns <- c("route_datetime_int", "egate_handling_time", "bordercheck_start_time", 
+                             "bordercheck_end_time", "bordercheck_handled")
+  passengers_egate <- passengers %>% 
+    filter(egate_used == "egate") %>% 
+    mutate(egate_handling_time = alt_get_egate_handling_times(n_passengers = n()))
+  passengers_egate_matrix <- passengers_egate %>%
+    select(all_of(egate_numeric_columns)) %>% 
+    as.matrix()
+    
+  desk_numeric_columns <- c("route_datetime_int", "bordercheck_start_time", "bordercheck_end_time",
+                            "bordercheck_handled")
+  passengers_desk <- passengers %>% 
+    filter(egate_used == "desk") 
+  passengers_desk_matrix <- passengers_desk %>% 
+    select(all_of(desk_numeric_columns)) %>% 
+    as.matrix()
   
   #### get all the egate passengers through
   
   
   n_borderchecks <- bordercheck_egates$n_borderchecks
+  bordercheck_egates$bordercheck_ids_int <- as.integer(str_sub(bordercheck_egates$bordercheck_ids, 2, -1))
+  bordercheck_desks$bordercheck_ids_int <- as.integer(str_sub(bordercheck_desks$bordercheck_ids, 2, -1))
+  
   bordercheck_times <- rep(0, times = n_borderchecks)
   
   n_passengers_egate <- dim(passengers_egate)[1]
-  
-  for(i in seq_len(n_passengers_egate)){ 
+  message("egate loop")
+  for(passenger_index in seq_len(n_passengers_egate)){ 
     
-    next_arrival_time <- passengers_egate$route_time_int[i]
+    next_arrival_time <- passengers_egate_matrix[passenger_index, "route_datetime_int"]
     
     # if a check is idle, update their time
     bordercheck_times <- pmax(bordercheck_times, next_arrival_time)
@@ -129,25 +163,30 @@ immigration_queue <- function(passengers,
     next_free_bordercheck_time <- min(bordercheck_times)
     
     # how long it takes to handle passenger
-    handling_time <- get_egate_handling_time(bordercheck_egates, next_free_bordercheck)
-    
+    handling_time <- passengers_egate_matrix[passenger_index, "egate_handling_time"]
+
     # update accordingly for passenger
-    passengers_egate$bordercheck_start_time[i] <- next_free_bordercheck_time
-    passengers_egate$bordercheck_end_time[i] <- next_free_bordercheck_time + handling_time
-    passengers_egate$bordercheck_handled[i] <- bordercheck_egates$bordercheck_ids[next_free_bordercheck]
+    passengers_egate_matrix[passenger_index, "bordercheck_start_time"] <- next_free_bordercheck_time
+    passengers_egate_matrix[passenger_index, "bordercheck_end_time"] <- next_free_bordercheck_time + handling_time
+    passengers_egate_matrix[passenger_index, "bordercheck_handled"] <- bordercheck_egates$bordercheck_ids_int[next_free_bordercheck]
     
     # update check 
     bordercheck_times[next_free_bordercheck] <- bordercheck_times[next_free_bordercheck] + handling_time
     
     
   }
-  
+  passengers_egate[, egate_numeric_columns] <- passengers_egate_matrix
   # at this point the egate passengers are processed
-  
+  message("dealing with failed egate passengers")
   # now deal with the failed passengers
   passengers_failed <- passengers_egate[passengers_egate$egate_failed == "failed", ]
   passengers_failed$bordercheck_egate_end_time <- passengers_failed$bordercheck_end_time
   passengers_failed <- passengers_failed[order(passengers_failed$bordercheck_end_time), ]
+  failed_numeric_columns <- c("bordercheck_egate_end_time", "bordercheck_start_time", "bordercheck_end_time",
+                              "bordercheck_handled")
+  passengers_failed_matrix <- passengers_failed %>% 
+    select(all_of(failed_numeric_columns)) %>% 
+    as.matrix()
   
   n_passengers_failed <- dim(passengers_failed)[1]
   
@@ -170,20 +209,20 @@ immigration_queue <- function(passengers,
   i_failed <- 1
   
   
-  
+  message("desk passengers")
   while(still_passengers_left){
     
     if(i_desk > n_passengers_desk){
       next_desk_arrival_time <- Inf
     } else {
-      next_desk_arrival_time <- passengers_desk$route_time_int[i_desk]
+      next_desk_arrival_time <- passengers_desk_matrix[i_desk, "route_datetime_int"]
     }
     
     
     if(i_failed > n_passengers_failed){
       next_failed_arrival_time <- Inf
     } else {
-      next_failed_arrival_time <- passengers_failed$bordercheck_egate_end_time[i_failed]
+      next_failed_arrival_time <- passengers_failed_matrix[i_failed, "bordercheck_egate_end_time"]
     }
     
     
@@ -223,9 +262,9 @@ immigration_queue <- function(passengers,
       handling_time <- get_desk_handling_time(bordercheck_desks, next_free_bordercheck) #TODO: add nationality
       
       # update accordingly for passenger
-      passengers_desk$bordercheck_start_time[i_desk] <- next_free_bordercheck_time
-      passengers_desk$bordercheck_end_time[i_desk] <- next_free_bordercheck_time + handling_time
-      passengers_desk$bordercheck_handled[i_desk] <- bordercheck_desks$bordercheck_ids[next_free_bordercheck]
+      passengers_desk_matrix[i_desk, "bordercheck_start_time"] <- next_free_bordercheck_time
+      passengers_desk_matrix[i_desk, "bordercheck_end_time"] <- next_free_bordercheck_time + handling_time
+      passengers_desk_matrix[i_desk, "bordercheck_handled"] <- bordercheck_desks$bordercheck_ids_int[next_free_bordercheck]
       
       i_desk <- i_desk+1
       
@@ -235,15 +274,14 @@ immigration_queue <- function(passengers,
       handling_time <- get_desk_handling_time(bordercheck_desks, next_free_bordercheck) #TODO: add nationality
       
       # update accordingly for passenger
-      passengers_failed$bordercheck_start_time[i_failed] <- next_free_bordercheck_time
-      passengers_failed$bordercheck_end_time[i_failed] <- next_free_bordercheck_time + handling_time
-      passengers_failed$bordercheck_handled[i_failed] <- bordercheck_desks$bordercheck_ids[next_free_bordercheck]
+      passengers_failed_matrix[i_failed, "bordercheck_start_time"] <- next_free_bordercheck_time
+      passengers_failed_matrix[i_failed, "bordercheck_end_time"] <- next_free_bordercheck_time + handling_time
+      passengers_failed_matrix[i_failed, "bordercheck_handled"] <- bordercheck_desks$bordercheck_ids_int[next_free_bordercheck]
       
       i_failed <- i_failed+1
       
     }
     
-       
     # update desks 
     bordercheck_times[next_free_bordercheck] <- bordercheck_times[next_free_bordercheck] + handling_time
     
@@ -255,17 +293,23 @@ immigration_queue <- function(passengers,
     
    
   }
+  passengers_failed[, failed_numeric_columns] <- passengers_failed_matrix
+  passengers_desk[, desk_numeric_columns] <- passengers_desk_matrix
+  passengers_egate$bordercheck_handled <- paste0("E", str_pad(passengers_egate$bordercheck_handled, 2, pad = "0"))
+  passengers_desk$bordercheck_handled <- paste0("D", str_pad(passengers_desk$bordercheck_handled, 2, pad = "0"))
+  passengers_failed$bordercheck_handled <- paste0("D", str_pad(passengers_failed$bordercheck_handled, 2, pad = "0"))
   
   
+  message("final steps")
+  passengers_egate$egate_handling_time <- NULL
+  passengers_failed$egate_handling_time <- NULL
   passengers_failed$bordercheck_egate_end_time <- NULL
   
   passengers <- rbind(passengers_egate[passengers_egate$egate_failed == "passed", ], 
                       passengers_desk, 
                       passengers_failed)
-  passengers <- passengers[order(passengers$route_time_int), ]
-  
-  
-  
+  passengers <- passengers %>% 
+    arrange(route_datetime_int)
   
   return(passengers)
   
