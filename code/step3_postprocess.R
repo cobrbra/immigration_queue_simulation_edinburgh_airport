@@ -4,7 +4,7 @@
 
 get_wait_times_raw <- function(passengers){
   
-  wait_times <- passengers$bordercheck_start_time - passengers$route_time_int
+  wait_times <- passengers$bordercheck_start_time - passengers$route_datetime_int
   
   res <- data.frame(passenger_id = passengers$passenger_id, nationality = passengers$nationality, egate_eligibility = passengers$egate_eligibility,
                     egate_used = passengers$egate_used, egate_failed = passengers$egate_failed, wait_times = wait_times)
@@ -58,7 +58,7 @@ queue_length_helper <- function(passengers, input_times){
   
   times_matrix <- matrix(rep(input_times, each = n_passengers),
                          nrow = n_passengers, byrow = FALSE) 
-  arrival_matrix <- matrix(rep(passengers$route_time_int, each = n_times),
+  arrival_matrix <- matrix(rep(passengers$route_datetime_int, each = n_times),
                            nrow = n_passengers, byrow = TRUE)
   start_bordercheck_matrix <- matrix(rep(passengers$bordercheck_start_time, each = n_times),
                                      nrow = n_passengers, byrow = TRUE)
