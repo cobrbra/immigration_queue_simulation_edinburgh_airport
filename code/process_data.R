@@ -96,13 +96,29 @@ simulate_aircrafts_arrivals <- function(n_aircrafts = 5, seed = NULL) {
   return(aircrafts)
 }
 
+
 process_aircrafts_arrivals <- function(folder_name, 
                                                 airports_reference,
                                                 aircrafts_reference) {
-  files <- map2(.x = rep(1:4, 2),
-                .y = rep(c(" 2019", " 2022"), each = 4),
-                .f = ~ paste0(folder_name, 
-                      "/Q", .x, .y, ".xlsx"))
+  years_not_split_by_runway <- c(" 2019", " 2022")
+  years_split_by_runway <- c(" 2020", " 2021")
+  files_not_split_by_runway <- map2(
+    .x = rep(1:4, length(years_not_split_by_runway)),
+    .y = rep(years_not_split_by_runway, each = 4),
+    .f = ~ paste0(folder_name, 
+                  "/Q", .x, .y, ".xlsx")
+    )
+  files_split_by_runway <- map2(
+    .x = rep(1:4, length(years_split_by_runway)),
+    .y = rep(years_split_by_runway, each = 4),
+    .f = ~ paste0(folder_name, 
+                  "/Q", .x, .y)
+  )
+  files_split_by_runway <- paste0(
+    rep(files_split_by_runway, each = 2),
+    rep(c(" R06.xlsx", " R24.xlsx"), times = length(files_split_by_runway))
+  )
+  files <- c(files_not_split_by_runway, files_split_by_runway)
   
   # bind together files for aircraft arrivals
   aircrafts_observed_arrivals <- map(files,
@@ -215,6 +231,12 @@ filter_arrivals_for_equivalent_weeks <- function(aircrafts_observed_arrivals, UK
     filter(((Year == 2022) & 
               (sched_aircraft_date_posix >= as.Date("2022-07-11")) &
               (sched_aircraft_date_posix <= as.Date("2022-07-17"))) |
+             ((Year == 2021) & 
+                (sched_aircraft_date_posix >= as.Date("2021-07-12")) &
+                (sched_aircraft_date_posix <= as.Date("2021-07-18"))) |
+             ((Year == 2020) & 
+                (sched_aircraft_date_posix >= as.Date("2020-07-13")) &
+                (sched_aircraft_date_posix <= as.Date("2020-07-17"))) |
              ((Year == 2019) &
                 (sched_aircraft_date_posix >= as.Date("2019-07-08")) &
                 (sched_aircraft_date_posix <= as.Date("2019-07-14")))) %>% 

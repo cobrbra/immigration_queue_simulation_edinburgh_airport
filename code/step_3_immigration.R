@@ -105,8 +105,6 @@ get_egate_failure <- function(egate_used, egate_failure_prop){
   
 }
 
-passengers <- ex_week_2023_routes
-
 immigration_queue <- function(passengers, 
                   bordercheck_desks, bordercheck_egates, 
                   egate_uptake_prop, egate_failure_prop, 
