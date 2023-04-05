@@ -38,11 +38,11 @@ bordercheck_egates <- list(n_borderchecks = n_egates,
                            bordercheck_ids = eGate_ids)
 
 
-original_ex_week_2023_immigration <- immigration_queue(ex_week_2023_routes, bordercheck_desks = bordercheck_desks, 
+ex_week_2023_immigration <- immigration_queue(ex_week_2023_routes, bordercheck_desks = bordercheck_desks, 
                                               bordercheck_egates = bordercheck_egates, egate_uptake_prop = 0.8, 
-                                              egate_failure_prop = 0.05, egate_failed_passenger_next = 0.75, seed = 4)
+                                              egate_failure_prop = 0.05, egate_failed_passenger_next = 0.75, seed = 6)
 
-input_times <- seq(from = 1688948394 , to =  1689548711 + 3600, by = 300)
+input_times <- seq(from = as.numeric(as.POSIXct("2023-07-10 00:00:00")) , to =  as.numeric(as.POSIXct("2023-07-17 00:00:00")), by = 900)
 ql <- get_queue_length(passengers = ex_week_2023_immigration, input_times = input_times) %>% 
   mutate(input_datetime_int = input_times) %>% 
   get_datetime_alternates(column_prefixes = c("input"))
@@ -51,8 +51,31 @@ ql %>%
   pivot_longer(cols = c(desk, egate), names_to = "check_type", values_to = "queue_length") %>%  
   ggplot(aes(x = input_datetime_posix, y = queue_length, colour = check_type)) + geom_point()
   
+rel_scales <- 5
+rough_arrivals_queue_comp <- ggplot() + 
+  geom_histogram(
+    data = ex_week_2023_passengers,
+    mapping = aes(x = aircraft_datetime_posix),
+    alpha = 0.5,
+    fill = edi_airport_colours[3]
+  ) + 
+  geom_point(
+    data = ql %>% 
+      pivot_longer(cols = c(desk, egate), names_to = "check_type", values_to = "queue_length"),
+    mapping = aes(x = input_datetime_posix, y = rel_scales*queue_length, colour = check_type)
+  ) + 
+  scale_y_continuous(
+      name = "Queue Length",
+      sec.axis = sec_axis( trans=~./rel_scales, name="Passengers arriving")
+  ) +
+  labs(x = "Date and Time") + 
+  theme_edi_airport() +
+  theme(legend.title = element_blank()) +
+  scale_colour_manual(values = edi_airport_colours)
+ggsave(filename = here("figures/rough_arrivals_queue_comp.png"), rough_arrivals_queue_comp, width = 7, height = 7)
 
-
+ex_week_2023_passengers %>% 
+  ggplot(aes(x = aircraft_datetime_posix)) + geom_histogram()
 
 
 
