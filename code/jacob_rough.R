@@ -8,16 +8,16 @@ ex_week_2023_aircrafts <- tar_read(future_aircrafts_arrivals) %>%
   mutate(aircraft_datetime_int = simulate_delay_times(flight_id, .21, .58, .21, 50*60, 21*60) + sched_aircraft_datetime_int) %>% 
   get_datetime_alternates(column_prefixes = c("aircraft", "sched_aircraft")) %>% 
   mutate(coached = get_coached_status(flight_id)) %>% 
-  simulate_future_airport_classification(tar_read(n_passenger_quantiles))
+  simulate_future_airport_classification(tar_read(n_passenger_quantiles), seed = 1234)
 
 ex_week_2023_passengers <- get_passengers_after_aircrafts(ex_week_2023_aircrafts,
                                                       tar_read(EU_plus_hubs), tar_read(other_hubs),
                                                       tar_read(prop_nationality), tar_read(UK_plus_countries),
                                                       tar_read(EU_plus_countries), tar_read(load_factor_mean), 
-                                                      tar_read(load_factor_sd))
+                                                      tar_read(load_factor_sd), seed = 1234)
 
 
-ex_week_2023_routes <- get_passengers_after_route(ex_week_2023_passengers)
+ex_week_2023_routes <- get_passengers_after_route(ex_week_2023_passengers, seed = 1234)
 
 n_desks <- 9
 # desk_rates <- pmax(1/200, rnorm(n_desks, mean = 1/60, sd = 0.01))
@@ -40,7 +40,7 @@ bordercheck_egates <- list(n_borderchecks = n_egates,
 
 ex_week_2023_immigration <- immigration_queue(ex_week_2023_routes, bordercheck_desks = bordercheck_desks, 
                                               bordercheck_egates = bordercheck_egates, egate_uptake_prop = 0.8, 
-                                              egate_failure_prop = 0.05, egate_failed_passenger_next = 0.75, seed = 6)
+                                              egate_failure_prop = 0.05, egate_failed_passenger_next = 0.75, seed = 1234)
 
 input_times <- seq(from = as.numeric(as.POSIXct("2023-07-10 00:00:00")) , to =  as.numeric(as.POSIXct("2023-07-17 00:00:00")), by = 900)
 ql <- get_queue_length(passengers = ex_week_2023_immigration, input_times = input_times) %>% 

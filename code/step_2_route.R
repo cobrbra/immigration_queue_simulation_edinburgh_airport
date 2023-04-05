@@ -48,7 +48,8 @@ get_walk_time <- function(passengers, seed = NULL) {
 }
 
 
-get_passengers_after_route <- function(passengers_after_aircraft) {
+get_passengers_after_route <- function(passengers_after_aircraft, seed = NULL) {
+  if (!is.null(seed)) {set.seed(seed)}
   passengers_after_route <- passengers_after_aircraft %>% 
     get_coach_time() %>% 
     get_walk_time() %>% 
