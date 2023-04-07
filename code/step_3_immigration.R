@@ -37,7 +37,7 @@ get_egate_handling_time <- function(borderchecks, bordercheck_id, seed = NULL) {
   if (!is.null(seed)) {set.seed(seed)}
   
   # bordercheck_handling_time <- rexp(1, borderchecks$bordercheck_rates[bordercheck_id])
-  bordercheck_handling_time <- pmax(20, rnorm(1, mean = borderchecks$bordercheck_rates[bordercheck_id], sd = 5))
+  bordercheck_handling_time <- max(20, rnorm(1, mean = borderchecks$bordercheck_rates[bordercheck_id], sd = 5))
   
   return (bordercheck_handling_time)
 }
@@ -50,10 +50,12 @@ alt_get_egate_handling_times <- function(handling_time_mean = 45,
   
   if (!is.null(seed)) {set.seed(seed)}
   
-  bordercheck_handling_times <- pmax(handling_time_lower_bound, 
-                                     rnorm(n_passengers, 
-                                           mean = handling_time_mean, 
-                                           sd = handling_time_sd))
+  bordercheck_handling_times <- rnorm(n_passengers, 
+                                      mean = handling_time_mean, 
+                                      sd = handling_time_sd)
+  bordercheck_handling_times[
+    bordercheck_handling_times < handling_time_lower_bound
+  ] <- handling_time_lower_bound
   
   return (bordercheck_handling_times)
 }
@@ -62,10 +64,9 @@ alt_get_egate_handling_times <- function(handling_time_mean = 45,
 
 get_desk_handling_time <- function(borderchecks, bordercheck_id, seed = NULL) {
   # TODO: input nationality as well
-  # TODO: differentiate egate and desk
   if (!is.null(seed)) {set.seed(seed)}
   # bordercheck_handling_time <- rexp(1, borderchecks$bordercheck_rates[bordercheck_id])
-  bordercheck_handling_time <- pmax(30, rnorm(1, mean = borderchecks$bordercheck_rates[bordercheck_id]), sd = 10)
+  bordercheck_handling_time <- max(30, rnorm(1, mean = borderchecks$bordercheck_rates[bordercheck_id], sd = 10))
   
   return (bordercheck_handling_time)
 }
@@ -152,7 +153,7 @@ immigration_queue <- function(passengers,
     next_arrival_time <- passengers_egate_matrix[passenger_index, "route_datetime_int"]
     
     # if a check is idle, update their time
-    bordercheck_times <- pmax(bordercheck_times, next_arrival_time)
+    bordercheck_times[bordercheck_times < next_arrival_time] <- next_arrival_time
     
     # decide which check to send the passenger to
     next_free_bordercheck <- which(bordercheck_times == min(bordercheck_times))[1] 
@@ -203,7 +204,7 @@ immigration_queue <- function(passengers,
   i_desk <- 1
   i_failed <- 1
   
-    while(still_passengers_left){
+  while(still_passengers_left){
     
     if(i_desk > n_passengers_desk){
       next_desk_arrival_time <- Inf
@@ -222,7 +223,7 @@ immigration_queue <- function(passengers,
     next_arrival_time <- min(next_desk_arrival_time, next_failed_arrival_time)
     
     # if a desk is idle, update their time
-    bordercheck_times <- pmax(bordercheck_times, next_arrival_time)
+    bordercheck_times[bordercheck_times < next_arrival_time] <- next_arrival_time
     
     # decide which desk to send the passenger to
     next_free_bordercheck <- which(bordercheck_times == min(bordercheck_times))[1] 
@@ -258,7 +259,7 @@ immigration_queue <- function(passengers,
       passengers_desk_matrix[i_desk, "bordercheck_end_time"] <- next_free_bordercheck_time + handling_time
       passengers_desk_matrix[i_desk, "bordercheck_handled"] <- bordercheck_desks$bordercheck_ids_int[next_free_bordercheck]
       
-      i_desk <- i_desk+1
+      i_desk <- i_desk + 1
       
     } else {
       
