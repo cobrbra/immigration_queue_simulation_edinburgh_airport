@@ -96,7 +96,7 @@ get_nationality_split <- function(aircrafts, EU_plus_hubs, other_hubs, prop_nati
     sample(x = colnames(prop_nationality)[-1],
            size = n_passenegers,
            replace = TRUE,
-           prob = prop_nationality[prop_nationality$Arriving_from == airport_classification][[airport_classification]]
+           prob = prop_nationality[prop_nationality$Arriving_from == airport_classification, ][-1]
     )
   }
   
