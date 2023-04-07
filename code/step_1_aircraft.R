@@ -119,7 +119,9 @@ simulate_delay_times <- function(flight_id,
                                  prop_flights_early,
                                  mean_delay_time,
                                  mean_early_time,
-                                 on_time_window = 30*60) {
+                                 on_time_window = 30*60, 
+                                 seed = NULL) {
+  if (!is.null(seed)) {set.seed(seed)}
   n_flights <- length(flight_id)
   simulated_delay_status <- sample(c("delayed", "on-time", "early"), 
                                    size = n_flights,
