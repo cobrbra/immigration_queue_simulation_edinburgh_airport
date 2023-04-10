@@ -42,7 +42,7 @@ get_tables <- function(future_aircrafts_arrivals,
                                        format = "%d/%m")))) %>% 
     select(Year, `Start Date`, `End Date`, `Number of Flights`) %>% 
     arrange(Year)
-  captions$observed_schedule <- "Hisorical arrivals for Edinburgh Airport, 2019-2022."
+  captions$observed_schedule <- "Historical arrivals for Edinburgh Airport, 2019-2022."
   
   # tables$table_1 <- ...
   # add code to generate new tables here
