@@ -30,8 +30,8 @@ tar_source(files = c(
   here("code/step_3_immigration.R"),
   # here("code/model_data.R"),
   # here("code/get_results.R"),
-  here("code/get_figures.R")
-  # here("code/get_tables.R")
+  here("code/get_figures.R"),
+  here("code/get_tables.R")
   )
 )
 # source("other_functions.R") # Source other scripts as needed. # nolint
@@ -144,7 +144,9 @@ list(
   tar_target(figures,
              get_figures(future_aircrafts_arrivals = future_aircrafts_arrivals,
                          future_coached_levels = future_coached_levels,
-                         filtered_aircrafts_observed_arrivals = filtered_aircrafts_observed_arrivals))
+                         filtered_aircrafts_observed_arrivals = filtered_aircrafts_observed_arrivals)),
+  tar_target(tables,
+             get_tables(future_aircrafts_arrivals = future_aircrafts_arrivals))
   
   # # Generating simulated arrivals data
   # tar_target(arrivals_sim_params,
