@@ -7,6 +7,8 @@ get_tables <- function(future_aircrafts_arrivals, ...) {
   
   tables <- list()
   captions <- list()
+  bold <- function(x) {paste('{\\textbf{',x,'}}', sep ='')}
+  
   
   tables$anticipated_schedule <- future_aircrafts_arrivals %>% 
     mutate(Year = format(sched_aircraft_datetime_posix, "%Y")) %>% 
@@ -39,7 +41,8 @@ get_tables <- function(future_aircrafts_arrivals, ...) {
     print(xtable(tables[[table_index]],
                  caption = captions[[table_name]]), 
           file = paste0(here("tables/"), table_name, ".tex"),
-          include.rownames = FALSE)
+          include.rownames = FALSE,
+          sanitize.colnames.function = bold)
   }
   return(tables)
 }
