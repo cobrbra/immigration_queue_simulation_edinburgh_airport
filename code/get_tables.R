@@ -32,7 +32,8 @@ get_tables <- function(future_aircrafts_arrivals,
     group_by(Year) %>% 
     nest() %>% 
     mutate(
-      `Number of Flights` = unlist(map(data, nrow)),
+      `Number of Flights` = format(unlist(map(data, nrow)),
+                                   big.mark = ","),
       `Start Date` = unlist(map(data, 
                                 ~ format(min(.$sched_aircraft_date_posix),
                                          format = "%d/%m"))),
