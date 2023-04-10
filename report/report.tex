@@ -158,22 +158,22 @@ The average queue time at \glspl{egate} at UK airports for the financial years 2
 
 
 \paragraph{Historical Arrivals Data}
-We accessed complementary historical historical flight arrivals data from the Edinburgh Airport Noise Lab \cite{noise_lab}. For these 83,652 passenger flight arrivals, spread Q1-4 for the years 2019 and 2022 (Table~\ref{tab:observed_arrivals_overview}), we were able to recover airport of origin, aircraft type (and therefore a proxy for passenger count), and scheduled vs. actual arrival time. We were not, however (unlike for anticipated future arrivals) able to recover coached vs. contact status (Figure~\ref{fig:future_passenger_burden}). We see this dataset, therefore, as useful for validating distributional assumptions around aircraft arrival times and passenger demographics. 
+We accessed complementary historical historical flight arrivals data from the Edinburgh Airport Noise Lab \cite{noise_lab}. For these 83,652 passenger flight arrivals, spread Q1-4 for the years 2019 and 2022 (Table~\ref{tab:observed_schedule}), we were able to recover airport of origin, aircraft type (and therefore a proxy for passenger count), and scheduled vs. actual arrival time. We were not, however (unlike for anticipated future arrivals) able to recover coached vs. contact status (Figure~\ref{fig:future_passenger_burden}). We see this dataset, therefore, as useful for validating distributional assumptions around aircraft arrival times and passenger demographics. 
 
 
-\begin{table}[!ht]
-\caption{Historical datasets of Edinburgh Airport Arrivals. \bdnote{Need to add the other years here as well.} \jbnote{I have a cunnning plan for this.}}
-\label{tab:observed_arrivals_overview}
-\centering
-\begin{tabular}{ccccc}
-\hline
-\multicolumn{1}{c}{\textbf{Dataset}} & \textbf{Year} & \textbf{Start Date} & \textbf{End Date} & \textbf{Number of Flights} \\ \hline
-1  & 2019  & 01/01  & 31/12    &  51,669  \\
-2  & 2022  & 01/01  & 31/12    &  31,983  \\
- \hline
-\end{tabular}
-\end{table}
-
+% \begin{table}[!ht]
+% \caption{Historical datasets of Edinburgh Airport Arrivals. \bdnote{Need to add the other years here as well.} \jbnote{I have a cunnning plan for this.}}
+% \label{tab:observed_arrivals_overview}
+% \centering
+% \begin{tabular}{ccccc}
+% \hline
+% \multicolumn{1}{c}{\textbf{Dataset}} & \textbf{Year} & \textbf{Start Date} & \textbf{End Date} & \textbf{Number of Flights} \\ \hline
+% 1  & 2019  & 01/01  & 31/12    &  51,669  \\
+% 2  & 2022  & 01/01  & 31/12    &  31,983  \\
+%  \hline
+% \end{tabular}
+% \end{table}
+\input{tables/observed_schedule}
 
 Aircraft type and maximum passenger capacity were established by cross-linking with another publicly available dataset \cite{aircraft_capacity}. The average percentage of occupied seat for a given flight ranges from 86\% in 2019 for international flights in the UK \cite{loading_factor_national} to self-reported 91\% for a budget airline in 2022 \cite{loading_factor_ryanair}. This is called the \textit{load factor}.
 
