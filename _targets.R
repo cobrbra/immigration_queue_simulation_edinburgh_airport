@@ -146,7 +146,8 @@ list(
                          future_coached_levels = future_coached_levels,
                          filtered_aircrafts_observed_arrivals = filtered_aircrafts_observed_arrivals)),
   tar_target(tables,
-             get_tables(future_aircrafts_arrivals = future_aircrafts_arrivals))
+             get_tables(future_aircrafts_arrivals = future_aircrafts_arrivals,
+                        aircrafts_observed_arrivals = aircrafts_observed_arrivals))
   
   # # Generating simulated arrivals data
   # tar_target(arrivals_sim_params,
