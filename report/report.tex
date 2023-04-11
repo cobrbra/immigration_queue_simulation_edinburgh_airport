@@ -55,9 +55,7 @@
 \FXRegisterAuthor{jb}{ajb}{\color{blue} JB}
 \FXRegisterAuthor{bd}{abd}{\color{red} BD}
 
-\title{Anticipating Demand on Immigration at Edinburgh Airport}
-% Planning for future immigration demand at Edinburgh Airport
-% Simulations of Immigration Queues at Edinburgh Airport: Report}
+\title{Planning for Future Demand on Border Operations\\ at Edinburgh Airport}
  \author{Isabella Deutsch and Jacob R. Bradley}
  \date{}
 
@@ -90,7 +88,7 @@ Note that \textit{queue length} is measured as a function over time, i.e. we rec
 \subsection{Service Level Agreements}
 
 
-\section{Data}
+\section{Data Sources}
 This section outlines the datasets used throughout this report. The majority of the data used for the core components of our analysis were provided by Edinburgh Airport via the Edinburgh SIAM \& IMA Student Chapter Modelling Competition \cite{modelling_competition}. Occasionally, it has been useful to make use of some external datasets, which have also been described here. These are all either in the public domain, or are accessible to all researchers participating in the modelling competition. 
 
 \subsection{Competition Data}
@@ -99,18 +97,18 @@ We first outline the data received through the modelling competition. This data,
 
 \subsubsection{Operational Data}
 
-\paragraph{Hall Capacity}
+\paragraph{Hall capacity}
 The immigration hall at Edinburgh Airport has a \textit{initial capacity} of 500 people. Its \textit{overflow capacity}, which can be used without overly impacting other areas of the operation, is a further 150 people. There is also a \textit{contingency capacity} for additional 600 people. However, its usage negatively impacts the operations of the airport.
 
-\paragraph{Coached vs. Contact}
+\paragraph{Coached vs contact}
 Once an aircraft has reached its parking position there are two ways for passengers to reach the terminal building. \textit{Contact} passengers walk by foot to the immigration queue. \textit{Coached} passengers exit the aircraft via stairs and are loaded onto buses, which bring them to the terminal building. The percentage of contact passengers lies around 80\% and varies across years.
 
-\paragraph{eGate Eligibility for EU+ Passengers}
+\paragraph{eGate eligibility for EU+ passengers}
 Passengers of the following nationalities are allowed to use \glspl{egate}: EU countries, Australia, Canada, Iceland, Japan, Liechtenstein, New Zealand, Norway, Singapore, South Korea, Switzerland, and the USA. In the following we refer to these countries as \textit{EU+}. 
 
-\paragraph{UKIE Flights} Flights arriving from the United Kingdom (including Northern Ireland), the Crown Dependencies, and the Republic of Ireland (referred throughout as \textit{UKIE}) do not need to be processed by immigration services, as there are currently no routine passport controls between these countries \cite{common_travel_area}.
+\paragraph{UKIE flights} Flights arriving from the United Kingdom (including Northern Ireland), the Crown Dependencies, and the Republic of Ireland (referred throughout as \textit{UKIE}) do not need to be processed by immigration services, as there are currently no routine passport controls between these countries \cite{common_travel_area}.
 
-\paragraph{Early and Delayed Flights}
+\paragraph{Early and delayed flights}
 In the summer of 2019 only 58\% of flights arrived on time (measured if arrived within 15 minutes of scheduled arrival), 21\% were late, and 21\% were early. Of those that were early, average arrival time was 21 minutes ahead of schedule (standard deviation 6 minutes). For late arrivals, average delay was 50 minutes (standard deviation 56 minutes).
 
 \subsubsection{Future Arrivals Data} \label{sec:future_arrivals_data}
@@ -131,21 +129,21 @@ We are not provided with information on passenger nationalities, or airports of 
 
 \subsection{External Datasets} \label{sec:observed_arrivals_data}
 
-\paragraph{eGate Utilisation}
+\paragraph{eGate utilisation}
 The UK government's target for \gls{egate} usage among those eligible is 80\% \cite{UK_border_2025}, which was broadly met on a national level in 2019 and the first quarter of 2020. For airports in Scotland and the North of England the uptake was consistently lower at around 70\% for the same period \cite{Inspection_eGates}. While there were no publicly available data for Edinburgh Airport, Glasgow Airport's uptake of around 60\% represents some of the lowest utilisation of \glspl{egate} nationwide \cite{Inspection_eGates}, and may serve as a reference/lower band due to its proximity.
 
-\paragraph{Average Queue Time for eGates}
+\paragraph{Average queue time for eGates}
 The average queue time at \glspl{egate} at UK airports for the financial years 2017-18, 2018-19, 2019-20 and Q1 2020 was six minutes and one second \cite{Inspection_eGates}. Stansted and Luton reported averages just below the three minute mark. Glasgow Airport's average waiting time at the \glspl{egate} was over 8.5 minutes. However, their calculation was based a shorter time period (December 2017, January 2018, and February 2019), and may therefore be unrepresentative \cite{Inspection_eGates}.
 
 
-\paragraph{Historical Arrivals Data}
+\paragraph{Historical arrivals data}
 We accessed complementary historical historical flight arrivals data from the Edinburgh Airport Noise Lab \cite{noise_lab}. For these 83,652 passenger flight arrivals, spread Q1-4 for the years 2019 and 2022 (Table~\ref{tab:observed_schedule}), we were able to recover airport of origin, aircraft type (and therefore a proxy for passenger count), and scheduled vs. actual arrival time. We were not, however (unlike for anticipated future arrivals) able to recover coached vs. contact status (Figure~\ref{fig:future_passenger_burden}). We see this dataset, therefore, as useful for validating distributional assumptions around aircraft arrival times and passenger demographics. 
 
 \input{tables/observed_schedule}
 
 Aircraft type and maximum passenger capacity were established by cross-linking with another publicly available dataset \cite{aircraft_capacity}. The average percentage of occupied seat for a given flight ranges from 86\% in 2019 for international flights in the UK \cite{loading_factor_national} to self-reported 91\% for a budget airline in 2022 \cite{loading_factor_ryanair}.
 
-\paragraph{Airport Classification}
+\paragraph{Airport classification}
 We assume that the passenger nationality split depends on departure airport, and therefore group airports into the following categories: 
 \begin{itemize}
     \item \textbf{UKIE}: All airports in the United Kingdom (including Northern Ireland), the Crown Dependencies, and the Republic of Ireland.
@@ -179,45 +177,43 @@ We assume that the passenger nationality split depends on departure airport, and
 
 \subsubsection{Aircraft}
 
-\paragraph{Departing Airport Classification}
+\paragraph{Departing airport classification}
 The arrivals dataset provided by the modelling competition (Section~\ref{sec:future_arrivals_data}) does not contain information regarding the departing airport. As this is provided in the additional dataset (Section~\ref{sec:observed_arrivals_data}) we are able to randomly sample airport classifications for the competition dataset conditional on the number of passengers on the flight, for an approximate distributional match. 
 
 
 
-% \paragraph{Number of Passengers}
+% \paragraph{Number of passengers}
 % The competition dataset contains the number of passengers on board each flight. This information is not available for the additional historical data, but can be simulated with the aircraft type, its maximum capacity, and the load factor. \jbnote{Do we need to choose an overall load factor? Also slightly unsure if we'll ever actually ever need this simulated on historical data.} \bdnote{we use it indirectly to simulate an airport classification as the load factor goes into the historical quantiles. Could also be ignored.}
 
-\paragraph{Coached vs. Contact}
+\paragraph{Coached vs contact}
 The competition data gives an overall split of flights that are coached or contact for each year. As there was no additional information available we assume that the decision between coached or contact is independent of all flight characteristics, including passenger number. Anticipated future coached vs. contact splits are shown in Figure~\ref{fig:future_passenger_burden}, with coached arrivals continuing to form a minority, albeit an increasing one, of future aircraft arrivals. We explore the effects of non-independent occurrence of coached arrivals in Section~XX \jbnote{Robustness analysis I'd like to do: repeat whatever the main analysis pipeline is, with all coached in the biggest flights}.
 
 
 \subsubsection{Route}
 
-\paragraph{Bulk Profile} 
+\paragraph{Bulk profile} 
  Passengers  brought to the immigration hall coach arrive at the queue in rapid succession. We choose a XXX distribution  here.
 
-\paragraph{Coach Availability}
-For this analysis we assume sufficient coaches are always available to transport passengers from the aircraft to the airport building. While this might not be always the case, it provides us with a ``worst case'' scenario from the perspective of the immigration hall, which is most interesting for us. Any delay in passengers due to unavailability of coaches would smooth out peaks. \jbnote{I do think we should play with this though (only report if it's interesting.)} \bdnote{Would put a low piority on this right now.}
-
+\paragraph{Coach availability}
+For this analysis we assume sufficient coaches are always available to transport passengers from the aircraft to the airport building. While this might not be always the case, it provides us with a ``worst case'' scenario from the perspective of the immigration hall, which is most interesting for us. Any delay in passengers due to unavailability of coaches would smooth out peaks.
 
 \subsubsection{Immigration}
 
-\paragraph{Number of \glspl{egate} and Desks} There are currently 10 \glspl{egate} and 9 \gls{bfo}-staffed desks in use at Edinburgh Airport. In our analysis we simulate the effects of increased \gls{egate} construction.
+\paragraph{Number of eGates and desks} There are currently 10 \glspl{egate} and 9 \gls{bfo}-staffed desks in use at Edinburgh Airport. In our analysis we simulate the effects of increased \gls{egate} construction.
 
-\paragraph{eGate Eligibility} 
+\paragraph{eGate eligibility} 
 As only passengers from certain countries are can use \glspl{egate}, we make the percentage of passengers eligible for \glspl{egate} per aircraft dependent on the classification of the airport. For example, we assume that an aircraft from a hub is more likely to carry a variety of international passengers, of which fewer can use \glspl{egate} compared to a flight from a EU+ non-hub. \jbnote{This needs a lot of attention, in write up and in modelling approach.}
 
-\paragraph{\gls{egate} Uptake} 
-Not all passengers who are eligible to use eGates choose to do so for a variety of reasons. We vary the percentage of \gls{egate} uptake between XX and XX. \jbnote{Is this varying randomly or systematically? If randomly, seems better just to pick a bad case.} 
+\paragraph{eGate Uptake} 
+Not all passengers who are eligible to use eGates choose to do so for a variety of reasons. We vary the percentage of \gls{egate} uptake between XX and XX. 
 
-\paragraph{eGate Failure Rate}
-A small percentage of passengers who use an \gls{egate} fail to pass through it successfully. This is set to lie between XX and XX. \jbnote{As above.} \bdnote{hmm, maybe we just fix to something sensible? or do two cases: sensible and bad? Question: is "choosing a bad day" what they want? Do they want to know whta happens on average on a busy day or do they want the bad case avoided? given their SLAs I would say the former.}
+\paragraph{eGate failure rate}
+A small percentage of passengers who use an \gls{egate} fail to pass through it successfully. This is set to XX. 
 
-\paragraph{Priority for failed \gls{egate} passengers}
-Passengers who used an \gls{egate}, but failed to use it successfully, need to exit the \gls{egate} back into the immigration hall to complete their immigration at a staffed desk. They join a separate queue towards the desks, which is located next to the general desk queue. Whenever a desk can handle a new person, priority is given to the passenger from the failed \gls{egate} queue with a probability of XX to XX.
+\paragraph{Priority for failed eGate passengers}
+Passengers who used an \gls{egate}, but failed to use it successfully, need to exit the \gls{egate} back into the immigration hall to complete their immigration at a staffed desk. They join a separate queue towards the desks, which is located next to the general desk queue. Whenever a desk can handle a new person, priority is given to the passenger from the failed \gls{egate} queue with a probability of XX.
 
-\paragraph{Capacity Split}
-
+\paragraph{Capacity split}
 Which percentage of the hall capacity, overflow , and contingency is allocated to the desk queue. Varied to change the effect of queue length of contingency usage.
 
 
@@ -264,7 +260,8 @@ this is a nice bonus they hinted at in the description, so I think we should inc
 all the assumptions we made \\
 to include limitations \\
 include edge cases, such as all gates closed for high risk flights (see Government doc on \glspl{egate}) \\
-signange and direction need to be clear (hosts inccrease this and are important 6.28 \cite{Inspection_eGates})
+signange and direction need to be clear (hosts inccrease this and are important 6.28 \cite{Inspection_eGates}) \\
+we picked slightly pessimistic where we don't have good notion to avoid accidentally producing an overly optimistic case
 
 {\footnotesize
 \bibliography{report/references}}
