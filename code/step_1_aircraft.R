@@ -31,8 +31,8 @@ get_n_passengers <- function(max_passengers, load_factor, seed = NULL){
   
   load_factors <- rnorm(n = length(max_passengers),
                        mean = load_factor$mean, sd = load_factor$sd) 
-  load_factors <- pmin(load_factor, 1)
-  load_factors <- pmax(load_factor, 0)
+  load_factors <- pmin(load_factors, 1)
+  load_factors <- pmax(load_factors, 0)
   
   n_passengers <- round(max_passengers * load_factors)
   
