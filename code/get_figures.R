@@ -44,21 +44,24 @@ get_figures <- function(future_aircrafts_arrivals, future_coached_levels, filter
   # results <- targets::tar_read(example_results) # Use for debugging, COMMENT WHEN RUNNING TARGETS
   font_add_google("Lato")
   showtext_auto()
-  edi_airport_colours <- c("#7D0C6E", "#A19384", "#F2D6EA", "#2D0255", "#","#")
+  edi_airport_colours <- c("#7D0C6E", "#A19384", "#F2D6EA",
+                           "#6E7D0C", "#84A193", "#EAF2D6",
+                           "#0C6E7D", "#9384A1", "#D6EAF2",
+                           "#2D0255", "#511166","#B41788")
   
   figures <- list()
   figure_sizes <- list()
   
-  observed_max_passengers_per_year <- filtered_aircrafts_observed_arrivals %>% 
+  observed_max_passengers_per_year <- (filtered_aircrafts_observed_arrivals) %>% 
     group_by(Year) %>% 
     summarise(`Total Passengers` = sum(max_passengers)) %>% 
     mutate(coached_status = "Unknown") 
   
-  figures$future_passenger_burden_fig <- future_aircrafts_arrivals %>% # future_aircrafts_arrivals %>% # 
+  figures$future_passenger_burden_fig <- (future_aircrafts_arrivals) %>% # future_aircrafts_arrivals %>% #
     mutate(Year = format(sched_aircraft_datetime_posix, format = "%Y")) %>% 
     group_by(Year) %>% 
     summarise(`Total Passengers` = sum(n_passengers)) %>% 
-    inner_join(future_coached_levels, by = "Year") %>% 
+    inner_join((future_coached_levels), by = "Year") %>% 
     mutate(`Total Passengers` = `Total Passengers` * Percent) %>% 
     select(Year, `Total Passengers`, coached_status) %>% 
     bind_rows(observed_max_passengers_per_year) %>% 
@@ -68,7 +71,7 @@ get_figures <- function(future_aircrafts_arrivals, future_coached_levels, filter
     labs(title = "Passenger pressure forecasted to increase beyond pre-Covid levels") + 
     theme_edi_airport() +
     theme(legend.title = element_blank()) +
-    scale_fill_manual(values = edi_airport_colours) +
+    scale_fill_manual(values = edi_airport_colours[c(4,5,6)]) +
     scale_y_continuous(labels = scales::comma)
   figure_sizes$future_passenger_burden_fig <- c(7, 3)
   
