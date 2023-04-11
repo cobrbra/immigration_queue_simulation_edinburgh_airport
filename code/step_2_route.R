@@ -34,11 +34,12 @@ get_coach_time <- function(passengers, seed = NULL) {
   return(passengers_with_coach_time)
 }
 
-get_walk_time <- function(passengers, seed = NULL) {
+get_walk_time <- function(passengers, 
+                          seed = NULL) {
   if (!is.null(seed)) {set.seed(seed)}
   n_passengers <- nrow(passengers)
-  coached_walk_time <- rexp(n_passengers, .5)
-  contact_walk_time <- rexp(n_passengers, .2) # TODO: this cumsum is over the whole dataset and shouldn't be!
+  coached_walk_time <- rexp(n_passengers, 1.)
+  contact_walk_time <- rexp(n_passengers, .2) 
   passengers_with_walk_time <- passengers %>% 
     mutate(walk_time = if_else(coached, coached_walk_time, contact_walk_time)) %>% 
     group_by(flight_id) %>% 

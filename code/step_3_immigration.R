@@ -32,30 +32,18 @@ check_passengers_after_immigration <- function(passengers_after_immigration) {
   
 }
 
-get_egate_handling_time <- function(borderchecks, bordercheck_id, seed = NULL) {
-  
-  if (!is.null(seed)) {set.seed(seed)}
-  
-  # bordercheck_handling_time <- rexp(1, borderchecks$bordercheck_rates[bordercheck_id])
-  bordercheck_handling_time <- max(20, rnorm(1, mean = borderchecks$bordercheck_rates[bordercheck_id], sd = 5))
-  
-  return (bordercheck_handling_time)
-}
-
-alt_get_egate_handling_times <- function(handling_time_mean = 45, 
-                                         handling_time_sd = 5, 
-                                         handling_time_lower_bound = 20, 
-                                         n_passengers = 1, 
-                                         seed = NULL) {
+get_egate_handling_times <- function(bordercheck_egates, 
+                                     n_passengers = 1, 
+                                     seed = NULL) {
   
   if (!is.null(seed)) {set.seed(seed)}
   
   bordercheck_handling_times <- rnorm(n_passengers, 
-                                      mean = handling_time_mean, 
-                                      sd = handling_time_sd)
+                                      mean = bordercheck_egates$bordercheck_mean, 
+                                      sd = bordercheck_egates$bordercheck_sd)
   bordercheck_handling_times[
-    bordercheck_handling_times < handling_time_lower_bound
-  ] <- handling_time_lower_bound
+    bordercheck_handling_times < 0
+  ] <- 0
   
   return (bordercheck_handling_times)
 }
@@ -65,8 +53,7 @@ alt_get_egate_handling_times <- function(handling_time_mean = 45,
 get_desk_handling_time <- function(borderchecks, bordercheck_id, seed = NULL) {
   # TODO: input nationality as well
   if (!is.null(seed)) {set.seed(seed)}
-  # bordercheck_handling_time <- rexp(1, borderchecks$bordercheck_rates[bordercheck_id])
-  bordercheck_handling_time <- max(30, rnorm(1, mean = borderchecks$bordercheck_rates[bordercheck_id], sd = 10))
+  bordercheck_handling_time <- max(0, rnorm(1, mean = borderchecks$bordercheck_means[bordercheck_id], sd = borderchecks$bordercheck_sd))
   
   return (bordercheck_handling_time)
 }
@@ -109,7 +96,7 @@ get_egate_failure <- function(egate_used, egate_failure_prop){
 immigration_queue <- function(passengers, 
                   bordercheck_desks, bordercheck_egates, 
                   egate_uptake_prop, egate_failure_prop, 
-                  egate_failed_passenger_next, 
+                  failed_egate_priority, 
                   seed = NULL){
   
   if (!is.null(seed)) {set.seed(seed)}
@@ -125,7 +112,8 @@ immigration_queue <- function(passengers,
                              "bordercheck_end_time", "bordercheck_handled")
   passengers_egate <- passengers %>% 
     filter(egate_used == "egate") %>% 
-    mutate(egate_handling_time = alt_get_egate_handling_times(n_passengers = n()))
+    mutate(egate_handling_time = get_egate_handling_times(bordercheck_egates,
+                                                          n_passengers = n()))
   passengers_egate_matrix <- passengers_egate %>%
     select(all_of(egate_numeric_columns)) %>% 
     as.matrix()
@@ -246,13 +234,12 @@ immigration_queue <- function(passengers,
       next_passenger <- "failed"
     } else {
       # both desk and failed passenger waiting
-      next_passenger <- ifelse(runif(1) < egate_failed_passenger_next, "failed", "desk")
+      next_passenger <- ifelse(runif(1) < failed_egate_priority, "failed", "desk")
     }
     
+    # how long it takes to handle passenger
+    handling_time <- get_desk_handling_time(bordercheck_desks, next_free_bordercheck) 
     if(next_passenger == "desk"){
-      
-      # how long it takes to handle passenger
-      handling_time <- get_desk_handling_time(bordercheck_desks, next_free_bordercheck) #TODO: add nationality
       
       # update accordingly for passenger
       passengers_desk_matrix[i_desk, "bordercheck_start_time"] <- next_free_bordercheck_time
@@ -262,16 +249,13 @@ immigration_queue <- function(passengers,
       i_desk <- i_desk + 1
       
     } else {
-      
-      # how long it takes to handle passenger
-      handling_time <- get_desk_handling_time(bordercheck_desks, next_free_bordercheck) #TODO: add nationality
-      
+   
       # update accordingly for passenger
       passengers_failed_matrix[i_failed, "bordercheck_start_time"] <- next_free_bordercheck_time
       passengers_failed_matrix[i_failed, "bordercheck_end_time"] <- next_free_bordercheck_time + handling_time
       passengers_failed_matrix[i_failed, "bordercheck_handled"] <- bordercheck_desks$bordercheck_ids_int[next_free_bordercheck]
       
-      i_failed <- i_failed+1
+      i_failed <- i_failed + 1
       
     }
     

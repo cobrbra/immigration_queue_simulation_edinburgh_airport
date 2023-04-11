@@ -64,6 +64,7 @@ get_coached_status <- function(flight_id, prob_coached = .15, seed = NULL) {
   return(coached)
 }
 
+# TODO: function for walk time baseline
 
 get_nationality_split <- function(aircrafts, EU_plus_hubs, other_hubs, prop_nationality, 
                                   UK_plus_countries, EU_plus_countries,
