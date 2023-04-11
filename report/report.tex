@@ -175,7 +175,7 @@ We accessed complementary historical historical flight arrivals data from the Ed
 % \end{table}
 \input{tables/observed_schedule}
 
-Aircraft type and maximum passenger capacity were established by cross-linking with another publicly available dataset \cite{aircraft_capacity}. The average percentage of occupied seat for a given flight ranges from 86\% in 2019 for international flights in the UK \cite{loading_factor_national} to self-reported 91\% for a budget airline in 2022 \cite{loading_factor_ryanair}. This is called the \textit{load factor}.
+Aircraft type and maximum passenger capacity were established by cross-linking with another publicly available dataset \cite{aircraft_capacity}. The average percentage of occupied seat for a given flight ranges from 86\% in 2019 for international flights in the UK \cite{loading_factor_national} to self-reported 91\% for a budget airline in 2022 \cite{loading_factor_ryanair}.
 
 \paragraph{Airport Classification}
 We assume that the passenger nationality split depends on departure airport, and therefore group airports into the following categories: 
@@ -239,7 +239,7 @@ For this analysis we assume sufficient coaches are always available to transport
 \paragraph{eGate Eligibility} 
 As only passengers from certain countries are can use \glspl{egate}, we make the percentage of passengers eligible for \glspl{egate} per aircraft dependent on the classification of the airport. For example, we assume that an aircraft from a hub is more likely to carry a variety of international passengers, of which fewer can use \glspl{egate} compared to a flight from a EU+ non-hub. \jbnote{This needs a lot of attention, in write up and in modelling approach.}
 
-\paragraph{\gls{egate} Uptake and Failure Rate} 
+\paragraph{\gls{egate} Uptake} 
 Not all passengers who are eligible to use eGates choose to do so for a variety of reasons. We vary the percentage of \gls{egate} uptake between XX and XX. \jbnote{Is this varying randomly or systematically? If randomly, seems better just to pick a bad case.} 
 
 \paragraph{eGate Failure Rate}
@@ -281,14 +281,16 @@ need to also talk about the hall setup here?
 summary of the project and our approach \\
 the number of contact spaces is fixed at the airport so if you want more flights you need to coach them (unless you want to undertake big building works) 
 
-\subsection{Recommendation for Hall Layout}
-we talk about the split of queue space and the mechanism queue space is allocated in the overflow hall \\
-this is a nice bonus they hinted at in the description, so I think we should include some info here (could be less detailled)
 
 \subsection{Recommendation for Total Number of eGates}
 we need to put our foot down and come up with a final number \\ 
 this number can be put into perspective by comparing it to the existing number of eGates at UK airports and funding to  deliver a programme to install up to 70 gates, which can be found here: \cite{Inspection_eGates} \\
 mention that this is the number of \textbf{working} eGates at any time, the eGate doc by the government has numbers on how often they break down, cite those here
+
+\subsection{Recommendation for Hall Layout}
+we talk about the split of queue space and the mechanism queue space is allocated in the overflow hall \\
+this is a nice bonus they hinted at in the description, so I think we should include some info here (could be less detailled)
+
 
 \subsection{Future Work}
 all the assumptions we made \\
