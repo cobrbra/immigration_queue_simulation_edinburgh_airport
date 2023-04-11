@@ -141,8 +141,8 @@ list(
   tar_target(load_factor_mean, .95),
   tar_target(load_factor_sd, .1),
   
-  tar_target(egate_failure_prop = .05),
-  tar_target(failed_egate_priority = .75),
+  tar_target(egate_failure_prop, .05),
+  tar_target(failed_egate_priority, .75),
   
   tar_target(figures,
              get_figures(future_aircrafts_arrivals = future_aircrafts_arrivals,
