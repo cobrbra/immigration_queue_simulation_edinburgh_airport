@@ -64,7 +64,7 @@ list(
   tar_target(n_passenger_quantiles, 
              process_aircrafts_quantiles(aircrafts_observed_arrivals, 
                                          EU_plus_hubs, other_hubs, UK_plus_countries,
-                                         EU_plus_countries, load_factor_mean, load_factor_sd)),
+                                         EU_plus_countries, load_factor)),
   
   # Making the future aircraft arrivals dataset accessible
   tar_target(future_aircrafts_arrivals_raw,
@@ -87,8 +87,7 @@ list(
                prop_nationality = prop_nationality,
                UK_plus_countries = UK_plus_countries,
                EU_plus_countries = EU_plus_countries,
-               load_factor_mean = load_factor_mean,
-               load_factor_sd = load_factor_sd)),
+               load_factor = load_factor)),
   tar_target(example_passengers_after_route,
              get_passengers_after_route(example_passenger_arrivals)),
   
