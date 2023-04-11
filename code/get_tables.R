@@ -12,7 +12,7 @@ get_tables <- function(future_aircrafts_arrivals,
   bold <- function(x) {paste('{\\textbf{',x,'}}', sep ='')}
   
   
-  tables$anticipated_schedule <- future_aircrafts_arrivals %>% 
+  tables$anticipated_schedule <- future_aircrafts_arrivals %>%
     mutate(Year = format(sched_aircraft_datetime_posix, "%Y")) %>% 
     group_by(Year) %>% 
     nest() %>% 
@@ -25,7 +25,7 @@ get_tables <- function(future_aircrafts_arrivals,
                              ~ format(max(.$sched_aircraft_date_posix),
                                       format = "%d/%m")))) %>% 
     select(Year, `Start Date`, `End Date`, `Number of Flights`) 
-  captions$anticipated_schedule <- "Anticipated flight schedule, 2023-2027."
+  captions$anticipated_schedule <- "Anticipated flight schedule (non-UK+) for 2023-2027."
   
   tables$observed_schedule <- (aircrafts_observed_arrivals) %>%
     mutate(Year = as.integer(format(sched_aircraft_datetime_posix, "%Y"))) %>% 
