@@ -2,18 +2,6 @@ library(tidyverse)
 library(here)
 library(readxl)
 
-get_processed_data <- function(file) {
-  
-  
-  processed_data <- read_csv(file) %>%
-    filter(mpg < 20)
-  write_csv(processed_data, here("processed_data/example_processed_data.csv"))
-  
-  
-  return(processed_data)
-}
-
-
 process_airports <- function(file) {
   airports_cols <- c("icao_code", "iata_code", "airport_name", "city", "country",
                    "lat_degrees", "lat_minutes", "lat_seconds", "lat_direction",
