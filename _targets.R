@@ -10,7 +10,7 @@ library(here)
 
 # Set target options:
 tar_option_set(
-  packages = c("here", "tidyverse", "readxl", "xtable", "showtext"), # packages that your targets need to run
+  packages = c("here", "readxl", "scales", "showtext", "tidyverse", "xtable"), # packages that your targets need to run
   format = "rds" # default storage format
   # Set other options as needed.
 )
@@ -141,8 +141,8 @@ list(
   tar_target(load_factor_mean, .95),
   tar_target(load_factor_sd, .1),
   
-  tar_target(egate_failure_prop = .05),
-  tar_target(failed_egate_priority = .75),
+  tar_target(egate_failure_prop, .05),
+  tar_target(failed_egate_priority, .75),
   
   tar_target(figures,
              get_figures(future_aircrafts_arrivals = future_aircrafts_arrivals,
