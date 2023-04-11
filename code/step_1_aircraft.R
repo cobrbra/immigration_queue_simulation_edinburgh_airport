@@ -25,17 +25,16 @@ check_passengers_after_aircraft <- function(passengers_after_aircraft) {
 }
 
 
-get_n_passengers <- function(max_passengers, load_factor_mean, 
-                             load_factor_sd, seed = NULL){
+get_n_passengers <- function(max_passengers, load_factor, seed = NULL){
   
   if (!is.null(seed)) {set.seed(seed)}
   
-  load_factor <- rnorm(n = length(max_passengers),
-                       mean = load_factor_mean, sd = load_factor_sd) 
-  load_factor <- pmin(load_factor, 1)
-  load_factor <- pmax(load_factor, 0)
+  load_factors <- rnorm(n = length(max_passengers),
+                       mean = load_factor$mean, sd = load_factor$sd) 
+  load_factors <- pmin(load_factor, 1)
+  load_factors <- pmax(load_factor, 0)
   
-  n_passengers <- round(max_passengers * load_factor)
+  n_passengers <- round(max_passengers * load_factors)
   
   return(n_passengers)
 }
@@ -145,15 +144,14 @@ get_passengers_after_aircrafts <- function(aircrafts,
                                           prop_nationality,
                                           UK_plus_countries,
                                           EU_plus_countries,
-                                          load_factor_mean,
-                                          load_factor_sd,
+                                          load_factor,
                                           seed = NULL){
   
   if (!is.null(seed)) {set.seed(seed)}
   
   aircrafts_with_passengers <- aircrafts %>% 
     mutate(n_passengers = if_else(is.na(n_passengers),
-                                  get_n_passengers(max_passengers, load_factor_mean, load_factor_sd),
+                                  get_n_passengers(max_passengers, load_factor),
                                   n_passengers)) %>% 
     mutate(coached = if_else(is.na(coached), get_coached_status(flight_id), coached)) %>% 
     get_nationality_split(EU_plus_hubs = EU_plus_hubs,

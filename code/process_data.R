@@ -248,7 +248,7 @@ process_future_coached_levels <- function(file) {
 
 process_aircrafts_quantiles <- function(aircrafts, 
                                         EU_plus_hubs, other_hubs, UK_plus_countries,
-                                        EU_plus_countries, load_factor_mean, load_factor_sd, 
+                                        EU_plus_countries, load_factor, 
                                         seed = NULL
 ){
   
@@ -266,8 +266,7 @@ process_aircrafts_quantiles <- function(aircrafts,
                                          EU_plus_countries = EU_plus_countries)
   
   ac_pass <- get_n_passengers(max_passengers = ac$max_passengers, 
-                              load_factor_mean = load_factor_mean,
-                              load_factor_sd = load_factor_sd,
+                              load_factor = load_factor,
                               seed = seed)
   
   

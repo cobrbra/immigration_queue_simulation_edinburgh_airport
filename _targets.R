@@ -117,9 +117,8 @@ list(
   tar_target(prop_nationality,
              read_delim(prop_nationality_raw, delim = ";")),
   
-  tar_target(load_factor_mean, .95),
-  tar_target(load_factor_sd, .1),
-  
+  tar_target(load_factor, list(mean = .95, sd = .1)),
+
   tar_target(egate_failure_prop, .05),
   tar_target(failed_egate_priority, .75),
   
