@@ -47,7 +47,7 @@ get_figures <- function(future_aircrafts_arrivals, future_coached_levels, filter
   edi_airport_colours <- c("#7D0C6E", "#A19384", "#F2D6EA",
                            "#6E7D0C", "#84A193", "#EAF2D6",
                            "#0C6E7D", "#9384A1", "#D6EAF2",
-                           "#2D0255", "#511166","#B41788")
+                           "#2D0255", "#511166", "#B41788")
   
   figures <- list()
   figure_sizes <- list()
