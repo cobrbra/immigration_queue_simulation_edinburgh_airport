@@ -87,15 +87,14 @@ list(
              data.frame(year = "1970",
                         prob_coached = .15)),
   tar_target(example_aircrafts_arrivals,
-             simulate_aircrafts_arrivals(seed = 8)),
+             simulate_aircrafts_arrivals(seed = 8) %>% 
+               complete_aircrafts_arrivals(hubs = hubs, 
+                                           countries = countries, 
+                                           prop_nationality = prop_nationality)),
   tar_target(example_passenger_arrivals,
              get_passengers_after_aircrafts(
-               aircrafts = example_aircrafts_arrivals,
-               hubs = hubs,
-               prop_nationality = prop_nationality,
-               countries = countries,
-               load_factor = load_factor,
-               coached_levels = example_coached_levels)),
+               aircrafts_arrivals = example_aircrafts_arrivals,
+               seed = 10)),
   tar_target(example_passengers_after_route,
              get_passengers_after_route(example_passenger_arrivals)),
   

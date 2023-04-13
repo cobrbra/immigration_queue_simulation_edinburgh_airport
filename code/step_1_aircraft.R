@@ -146,44 +146,27 @@ sim_delay_times <- function(flight_id,
 }
 
 
-get_passengers_after_aircrafts <- function(aircrafts, 
-                                          hubs,
-                                          prop_nationality,
-                                          countries,
-                                          load_factor,
-                                          coached_levels,
-                                          seed = NULL){
+get_passengers_after_aircrafts <- function(aircrafts_arrivals, seed = NULL){
   
   if (!is.null(seed)) {set.seed(seed)}
   
-  aircrafts_with_passengers <- aircrafts %>% 
-    mutate(n_passengers = if_else(is.na(n_passengers),
-                                  sim_n_passengers(max_passengers, load_factor),
-                                  n_passengers)) %>% 
-    sim_coached_status(coached_levels = coached_levels) %>% 
-    sim_nationality_split(hubs = hubs,  
-                          prop_nationality = prop_nationality, 
-                          countries = countries)
-  
-  n_passengers_aircraft <- aircrafts_with_passengers$n_passengers
-  n_passengers <- sum(n_passengers_aircraft)
+  n_passengers_total <- sum(aircrafts_arrivals$n_passengers)
 
   passengers <- data.frame(
-    
-    passenger_id = paste0("P", str_pad(seq_len(n_passengers), 10, pad = "0"),
+    passenger_id = paste0("P", str_pad(seq_len(n_passengers_total), 10, pad = "0"),
                           recycle0 = TRUE),
-    flight_id = rep(aircrafts_with_passengers$flight_id, n_passengers_aircraft),
-    nationality = aircrafts_with_passengers %>% 
+    flight_id = rep(aircrafts_arrivals$flight_id, aircrafts_arrivals$n_passengers),
+    nationality = aircrafts_arrivals %>% 
       select(n_nat_UKIE, n_nat_EU_plus, n_nat_other_easy, n_nat_other_hard) %>% 
       pivot_longer(cols = everything(), names_to = "nat", values_to = "n_nat") %>% 
       {rep(.$nat, .$n_nat)} %>% 
       str_sub(3,-1),
-    airport_classification = rep(aircrafts_with_passengers$airport_classification, n_passengers_aircraft),
-    aircraft_datetime_int = rep(aircrafts_with_passengers$aircraft_datetime_int, n_passengers_aircraft),
-    aircraft_datetime_posix = rep(aircrafts_with_passengers$aircraft_datetime_posix, n_passengers_aircraft),
-    aircraft_time_int = rep(aircrafts_with_passengers$aircraft_time_int, n_passengers_aircraft),
-    aircraft_date_posix = rep(aircrafts_with_passengers$aircraft_date_posix, n_passengers_aircraft),
-    coached = rep(aircrafts_with_passengers$coached, n_passengers_aircraft)
+    airport_classification = rep(aircrafts_arrivals$airport_classification, aircrafts_arrivals$n_passengers),
+    aircraft_datetime_int = rep(aircrafts_arrivals$aircraft_datetime_int, aircrafts_arrivals$n_passengers),
+    aircraft_datetime_posix = rep(aircrafts_arrivals$aircraft_datetime_posix, aircrafts_arrivals$n_passengers),
+    aircraft_time_int = rep(aircrafts_arrivals$aircraft_time_int, aircrafts_arrivals$n_passengers),
+    aircraft_date_posix = rep(aircrafts_arrivals$aircraft_date_posix, aircrafts_arrivals$n_passengers),
+    coached = rep(aircrafts_arrivals$coached, aircrafts_arrivals$n_passengers)
   ) %>% 
     sample_frac(1)
   
@@ -192,13 +175,13 @@ get_passengers_after_aircrafts <- function(aircrafts,
 }
 
 complete_aircrafts_arrivals <- function(aircrafts_arrivals, 
-                                        delay_dist,
                                         hubs,
                                         countries,
                                         prop_nationality,
-                                        n_passengers_quantiles,
-                                        load_factor,
-                                        coached_levels,
+                                        delay_dist = NULL,
+                                        n_passengers_quantiles = NULL,
+                                        load_factor = NULL,
+                                        coached_levels = NULL,
                                         seed = NULL) {
   if (!is.null(seed)) {set.seed(seed)}
   completed_aircrafts_arrivals <- aircrafts_arrivals
