@@ -85,6 +85,14 @@ get_queue_length <- function(passengers, input_times){
 
 
 
+mean_wait_time <- function(queue_data) {
+  return(mean(queue_data$bordercheck_start_time - queue_data$route_datetime_int))
+}
+
+sla_wait_time <- function(queue_data, threshold_minutes = 60) {
+  return(mean((queue_data$bordercheck_start_time - queue_data$route_datetime_int) > threshold_minutes*60))
+}
+
 
 
 
