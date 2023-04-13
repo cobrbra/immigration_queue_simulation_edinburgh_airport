@@ -11,7 +11,8 @@ check_passengers_after_aircrafts <- function(passengers_after_aircraft) {
     "aircraft_datetime_int",
     "aircraft_time_int",
     "aircraft_datetime_posix",
-    "aircraft_date_posix"
+    "aircraft_date_posix",
+    "sched_aircraft_date_posix"
   )
   if (any(!(necessary_columns %in% colnames(passengers_after_aircraft)))) {
     stop(

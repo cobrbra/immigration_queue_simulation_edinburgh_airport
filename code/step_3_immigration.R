@@ -18,7 +18,8 @@ check_passengers_after_immigration <- function(passengers_after_immigration) {
     "queue_time",
     "egate_eligible",
     "egate_used",
-    "egate_failed"
+    "egate_failed",
+    "sched_aircraft_date_posix"
   )
   if (any(!(necessary_columns %in% colnames(passengers_after_immigration)))) {
     stop(

@@ -10,7 +10,8 @@ check_passengers_after_routes <- function(passengers_after_routes) {
     "route_datetime_int",
     "route_time_int",
     "route_datetime_posix",
-    "route_date_posix")
+    "route_date_posix",
+    "sched_aircraft_date_posix")
   
   if (any(!(necessary_columns %in% colnames(passengers_after_routes)))) {
     stop(
