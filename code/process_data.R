@@ -115,14 +115,9 @@ process_aircrafts_arrivals <- function(folder_name,
     as.data.frame() %>% 
     select(-c(des_time,t)) %>% 
     drop_na() %>% 
-    mutate(sched_aircraft_datetime_posix = t_sched,
-           aircraft_datetime_posix = t_actual,
-           sched_aircraft_date_posix = as.Date(sched_aircraft_datetime_posix),
-           aircraft_date_posix = as.Date(aircraft_datetime_posix),
-           sched_aircraft_datetime_int = as.numeric(t_sched),
-           aircraft_datetime_int = as.numeric(aircraft_datetime_posix)) %>% 
-    mutate(sched_aircraft_time_int = sched_aircraft_datetime_int - 86400 * as.numeric(sched_aircraft_date_posix),
-           aircraft_time_int = aircraft_datetime_int - 86400 * as.numeric(aircraft_date_posix))
+    mutate(sched_aircraft_datetime_int = as.numeric(t_sched),
+           aircraft_datetime_int = as.numeric(t_actual)) %>% 
+    get_datetime_alternates(column_prefixes = c("sched_aircraft", "aircraft"))
   
   # bind together with airports data
   aircrafts_observed_arrivals <- aircrafts_observed_arrivals %>% 
