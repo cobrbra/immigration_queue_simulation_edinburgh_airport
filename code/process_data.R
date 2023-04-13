@@ -289,7 +289,7 @@ process_future_coached_levels <- function(file) {
 
 
 process_aircrafts_quantiles <- function(aircrafts, 
-                                        EU_plus_hubs, other_hubs, UK_plus_countries,
+                                        hubs, UK_plus_countries,
                                         EU_plus_countries, load_factor, 
                                         seed = NULL
 ){
@@ -302,8 +302,7 @@ process_aircrafts_quantiles <- function(aircrafts,
   
   ac_class <- get_airport_classification(airport_country = ac$dep_country, 
                                          airport_3letter = ac$dep_airport, 
-                                         EU_plus_hubs = EU_plus_hubs, 
-                                         other_hubs = other_hubs,
+                                         hubs = hubs,
                                          UK_plus_countries =  UK_plus_countries,
                                          EU_plus_countries = EU_plus_countries)
   

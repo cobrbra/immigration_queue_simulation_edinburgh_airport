@@ -63,7 +63,7 @@ list(
                                                   UK_plus_countries = UK_plus_countries)),
   tar_target(n_passenger_quantiles, 
              process_aircrafts_quantiles(observed_aircrafts_arrivals, 
-                                         EU_plus_hubs, other_hubs, UK_plus_countries,
+                                         hubs = hubs, UK_plus_countries,
                                          EU_plus_countries, load_factor)),
   
   # Making the future aircraft arrivals dataset accessible
@@ -82,8 +82,7 @@ list(
   tar_target(example_passenger_arrivals,
              get_passengers_after_aircrafts(
                aircrafts = example_aircraft_arrivals,
-               EU_plus_hubs = EU_plus_hubs,
-               other_hubs = other_hubs,
+               hubs = hubs,
                prop_nationality = prop_nationality,
                UK_plus_countries = UK_plus_countries,
                EU_plus_countries = EU_plus_countries,
@@ -102,10 +101,11 @@ list(
   
   # For passenger count and nationality
   tar_target(EU_plus_hubs_raw, here("params/nationality_info/EU_plus_hubs.txt"), format = "file"),
-  tar_target(EU_plus_hubs, colnames(read_delim(EU_plus_hubs_raw, delim = ","))),
-  
   tar_target(other_hubs_raw, here("params/nationality_info/other_hubs.txt"), format = "file"),
-  tar_target(other_hubs, colnames(read_delim(other_hubs_raw, delim = ","))),
+
+  tar_target(hubs,
+             list(EU_plus = colnames(read_delim(EU_plus_hubs_raw, delim = ",")),
+                  other = colnames(read_delim(other_hubs_raw, delim = ",")))),
   
   tar_target(EU_plus_countries_raw,
              here("params/nationality_info/EU_plus_countries.txt"), 
