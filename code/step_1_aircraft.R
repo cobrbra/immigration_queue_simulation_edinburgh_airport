@@ -25,7 +25,7 @@ check_passengers_after_aircraft <- function(passengers_after_aircraft) {
 }
 
 
-sim_n_passsengers <- function(max_passengers, load_factor, seed = NULL){
+sim_n_passengers <- function(max_passengers, load_factor, seed = NULL){
   
   if (!is.null(seed)) {set.seed(seed)}
   
@@ -166,7 +166,7 @@ get_passengers_after_aircrafts <- function(aircrafts,
   
   aircrafts_with_passengers <- aircrafts %>% 
     mutate(n_passengers = if_else(is.na(n_passengers),
-                                  sim_n_passsengers(max_passengers, load_factor),
+                                  sim_n_passengers(max_passengers, load_factor),
                                   n_passengers)) %>% 
     mutate(coached = if_else(is.na(coached), get_coached_status(flight_id), coached)) %>% 
     get_nationality_split(hubs = hubs, 
@@ -199,9 +199,55 @@ get_passengers_after_aircrafts <- function(aircrafts,
   return(passengers)
 }
 
-complete_aircrafts_arrivals <- function(aircrafts_arrivals) {
+complete_aircrafts_arrivals <- function(aircrafts_arrivals, 
+                                        delay_dist,
+                                        hubs,
+                                        countries,
+                                        n_passengers_quantiles,
+                                        seed = NULL) {
+  if (!is.null(seed)) {set.seed(seed)}
+  completed_aircrafts_arrivals <- aircrafts_arrivals
   
-  check_aircrafts_arrivals(complete_aircrafts_arrivals, complete = TRUE)
-  return(complete_aircrafts_arrivals)
+  # Simulate aircraft delays
+  if (all(is.na(completed_aircrafts_arrivals$aircraft_datetime_int))) {
+    completed_aircrafts_arrivals <- completed_aircrafts_arrivals %>% 
+      mutate(aircraft_datetime_int =
+               sched_aircraft_datetime_int + sim_delay_times(flight_id, delay_dist)
+      )
+  }
+  
+  # Get full datetime columns
+  completed_aircrafts_arrivals <- get_datetime_alternates(
+    completed_aircrafts_arrivals,
+    column_prefixes = c("sched_aircraft", "aircraft")
+  )
+  
+  # Get or simulate airport classification
+  if (all(is.na(completed_aircrafts_arrivals$airport_classification))) {
+    if (all(!is.na(completed_aircrafts_arrivals$dep_country)) &
+        all(!is.na(completed_aircrafts_arrivals$dep_airport))) {
+      completed_aircrafts_arrivals <- completed_aircrafts_arrivals %>% 
+        mutate(airport_classification = get_airport_classification(
+          airport_country = dep_country,
+          airport_3letter = dep_airport,
+          hubs = hubs,
+          countries = countries
+        ))
+    } 
+    else if (all(!is.na(completed_aircrafts_arrivals$n_passengers))) {
+      completed_aircrafts_arrivals <- completed_aircrafts_arrivals %>% 
+        mutate(airport_classification = sim_airport_classification(
+          n_passengers,
+          n_passengers_quantiles
+        ))
+    }
+    else {
+      stop("Aircraft arrivals must either have complete n_passengers or dep_country/dep_airport.")
+    }
+  }
+  
+  # check_aircrafts_arrivals(completed_aircrafts_arrivals, complete = TRUE)
+  return(completed_aircrafts_arrivals)
 }
+
 
