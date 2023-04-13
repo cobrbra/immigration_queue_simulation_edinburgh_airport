@@ -95,8 +95,8 @@ list(
              get_passengers_after_aircrafts(
                aircrafts_arrivals = example_aircrafts_arrivals,
                seed = 10)),
-  tar_target(example_passengers_after_route,
-             get_passengers_after_route(example_passenger_arrivals)),
+  tar_target(example_passengers_after_routes,
+             get_passengers_after_routes(example_passenger_arrivals)),
   
   tar_target(delay_dist,
              list(prop_delayed = .21,

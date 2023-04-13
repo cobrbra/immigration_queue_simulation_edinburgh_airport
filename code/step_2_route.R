@@ -1,5 +1,5 @@
-check_passengers_after_route <- function(passengers_after_route) {
-  if (!is.data.frame(passengers_after_route)) {
+check_passengers_after_routes <- function(passengers_after_routes) {
+  if (!is.data.frame(passengers_after_routes)) {
     stop("Passengers from route should be dataframe.")
   }
   necessary_columns <- c(
@@ -12,13 +12,13 @@ check_passengers_after_route <- function(passengers_after_route) {
     "route_datetime_posix",
     "route_date_posix")
   
-  if (any(!(necessary_columns %in% colnames(passengers_after_route)))) {
+  if (any(!(necessary_columns %in% colnames(passengers_after_routes)))) {
     stop(
       paste(c("Passengers from route should contain columns", necessary_columns), 
             collapse = " "))
   }
   
-  if (length(passengers_after_route$passenger_id) != length(unique(passengers_after_route$passenger_id))) {
+  if (length(passengers_after_routes$passenger_id) != length(unique(passengers_after_routes$passenger_id))) {
     stop("Passenger IDs are not unique.")
   }
 }
@@ -49,9 +49,9 @@ get_walk_time <- function(passengers,
 }
 
 
-get_passengers_after_route <- function(passengers_after_aircraft, seed = NULL) {
+get_passengers_after_routes <- function(passengers_after_aircraft, seed = NULL) {
   if (!is.null(seed)) {set.seed(seed)}
-  passengers_after_route <- passengers_after_aircraft %>% 
+  passengers_after_routes <- passengers_after_aircraft %>% 
     get_coach_time() %>% 
     get_walk_time() %>% 
     mutate(route_datetime_int = aircraft_datetime_int + coach_time + walk_time) %>%
@@ -62,6 +62,6 @@ get_passengers_after_route <- function(passengers_after_aircraft, seed = NULL) {
     arrange(route_datetime_int) %>% 
     as.data.frame()
   
-  check_passengers_after_route(passengers_after_route)
-  return(passengers_after_route)
+  check_passengers_after_routes(passengers_after_routes)
+  return(passengers_after_routes)
 }
