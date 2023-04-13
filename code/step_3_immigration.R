@@ -1,29 +1,34 @@
+necessary_immigration_columns <- c(
+  "passenger_id",
+  "flight_id",
+  "nationality",
+  "airport_classification",
+  "route_datetime_int",
+  "route_time_int",
+  "route_datetime_posix",
+  "route_date_posix",
+  "immigration_datetime_int",
+  "immigration_time_int",
+  "immigration_datetime_posix",
+  "immigration_date_posix",
+  "queue_time",
+  "egate_eligible",
+  "egate_used",
+  "egate_failed",
+  "sched_aircraft_date_posix"
+)
+
 check_passengers_after_immigration <- function(passengers_after_immigration) {
   if (!is.data.frame(passengers_after_immigration)) {
     stop("Passengers from immigration should be dataframe.")
   }
-  necessary_columns <- c(
-    "passenger_id",
-    "flight_id",
-    "nationality",
-    "airport_classification",
-    "route_datetime_int",
-    "route_time_int",
-    "route_datetime_posix",
-    "route_date_posix",
-    "immigration_datetime_int",
-    "immigration_time_int",
-    "immigration_datetime_posix",
-    "immigration_date_posix",
-    "queue_time",
-    "egate_eligible",
-    "egate_used",
-    "egate_failed",
-    "sched_aircraft_date_posix"
-  )
-  if (any(!(necessary_columns %in% colnames(passengers_after_immigration)))) {
+  
+  necessary_columns_missing <- !(necessary_immigration_columns %in% 
+                                   colnames(passengers_after_immigration))
+  if (any(necessary_columns_missing)) {
     stop(
-      paste(c("Passengers from immigration should contain columns", necessary_columns), 
+      paste(c("Passengers from immigration should contain columns", 
+              necessary_immigration_columns[necessary_columns_missing]), 
             collapse = " "))
   }
   

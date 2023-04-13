@@ -1,21 +1,25 @@
+necessary_route_columns <- c(
+  "passenger_id",
+  "flight_id",
+  "nationality",
+  "airport_classification",
+  "route_datetime_int",
+  "route_time_int",
+  "route_datetime_posix",
+  "route_date_posix",
+  "sched_aircraft_date_posix")
+
 check_passengers_after_routes <- function(passengers_after_routes) {
   if (!is.data.frame(passengers_after_routes)) {
     stop("Passengers from route should be dataframe.")
   }
-  necessary_columns <- c(
-    "passenger_id",
-    "flight_id",
-    "nationality",
-    "airport_classification",
-    "route_datetime_int",
-    "route_time_int",
-    "route_datetime_posix",
-    "route_date_posix",
-    "sched_aircraft_date_posix")
   
-  if (any(!(necessary_columns %in% colnames(passengers_after_routes)))) {
+  necessary_columns_missing <- !(necessary_route_columns %in% 
+                                   colnames(passengers_after_routes))
+  if (any(necessary_columns_missing)) {
     stop(
-      paste(c("Passengers from route should contain columns", necessary_columns), 
+      paste(c("Passengers from route should contain columns", 
+              necessary_route_columns[necessary_columns_missing]), 
             collapse = " "))
   }
   

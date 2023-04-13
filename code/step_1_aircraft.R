@@ -1,22 +1,27 @@
+necessary_passengers_arrivals_columns <- c(
+  "passenger_id",
+  "flight_id",
+  "nationality",
+  "airport_classification",
+  "coached",
+  "aircraft_datetime_int",
+  "aircraft_time_int",
+  "aircraft_datetime_posix",
+  "aircraft_date_posix",
+  "sched_aircraft_date_posix"
+)
+
 check_passengers_after_aircrafts <- function(passengers_after_aircraft) {
   if (!is.data.frame(passengers_after_aircraft)) {
     stop("Passengers from aircraft should be dataframe.")
   }
-  necessary_columns <- c(
-    "passenger_id",
-    "flight_id",
-    "nationality",
-    "airport_classification",
-    "coached",
-    "aircraft_datetime_int",
-    "aircraft_time_int",
-    "aircraft_datetime_posix",
-    "aircraft_date_posix",
-    "sched_aircraft_date_posix"
-  )
-  if (any(!(necessary_columns %in% colnames(passengers_after_aircraft)))) {
+  
+  necessary_columns_missing <- !(necessary_passengers_arrivals_columns %in% 
+                                   colnames(passengers_after_aircraft))
+  if (any(necessary_columns_missing)) {
     stop(
-      paste(c("Passengers from aircraft should contain columns", necessary_columns), 
+      paste(c("Passengers from aircraft should contain columns",
+              necessary_passengers_arrivals_columns[necessary_columns_missing]), 
             collapse = " "))
   }
   
