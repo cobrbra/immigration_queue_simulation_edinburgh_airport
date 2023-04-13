@@ -188,6 +188,7 @@ complete_aircrafts_arrivals <- function(aircrafts_arrivals,
   
   # Simulate aircraft delays
   if (all(is.na(completed_aircrafts_arrivals$aircraft_datetime_int))) {
+    if (is.null(delay_dist)) stop("must supply delay_dist to complete_aircrafts_arrivals")
     completed_aircrafts_arrivals <- completed_aircrafts_arrivals %>% 
       mutate(aircraft_datetime_int =
                sched_aircraft_datetime_int + sim_delay_times(flight_id, delay_dist)
@@ -213,6 +214,7 @@ complete_aircrafts_arrivals <- function(aircrafts_arrivals,
         ))
     } 
     else if (all(!is.na(completed_aircrafts_arrivals$n_passengers))) {
+      if (is.null(n_passengers_quantiles)) stop("must supply n_passengers_quantiles to complete_aircrafts_arrivals")
       completed_aircrafts_arrivals <- completed_aircrafts_arrivals %>% 
         mutate(airport_classification = sim_airport_classification(
           n_passengers,
@@ -226,12 +228,14 @@ complete_aircrafts_arrivals <- function(aircrafts_arrivals,
   
   # Simulate number of passengers
   if (all(is.na(completed_aircrafts_arrivals$n_passengers))) {
+    if (is.null(load_factor)) stop("must supply load_factor to complete_aircrafts_arrivals")
     completed_aircrafts_arrivals <- completed_aircrafts_arrivals %>% 
       mutate(n_passengers = sim_n_passengers(max_passengers, load_factor))
   }
   
   # Simulate coached status
   if(all(is.na(completed_aircrafts_arrivals$coached))) {
+    if (is.null(coached_levels)) stop("must supply coached_levels to complete_aircraft_arrivals")
     completed_aircrafts_arrivals <- completed_aircrafts_arrivals %>% 
       sim_coached_status(coached_levels = coached_levels)
   }
