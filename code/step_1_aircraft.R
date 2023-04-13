@@ -95,30 +95,12 @@ sim_airport_classification <- function(n_passengers, quantile_list, seed = NULL)
 
 # TODO: function for walk time baseline
 
-get_nationality_split <- function(aircrafts, hubs, prop_nationality, 
-                                  countries,
-                                  seed = NULL){
+sim_nationality_split <- function(aircrafts_arrivals, hubs, prop_nationality, 
+                                  countries, seed = NULL){
   
   if (!is.null(seed)) {set.seed(seed)}
   
-  if(!all(dim(prop_nationality) == c(5, 5))){stop("Prop Nationality needs to be 5x5.")}
-  
-  n_aircrafts <- dim(aircrafts)[1]
-  
-  if (!("airport_classification" %in% colnames(aircrafts)) | 
-      (("airport_classification" %in% colnames(aircrafts)) & 
-       any(is.na(aircrafts[["airport_classification"]])))) {
-    aircrafts_with_airport_class <- aircrafts %>% 
-      mutate(airport_classification = get_airport_classification(
-        airport_country = dep_country,
-        airport_3letter = dep_airport,
-        hubs = hubs,
-        countries = countries
-      ))
-  }
-  else{
-    aircrafts_with_airport_class <- aircrafts
-  }
+  if(!all(dim(prop_nationality) == c(5, 5))){stop("prop_nationality needs to be 5x5.")}
   
   sim_passengers <- function(n_passenegers, airport_classification) {
     sample(x = colnames(prop_nationality)[-1],
@@ -128,7 +110,7 @@ get_nationality_split <- function(aircrafts, hubs, prop_nationality,
     )
   }
   
-  aircrafts_with_simmed_nationality <- aircrafts_with_airport_class %>% 
+  aircrafts_with_simmed_nationality <- aircrafts_arrivals %>% 
     mutate(simmed_passengers = map2(.x = n_passengers, 
                                     .y = airport_classification,
                                     .f = ~ sim_passengers(.x, .y))) %>% 
@@ -179,7 +161,7 @@ get_passengers_after_aircrafts <- function(aircrafts,
                                   sim_n_passengers(max_passengers, load_factor),
                                   n_passengers)) %>% 
     sim_coached_status(coached_levels = coached_levels) %>% 
-    get_nationality_split(hubs = hubs, 
+    sim_nationality_split(hubs = hubs,  
                           prop_nationality = prop_nationality, 
                           countries = countries)
   
@@ -215,6 +197,7 @@ complete_aircrafts_arrivals <- function(aircrafts_arrivals,
                                         countries,
                                         n_passengers_quantiles,
                                         load_factor,
+                                        coached_levels,
                                         seed = NULL) {
   if (!is.null(seed)) {set.seed(seed)}
   completed_aircrafts_arrivals <- aircrafts_arrivals
@@ -263,7 +246,20 @@ complete_aircrafts_arrivals <- function(aircrafts_arrivals,
       mutate(n_passengers = sim_n_passengers(max_passengers, load_factor))
   }
   
-  # check_aircrafts_arrivals(completed_aircrafts_arrivals, complete = TRUE)
+  # Simulate coached status
+  if(all(is.na(completed_aircrafts_arrivals$coached))) {
+    completed_aircrafts_arrivals <- completed_aircrafts_arrivals %>% 
+      sim_coached_status(coached_levels = coached_levels)
+  }
+  
+  # Simulate nationality breakdown
+  completed_aircrafts_arrivals <- completed_aircrafts_arrivals %>% 
+    sim_nationality_split(hubs = hubs, 
+                          prop_nationality = prop_nationality, 
+                          countries = countries)
+    
+  
+  check_aircrafts_arrivals(completed_aircrafts_arrivals, complete = TRUE)
   return(completed_aircrafts_arrivals)
 }
 
