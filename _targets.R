@@ -63,7 +63,10 @@ list(
                                                   UK_plus_countries = countries$UK_plus)),
   tar_target(n_passenger_quantiles, 
              process_aircrafts_quantiles(observed_aircrafts_arrivals, 
-                                         hubs = hubs, countries = countries, load_factor)),
+                                         hubs = hubs, 
+                                         countries = countries, 
+                                         load_factor = load_factor,
+                                         seed = 1234)),
   
   # Making the future aircraft arrivals dataset accessible
   tar_target(future_aircrafts_arrivals_raw,
