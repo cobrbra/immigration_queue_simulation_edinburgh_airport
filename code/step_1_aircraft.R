@@ -58,11 +58,10 @@ sim_airport_classification <- function(n_passengers, quantile_list, seed = NULL)
   airport_classification <- numeric(n_aircrafts)
   
   selected_quantiles <- map(n_passengers, ~ sum(. > quantiles) + 1)
-  airport_classification <- map(selected_quantiles, 
+  airport_classification <- map_chr(selected_quantiles, 
                                 ~sample(x = ap_classifications, 
                                         size = 1, 
-                                        prob = table_for_sampling[, .])) %>% 
-    unlist()
+                                        prob = table_for_sampling[, .]))
   
   return(airport_classification)
   
@@ -138,10 +137,10 @@ sim_nationality_split <- function(aircrafts_arrivals, hubs, prop_nationality,
     mutate(simmed_passengers = map2(.x = n_passengers, 
                                     .y = airport_classification,
                                     .f = ~ sim_passengers(.x, .y))) %>% 
-    mutate(n_nat_UKIE = unlist(map(simmed_passengers, ~ sum(. == "UKIE"))),
-           n_nat_EU_plus = unlist(map(simmed_passengers, ~ sum(. == "EU_plus"))),
-           n_nat_other_easy = unlist(map(simmed_passengers, ~ sum(. == "other_easy"))),
-           n_nat_other_hard = unlist(map(simmed_passengers, ~ sum(. == "other_hard")))) %>% 
+    mutate(n_nat_UKIE = map_dbl(simmed_passengers, ~ sum(. == "UKIE")),
+           n_nat_EU_plus = map_dbl(simmed_passengers, ~ sum(. == "EU_plus")),
+           n_nat_other_easy = map_dbl(simmed_passengers, ~ sum(. == "other_easy")),
+           n_nat_other_hard = map_dbl(simmed_passengers, ~ sum(. == "other_hard"))) %>% 
     select(-simmed_passengers)
   
   return(aircrafts_with_simmed_nationality)
@@ -244,7 +243,8 @@ get_passengers_after_aircrafts <- function(aircrafts_arrivals, seed = NULL){
     aircraft_datetime_posix = rep(aircrafts_arrivals$aircraft_datetime_posix, aircrafts_arrivals$n_passengers),
     aircraft_time_int = rep(aircrafts_arrivals$aircraft_time_int, aircrafts_arrivals$n_passengers),
     aircraft_date_posix = rep(aircrafts_arrivals$aircraft_date_posix, aircrafts_arrivals$n_passengers),
-    coached = rep(aircrafts_arrivals$coached, aircrafts_arrivals$n_passengers)
+    coached = rep(aircrafts_arrivals$coached, aircrafts_arrivals$n_passengers),
+    sched_aircraft_date_posix = rep(aircrafts_arrivals$sched_aircraft_date_posix, aircrafts_arrivals$n_passengers)
   ) %>% 
     sample_frac(1) %>% 
     arrange(aircraft_datetime_posix)

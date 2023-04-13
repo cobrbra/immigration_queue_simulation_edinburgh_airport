@@ -17,13 +17,11 @@ get_tables <- function(future_aircrafts_arrivals,
     group_by(Year) %>% 
     nest() %>% 
     mutate(
-      `Number of Flights` = unlist(map(data, nrow)),
-      `Start Date` = unlist(map(data, 
-                                ~ format(min(.$sched_aircraft_date_posix),
-                                         format = "%d/%m"))),
-      `End Date` = unlist(map(data,
-                             ~ format(max(.$sched_aircraft_date_posix),
-                                      format = "%d/%m")))) %>% 
+      `Number of Flights` = map_dbl(data, nrow),
+      `Start Date` = map_chr(data, ~ format(min(.$sched_aircraft_date_posix),
+                                            format = "%d/%m")),
+      `End Date` = map_chr(data, ~ format(max(.$sched_aircraft_date_posix),
+                                          format = "%d/%m"))) %>% 
     select(Year, `Start Date`, `End Date`, `Number of Flights`) 
   captions$anticipated_schedule <- "Anticipated flight schedule (non-UKIE) for 2023-2027."
   
@@ -32,14 +30,12 @@ get_tables <- function(future_aircrafts_arrivals,
     group_by(Year) %>% 
     nest() %>% 
     mutate(
-      `Number of Flights` = format(unlist(map(data, nrow)),
+      `Number of Flights` = format(map_dbl(data, nrow),
                                    big.mark = ","),
-      `Start Date` = unlist(map(data, 
-                                ~ format(min(.$sched_aircraft_date_posix),
-                                         format = "%d/%m"))),
-      `End Date` = unlist(map(data,
-                              ~ format(max(.$sched_aircraft_date_posix),
-                                       format = "%d/%m")))) %>% 
+      `Start Date` = map_chr(data, ~ format(min(.$sched_aircraft_date_posix),
+                                            format = "%d/%m")),
+      `End Date` = map_chr(data, ~ format(max(.$sched_aircraft_date_posix),
+                                          format = "%d/%m"))) %>% 
     select(Year, `Start Date`, `End Date`, `Number of Flights`) %>% 
     arrange(Year)
   captions$observed_schedule <- "Historical arrivals for Edinburgh Airport, 2019-2022."
