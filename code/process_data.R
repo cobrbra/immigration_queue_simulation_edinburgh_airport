@@ -2,27 +2,6 @@ library(tidyverse)
 library(here)
 library(readxl)
 
-process_airports <- function(file) {
-  airports_cols <- c("icao_code", "iata_code", "airport_name", "city", "country",
-                   "lat_degrees", "lat_minutes", "lat_seconds", "lat_direction",
-                   "lon_degrees", "lon_minutes", "lon_seconds", "lon_direction",
-                   "altitude", "lat_dec", "lon_dec")
-  processed_data <- read_delim(file, 
-                               delim = ":",
-                               col_names = airports_cols) 
-  
-
-}
-
-process_aircrafts <- function(file) {
-  aircraft_cols <- c("aircraft_name", "long_code", "short_code", 
-                     "max_passengers", "country_of_origin")
-  read_delim(file, 
-             delim = ";",
-             col_names = aircraft_cols, 
-             na = "\\N")
-}
-
 necessary_aircrafts_arrivals_columns <- c(
   "flight_id",
   "airport_classification",
@@ -66,7 +45,7 @@ check_aircrafts_arrivals <- function(aircrafts_arrivals,
   }
   
   necessary_complete_columns_missing <- !(necessary_complete_aircrafts_arrivals_columns %in% 
-                                        colnames(aircrafts_arrivals %>% keep(~all(!is.na(.x)))))
+                                            colnames(aircrafts_arrivals %>% keep(~all(!is.na(.x)))))
   if (any(necessary_complete_columns_missing)) {
     stop(
       paste(c("Aircraft arrivals should contain complete columns:",
@@ -91,21 +70,21 @@ get_datetime_alternates <- function(events_with_datetime_int,
   for (column_prefix in column_prefixes) {
     events_with_datetime_int[[paste0(column_prefix, "_datetime_posix")]] <- 
       events_with_datetime_int[[paste0(column_prefix, "_datetime_int")]] %>% 
-        as.POSIXct(origin = "1970-01-01 00:00:00")
+      as.POSIXct(origin = "1970-01-01 00:00:00")
     events_with_datetime_int[[paste0(column_prefix, "_date_posix")]] <- 
       events_with_datetime_int[[paste0(column_prefix, "_datetime_posix")]] %>% 
-        as.Date()
+      as.Date()
     events_with_datetime_int[[paste0(column_prefix, "_time_int")]] <- 
       events_with_datetime_int[[paste0(column_prefix, "_datetime_int")]] -
-        86400 * as.numeric(
-          events_with_datetime_int[[paste0(column_prefix, "_date_posix")]] - 
-            as.Date('1970-01-01 00:00:00')
-        )
+      86400 * as.numeric(
+        events_with_datetime_int[[paste0(column_prefix, "_date_posix")]] - 
+          as.Date('1970-01-01 00:00:00')
+      )
   }
   return(events_with_datetime_int)
 }
 
-simulate_aircrafts_arrivals <- function(n_aircrafts = 5, seed = NULL) {
+sim_example_aircrafts_arrivals <- function(n_aircrafts = 5, seed = NULL) {
   if (!is.null(seed)) {set.seed(seed)}
   
   aircrafts <- data.frame(
@@ -131,6 +110,57 @@ simulate_aircrafts_arrivals <- function(n_aircrafts = 5, seed = NULL) {
   return(aircrafts)
 }
 
+process_aircrafts <- function(file) {
+  aircraft_cols <- c("aircraft_name", "long_code", "short_code", 
+                     "max_passengers", "country_of_origin")
+  read_delim(file, 
+             delim = ";",
+             col_names = aircraft_cols, 
+             na = "\\N")
+}
+
+process_n_passengers_quantiles <- function(aircrafts, hubs, countries, 
+                                           load_factor, seed = NULL) {
+  
+  if (!is.null(seed)) {set.seed(seed)}
+  
+  ac <- aircrafts
+  ac <- ac[!ac$dep_country %in% countries$UKIE, ]
+  
+  ac_class <- get_airport_classification(airport_country = ac$dep_country, 
+                                         airport_3letter = ac$dep_airport, 
+                                         hubs = hubs,
+                                         countries = countries)
+  
+  ac_pass <- sim_n_passengers(max_passengers = ac$max_passengers, 
+                              load_factor = load_factor,
+                              seed = seed)
+  
+  
+  quants_pass <- quantile(ac_pass, probs = seq(from = 0.2, to = 1, by = 0.2))
+  
+  ac_pass_quantile <- sapply(lapply(ac_pass, FUN = `>`, quants_pass), sum) + 1
+  
+  tab_ac <- table(ac_class, ac_pass_quantile)
+  
+  tab_ac_prop <- prop.table(tab_ac, margin = 2)
+  
+  res_list <- list(quantiles = quants_pass, table = tab_ac_prop)
+  
+  return(res_list)
+}
+
+process_airports <- function(file) {
+  airports_cols <- c("icao_code", "iata_code", "airport_name", "city", "country",
+                   "lat_degrees", "lat_minutes", "lat_seconds", "lat_direction",
+                   "lon_degrees", "lon_minutes", "lon_seconds", "lon_direction",
+                   "altitude", "lat_dec", "lon_dec")
+  processed_data <- read_delim(file, 
+                               delim = ":",
+                               col_names = airports_cols) 
+  
+
+}
 
 process_aircrafts_arrivals <- function(folder_name, 
                                        airports_reference,
@@ -259,7 +289,7 @@ process_future_aircrafts_arrivals <- function(file) {
   return(future_aircraft_arrivals)
 }
 
-filter_arrivals_for_equivalent_weeks <- function(observed_aircrafts_arrivals, UKIE_countries) {
+process_filtered_observed_aircrafts_arrivals <- function(observed_aircrafts_arrivals, UKIE_countries) {
   observed_aircrafts_arrivals %>% 
     mutate(Year = format(sched_aircraft_datetime_posix, format = "%Y")) %>% 
     filter(((sched_aircraft_date_posix >= as.Date("2022-07-11")) &
@@ -284,42 +314,3 @@ process_future_coached_levels <- function(file) {
   
   return(future_coached_levels)
 }
-
-
-process_aircrafts_quantiles <- function(aircrafts, 
-                                        hubs, countries, load_factor, 
-                                        seed = NULL
-){
-  
-  if (!is.null(seed)) {set.seed(seed)}
-  
-  ac <- aircrafts
-  
-  ac <- ac[!ac$dep_country %in% countries$UKIE, ]
-  
-  ac_class <- get_airport_classification(airport_country = ac$dep_country, 
-                                         airport_3letter = ac$dep_airport, 
-                                         hubs = hubs,
-                                         countries = countries)
-  
-  ac_pass <- sim_n_passengers(max_passengers = ac$max_passengers, 
-                              load_factor = load_factor,
-                              seed = seed)
-  
-  
-  quants_pass <- quantile(ac_pass, probs = seq(from = 0.2, to = 1, by = 0.2))
-  
-  ac_pass_quantile <- sapply(lapply(ac_pass, FUN = `>`, quants_pass), sum) + 1
-  
-  tab_ac <- table(ac_class, ac_pass_quantile)
-  
-  tab_ac_prop <- prop.table(tab_ac, margin = 2)
-  
-  res_list <- list(quantiles = quants_pass, table = tab_ac_prop)
-  
-  return(res_list)
-}
-
-
-
-

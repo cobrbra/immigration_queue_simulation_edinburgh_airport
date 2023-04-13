@@ -59,10 +59,10 @@ list(
                airports_reference = airports,
                aircrafts_reference = aircrafts)),
   tar_target(filtered_observed_aircrafts_arrivals,
-             filter_arrivals_for_equivalent_weeks(observed_aircrafts_arrivals = observed_aircrafts_arrivals,
+             process_filtered_observed_aircrafts_arrivals(observed_aircrafts_arrivals = observed_aircrafts_arrivals,
                                                   UKIE_countries = countries$UKIE)),
   tar_target(n_passengers_quantiles, 
-             process_aircrafts_quantiles(observed_aircrafts_arrivals, 
+             process_n_passengers_quantiles(observed_aircrafts_arrivals, 
                                          hubs = hubs, 
                                          countries = countries, 
                                          load_factor = load_factor,
@@ -87,7 +87,7 @@ list(
              data.frame(year = "1970",
                         prob_coached = .15)),
   tar_target(example_aircrafts_arrivals,
-             simulate_aircrafts_arrivals(seed = 8) %>% 
+             sim_example_aircrafts_arrivals(seed = 8) %>% 
                complete_aircrafts_arrivals(hubs = hubs, 
                                            countries = countries, 
                                            prop_nationality = prop_nationality)),
