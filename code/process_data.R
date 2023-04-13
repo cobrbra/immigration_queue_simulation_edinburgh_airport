@@ -326,28 +326,5 @@ process_aircrafts_quantiles <- function(aircrafts,
 }
 
 
-simulate_future_airport_classification <- function(aircrafts, quantile_list, seed = NULL){
-  
-  if (!is.null(seed)) {set.seed(seed)}
-  
-  n_aircrafts <- dim(aircrafts)[1]
-  quantiles <- quantile_list[[1]]
-  table_for_sampling <- quantile_list[[2]]
-  
-  ap_classifications <- rownames(table_for_sampling)
-  
-  airport_classification <- numeric(n_aircrafts)
-  
-  for(i in seq_len(n_aircrafts)) {
-    
-    selected_quantile <- sum(aircrafts$n_passengers[i] > quantiles) + 1
-    airport_classification[i] <- sample(x = ap_classifications, size = 1, prob = table_for_sampling[, selected_quantile])
-    
-  }
-  
-  return(aircrafts %>% mutate(airport_classification = airport_classification))
-  
-}
-
 
 

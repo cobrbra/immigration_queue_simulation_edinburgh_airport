@@ -63,6 +63,29 @@ get_coached_status <- function(flight_id, prob_coached = .15, seed = NULL) {
   return(coached)
 }
 
+sim_airport_classification <- function(n_passengers, quantile_list, seed = NULL){
+  
+  if (!is.null(seed)) {set.seed(seed)}
+  
+  n_aircrafts <- length(n_passengers)
+  quantiles <- quantile_list$quantiles
+  table_for_sampling <- quantile_list$table
+  
+  ap_classifications <- rownames(table_for_sampling)
+  
+  airport_classification <- numeric(n_aircrafts)
+  
+  selected_quantiles <- map(n_passengers, ~ sum(. > quantiles) + 1)
+  airport_classification <- map(selected_quantiles, 
+                                ~sample(x = ap_classifications, 
+                                        size = 1, 
+                                        prob = table_for_sampling[, .])) %>% 
+    unlist()
+  
+  return(airport_classification)
+  
+}
+
 # TODO: function for walk time baseline
 
 get_nationality_split <- function(aircrafts, EU_plus_hubs, other_hubs, prop_nationality, 
