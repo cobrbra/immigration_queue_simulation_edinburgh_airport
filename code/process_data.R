@@ -49,14 +49,14 @@ necessary_complete_aircrafts_arrivals_columns <- c(
   "max_passengers"
 )
 
-check_aircrafts_arrivals <- function(observed_aircrafts_arrivals, 
+check_aircrafts_arrivals <- function(aircrafts_arrivals, 
                                      complete = FALSE) {
-  if (!is.data.frame(observed_aircrafts_arrivals)) {
+  if (!is.data.frame(aircrafts_arrivals)) {
     stop("Aircraft schedule should be dataframe.")
   }
   
   necessary_columns_missing <- !(necessary_aircrafts_arrivals_columns %in% 
-                                   colnames(observed_aircrafts_arrivals))
+                                   colnames(aircrafts_arrivals))
   if (any(necessary_columns_missing)) {
     stop(
       paste(c("Aircraft arrivals should contain columns",
@@ -66,7 +66,7 @@ check_aircrafts_arrivals <- function(observed_aircrafts_arrivals,
   }
   
   necessary_complete_columns_missing <- !(necessary_complete_aircrafts_arrivals_columns %in% 
-                                        colnames(observed_aircrafts_arrivals %>% keep(~all(!is.na(.x)))))
+                                        colnames(aircrafts_arrivals %>% keep(~all(!is.na(.x)))))
   if (any(necessary_complete_columns_missing)) {
     stop(
       paste(c("Aircraft arrivals should contain complete columns:",
@@ -76,7 +76,7 @@ check_aircrafts_arrivals <- function(observed_aircrafts_arrivals,
   }
   
   necessary_columns_not_complete <- !(necessary_aircrafts_arrivals_columns %in% 
-                                        colnames(observed_aircrafts_arrivals %>% keep(~all(!is.na(.x)))))
+                                        colnames(aircrafts_arrivals %>% keep(~all(!is.na(.x)))))
   if (complete & any(necessary_columns_not_complete)) {
     stop(
       paste(c("Complete aircraft arrivals should contain complete columns:",
@@ -133,8 +133,8 @@ simulate_aircrafts_arrivals <- function(n_aircrafts = 5, seed = NULL) {
 
 
 process_aircrafts_arrivals <- function(folder_name, 
-                                                airports_reference,
-                                                aircrafts_reference) {
+                                       airports_reference,
+                                       aircrafts_reference) {
   years_not_split_by_runway <- c(" 2019", " 2022")
   years_split_by_runway <- c(" 2020", " 2021")
   files_not_split_by_runway <- map2(
