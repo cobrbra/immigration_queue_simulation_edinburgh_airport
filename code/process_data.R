@@ -45,13 +45,13 @@ necessary_complete_aircrafts_arrivals_columns <- c(
   "max_passengers"
 )
 
-check_aircrafts_arrivals <- function(aircrafts_observed_arrivals) {
-  if (!is.data.frame(aircrafts_observed_arrivals)) {
+check_aircrafts_arrivals <- function(observed_aircrafts_arrivals) {
+  if (!is.data.frame(observed_aircrafts_arrivals)) {
     stop("Aircraft schedule should be dataframe.")
   }
   
   necessary_columns_missing <- !(necessary_aircrafts_arrivals_columns %in% 
-                                   colnames(aircrafts_observed_arrivals))
+                                   colnames(observed_aircrafts_arrivals))
   if (any(necessary_columns_missing)) {
     stop(
       paste(c("Aircraft arrivals should contain columns",
@@ -61,7 +61,7 @@ check_aircrafts_arrivals <- function(aircrafts_observed_arrivals) {
   }
   
   necessary_complete_columns_missing <- !(necessary_complete_aircrafts_arrivals_columns %in% 
-                                        colnames(aircrafts_observed_arrivals %>% keep(~all(!is.na(.x)))))
+                                        colnames(observed_aircrafts_arrivals %>% keep(~all(!is.na(.x)))))
   if (any(necessary_complete_columns_missing)) {
     stop(
       paste(c("Aircraft arrivals should contain complete columns:",
@@ -137,7 +137,7 @@ process_aircrafts_arrivals <- function(folder_name,
   files <- c(files_not_split_by_runway, files_split_by_runway)
   
   # bind together files for aircraft arrivals
-  aircrafts_observed_arrivals <- map(files,
+  observed_aircrafts_arrivals <- map(files,
                                      ~ read_xlsx(path = .)) %>% 
     bind_rows() %>% 
     as.data.frame() %>% 
@@ -148,12 +148,12 @@ process_aircrafts_arrivals <- function(folder_name,
     get_datetime_alternates(column_prefixes = c("sched_aircraft", "aircraft"))
   
   # bind together with airports data
-  aircrafts_observed_arrivals <- aircrafts_observed_arrivals %>% 
+  observed_aircrafts_arrivals <- observed_aircrafts_arrivals %>% 
     inner_join(airports_reference, by = c("dep_af" = "icao_code")) %>% 
     mutate(country = if_else(country == "ENGALND", "ENGLAND", country))
   
   # bind together with aircraft data
-  aircrafts_observed_arrivals <- aircrafts_observed_arrivals %>% 
+  observed_aircrafts_arrivals <- observed_aircrafts_arrivals %>% 
     inner_join(aircrafts_reference %>% 
                  drop_na(long_code, max_passengers) %>% 
                  mutate(max_passengers = as.numeric(max_passengers)) %>% 
@@ -162,18 +162,18 @@ process_aircrafts_arrivals <- function(folder_name,
                  summarise(max_passengers = mean(max_passengers)), 
                by = c("ac_type" = "long_code"))
   
-  aircrafts_observed_arrivals <- aircrafts_observed_arrivals %>% 
+  observed_aircrafts_arrivals <- observed_aircrafts_arrivals %>% 
     mutate(flight_id = id,
            dep_country = country,
            dep_airport = iata_code,
-           airport_classification = rep(NA, nrow(aircrafts_observed_arrivals)),
-           n_passengers = rep(NA, nrow(aircrafts_observed_arrivals)),
-           coached = rep(NA, nrow(aircrafts_observed_arrivals)),
-           walk_time = rep(NA, nrow(aircrafts_observed_arrivals)),
-           n_nat_UKIE = rep(NA, nrow(aircrafts_observed_arrivals)),
-           n_nat_EU_plus = rep(NA, nrow(aircrafts_observed_arrivals)),
-           n_nat_other_easy = rep(NA, nrow(aircrafts_observed_arrivals)),
-           n_nat_other_hard = rep(NA, nrow(aircrafts_observed_arrivals))) %>% 
+           airport_classification = rep(NA, nrow(observed_aircrafts_arrivals)),
+           n_passengers = rep(NA, nrow(observed_aircrafts_arrivals)),
+           coached = rep(NA, nrow(observed_aircrafts_arrivals)),
+           walk_time = rep(NA, nrow(observed_aircrafts_arrivals)),
+           n_nat_UKIE = rep(NA, nrow(observed_aircrafts_arrivals)),
+           n_nat_EU_plus = rep(NA, nrow(observed_aircrafts_arrivals)),
+           n_nat_other_easy = rep(NA, nrow(observed_aircrafts_arrivals)),
+           n_nat_other_hard = rep(NA, nrow(observed_aircrafts_arrivals))) %>% 
     select("flight_id",
            "dep_country",
            "dep_airport",
@@ -197,8 +197,8 @@ process_aircrafts_arrivals <- function(folder_name,
            "n_nat_other_easy",
            "n_nat_other_hard")
   
-  check_aircrafts_arrivals(aircrafts_observed_arrivals)
-  return(aircrafts_observed_arrivals)
+  check_aircrafts_arrivals(observed_aircrafts_arrivals)
+  return(observed_aircrafts_arrivals)
 }
 
 process_future_aircrafts_arrivals <- function(file) {
@@ -236,8 +236,8 @@ process_future_aircrafts_arrivals <- function(file) {
   return(future_aircraft_arrivals)
 }
 
-filter_arrivals_for_equivalent_weeks <- function(aircrafts_observed_arrivals, UK_plus_countries) {
-  aircrafts_observed_arrivals %>% 
+filter_arrivals_for_equivalent_weeks <- function(observed_aircrafts_arrivals, UK_plus_countries) {
+  observed_aircrafts_arrivals %>% 
     mutate(Year = format(sched_aircraft_datetime_posix, format = "%Y")) %>% 
     filter(((sched_aircraft_date_posix >= as.Date("2022-07-11")) &
               (sched_aircraft_date_posix <= as.Date("2022-07-17"))) |

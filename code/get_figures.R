@@ -40,7 +40,7 @@ theme_edi_airport <- function() {
     ) 
 }
 
-get_figures <- function(future_aircrafts_arrivals, future_coached_levels, filtered_aircrafts_observed_arrivals, ...) {
+get_figures <- function(future_aircrafts_arrivals, future_coached_levels, filtered_observed_aircrafts_arrivals, ...) {
   # results <- targets::tar_read(example_results) # Use for debugging, COMMENT WHEN RUNNING TARGETS
   font_add_google("Lato")
   showtext_auto()
@@ -52,7 +52,7 @@ get_figures <- function(future_aircrafts_arrivals, future_coached_levels, filter
   figures <- list()
   figure_sizes <- list()
   
-  observed_max_passengers_per_year <- (filtered_aircrafts_observed_arrivals) %>% 
+  observed_max_passengers_per_year <- (filtered_observed_aircrafts_arrivals) %>% 
     group_by(Year) %>% 
     summarise(`Total Passengers` = sum(max_passengers)) %>% 
     mutate(coached_status = "Unknown") 

@@ -49,20 +49,20 @@ list(
   tar_target(aircrafts,
              process_aircrafts(aircrafts_raw)),
   
-  # Making the aircraft arrivals dataset accessible
-  tar_target(aircrafts_observed_arrivals_raw,
-         here("raw_data/aircrafts_observed_arrivals/"),
+  # Making the historical aircraft arrivals dataset accessible
+  tar_target(observed_aircrafts_arrivals_raw,
+         here("raw_data/observed_aircrafts_arrivals/"),
          format = "file"),
-  tar_target(aircrafts_observed_arrivals,
+  tar_target(observed_aircrafts_arrivals,
              process_aircrafts_arrivals(
-               aircrafts_observed_arrivals_raw,
+               observed_aircrafts_arrivals_raw,
                airports_reference = airports,
                aircrafts_reference = aircrafts)),
-  tar_target(filtered_aircrafts_observed_arrivals,
-             filter_arrivals_for_equivalent_weeks(aircrafts_observed_arrivals = aircrafts_observed_arrivals,
+  tar_target(filtered_observed_aircrafts_arrivals,
+             filter_arrivals_for_equivalent_weeks(observed_aircrafts_arrivals = observed_aircrafts_arrivals,
                                                   UK_plus_countries = UK_plus_countries)),
   tar_target(n_passenger_quantiles, 
-             process_aircrafts_quantiles(aircrafts_observed_arrivals, 
+             process_aircrafts_quantiles(observed_aircrafts_arrivals, 
                                          EU_plus_hubs, other_hubs, UK_plus_countries,
                                          EU_plus_countries, load_factor)),
   
@@ -124,8 +124,8 @@ list(
   tar_target(figures,
              get_figures(future_aircrafts_arrivals = future_aircrafts_arrivals,
                          future_coached_levels = future_coached_levels,
-                         filtered_aircrafts_observed_arrivals = filtered_aircrafts_observed_arrivals)),
+                         filtered_observed_aircrafts_arrivals = filtered_observed_aircrafts_arrivals)),
   tar_target(tables,
              get_tables(future_aircrafts_arrivals = future_aircrafts_arrivals,
-                        aircrafts_observed_arrivals = aircrafts_observed_arrivals))
+                        observed_aircrafts_arrivals = observed_aircrafts_arrivals))
 )
