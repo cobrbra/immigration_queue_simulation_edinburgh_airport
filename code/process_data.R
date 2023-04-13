@@ -36,7 +36,11 @@ necessary_aircrafts_arrivals_columns <- c(
   "sched_aircraft_date_posix",
   "max_passengers",
   "n_passengers",
-  "coached"
+  "coached",
+  "n_nat_UKIE",
+  "n_nat_EU_plus",
+  "n_nat_other_easy",
+  "n_nat_other_hard"
 )
 
 necessary_complete_aircrafts_arrivals_columns <- c(
@@ -45,7 +49,8 @@ necessary_complete_aircrafts_arrivals_columns <- c(
   "max_passengers"
 )
 
-check_aircrafts_arrivals <- function(observed_aircrafts_arrivals) {
+check_aircrafts_arrivals <- function(observed_aircrafts_arrivals, 
+                                     complete = FALSE) {
   if (!is.data.frame(observed_aircrafts_arrivals)) {
     stop("Aircraft schedule should be dataframe.")
   }
@@ -103,7 +108,11 @@ simulate_aircrafts_arrivals <- function(n_aircrafts = 5, seed = NULL) {
     sched_aircraft_datetime_int = 800000 + cumsum(rexp(n = n_aircrafts, rate = 1e-3)),
     max_passengers = 150,
     n_passengers = round(runif(n_aircrafts, 100, 150)),
-    coached = sample(c(TRUE, FALSE), size = n_aircrafts, replace = TRUE)
+    coached = sample(c(TRUE, FALSE), size = n_aircrafts, replace = TRUE),
+    n_nat_UKIE = rep(NA, n_aircrafts),
+    n_nat_EU_plus = rep(NA, n_aircrafts),
+    n_nat_other_easy = rep(NA, n_aircrafts),
+    n_nat_other_hard = rep(NA, n_aircrafts)
   ) %>% mutate(
     aircraft_datetime_int = sched_aircraft_datetime_int + rexp(n = n_aircrafts, rate = 5e-3)
   ) %>% get_datetime_alternates(column_prefixes = c("aircraft", "sched_aircraft"))
