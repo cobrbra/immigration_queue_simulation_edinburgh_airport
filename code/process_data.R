@@ -18,7 +18,8 @@ process_aircrafts <- function(file) {
   aircraft_cols <- c("aircraft_name", "long_code", "short_code", "max_passengers", "country_of_origin")
   read_delim(file, 
              delim = ";",
-             col_names = aircraft_cols)
+             col_names = aircraft_cols, 
+             na = "\\N")
 }
 
 
@@ -127,10 +128,9 @@ process_aircrafts_arrivals <- function(folder_name,
   # bind together with aircraft data
   aircrafts_observed_arrivals <- aircrafts_observed_arrivals %>% 
     inner_join(aircrafts_reference %>% 
-                 mutate(max_passengers = as.integer(max_passengers)) %>% 
+                 drop_na(long_code, max_passengers) %>% 
+                 mutate(max_passengers = as.numeric(max_passengers)) %>% 
                  select(long_code, max_passengers) %>% 
-                 filter(long_code != "\\N") %>% 
-                 drop_na() %>% 
                  group_by(long_code) %>% 
                  summarise(max_passengers = mean(max_passengers)), 
                by = c("ac_type" = "long_code"))
