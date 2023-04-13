@@ -61,7 +61,7 @@ list(
   tar_target(filtered_observed_aircrafts_arrivals,
              filter_arrivals_for_equivalent_weeks(observed_aircrafts_arrivals = observed_aircrafts_arrivals,
                                                   UK_plus_countries = countries$UK_plus)),
-  tar_target(n_passenger_quantiles, 
+  tar_target(n_passengers_quantiles, 
              process_aircrafts_quantiles(observed_aircrafts_arrivals, 
                                          hubs = hubs, 
                                          countries = countries, 
