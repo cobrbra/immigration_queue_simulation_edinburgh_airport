@@ -113,26 +113,24 @@ get_nationality_split <- function(aircrafts, EU_plus_hubs, other_hubs, prop_nati
   return(aircrafts_with_simmed_nationality)
 }
 
-simulate_delay_times <- function(flight_id, 
-                                 prop_flights_delayed, 
-                                 prop_flights_on_time, 
-                                 prop_flights_early,
-                                 mean_delay_time,
-                                 mean_early_time,
-                                 on_time_window = 30*60, 
-                                 seed = NULL) {
+sim_delay_times <- function(flight_id, 
+                            delay_dist,
+                            seed = NULL) {
   if (!is.null(seed)) {set.seed(seed)}
   n_flights <- length(flight_id)
   simulated_delay_status <- sample(c("delayed", "on-time", "early"), 
                                    size = n_flights,
-                                   prob = c(prop_flights_delayed,
-                                            prop_flights_on_time,
-                                            prop_flights_early),
+                                   prob = c(delay_dist$prop_delayed,
+                                            delay_dist$prop_on_time,
+                                            delay_dist$prop_early),
                                    replace = TRUE)
   simulated_delay <- case_when(
-    simulated_delay_status == "early" ~ - on_time_window/2 - rexp(n = n_flights, rate = 1/(mean_early_time - on_time_window/2)),
-    simulated_delay_status == "on-time" ~ runif(n = n_flights, -on_time_window/2, on_time_window/2),
-    simulated_delay_status == "delayed" ~ on_time_window/2 + rexp(n = n_flights, rate = 1/(mean_delay_time-on_time_window/2))
+    simulated_delay_status == "early" ~ - delay_dist$on_time_window/2 - 
+      rexp(n = n_flights, rate = 1/(delay_dist$mean_early_time - delay_dist$on_time_window/2)),
+    simulated_delay_status == "on-time" ~ 
+      runif(n = n_flights, - delay_dist$on_time_window/2, delay_dist$on_time_window/2),
+    simulated_delay_status == "delayed" ~ delay_dist$on_time_window/2 + 
+      rexp(n = n_flights, rate = 1/(delay_dist$mean_delay_time - delay_dist$on_time_window/2))
   ) 
   return(simulated_delay)
 }

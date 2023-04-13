@@ -91,6 +91,15 @@ list(
   tar_target(example_passengers_after_route,
              get_passengers_after_route(example_passenger_arrivals)),
   
+  tar_target(delay_dist,
+             list(prop_delayed = .21,
+                  prop_on_time = .58,
+                  prop_early = .21,
+                  mean_delay_time = 50*60, #translating to minutes
+                  mean_early_time = 21*60,
+                  on_time_window = 15*60*2 # window length, to seconds, double sided 
+             )),
+  
   # For passenger count and nationality
   tar_target(EU_plus_hubs_raw, here("params/nationality_info/EU_plus_hubs.txt"), format = "file"),
   tar_target(EU_plus_hubs, colnames(read_delim(EU_plus_hubs_raw, delim = ","))),
