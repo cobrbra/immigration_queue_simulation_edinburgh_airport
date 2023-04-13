@@ -23,40 +23,49 @@ check_passengers_after_routes <- function(passengers_after_routes) {
   }
 }
 
-
-get_coach_time <- function(passengers, seed = NULL) {
+sim_aircraft_route_time <- function(passengers, coach_dist, base_walk_dist, seed = NULL) {
   if (!is.null(seed)) {set.seed(seed)}
   n_flights <- n_distinct(passengers$flight_id)
+  coach_times <- rnorm(n_flights, coach_dist$mean, coach_dist$sd)
+  coach_times[coach_times <= 0] <- 0
+  base_walk_times <- runif(n_flights, base_walk_dist$min, base_walk_dist$max)
   passengers_with_coach_time <- passengers %>% 
-    nest(cols = -c(coached, flight_id)) %>% 
-    mutate(coach_time = if_else(coached, pmax(60, rnorm(n_flights, 23*60, 6*60)), 0)) %>% 
-    unnest(cols)
+    nest(flight_data = -c(coached, flight_id)) %>% 
+    mutate(aircraft_route_time = if_else(coached, coach_times, base_walk_times)) %>% 
+    unnest(flight_data)
   return(passengers_with_coach_time)
 }
 
-get_walk_time <- function(passengers, 
+sim_passenger_route_time <- function(passengers, 
+                          walk_dist,
                           seed = NULL) {
   if (!is.null(seed)) {set.seed(seed)}
   n_passengers <- nrow(passengers)
-  coached_walk_time <- rexp(n_passengers, 1.)
-  contact_walk_time <- rexp(n_passengers, .2) 
+  coached_walk_time <- rexp(n_passengers, 1/walk_dist$coached_inter)
+  contact_walk_time <- rexp(n_passengers, 1/walk_dist$contact_inter) 
   passengers_with_walk_time <- passengers %>% 
-    mutate(walk_time = if_else(coached, coached_walk_time, contact_walk_time)) %>% 
+    mutate(passenger_intervals = if_else(coached, coached_walk_time, contact_walk_time)) %>% 
     group_by(flight_id) %>% 
-    mutate(walk_time = cumsum(walk_time)) %>% 
+    mutate(passenger_route_time = cumsum(passenger_intervals)) %>% 
     ungroup()
   return(passengers_with_walk_time)
 }
 
 
-get_passengers_after_routes <- function(passengers_after_aircraft, seed = NULL) {
+get_passengers_after_routes <- function(passengers_after_aircraft, 
+                                        coach_dist,
+                                        walk_dist,
+                                        base_walk_dist,
+                                        seed = NULL) {
   if (!is.null(seed)) {set.seed(seed)}
   passengers_after_routes <- passengers_after_aircraft %>% 
-    get_coach_time() %>% 
-    get_walk_time() %>% 
-    mutate(route_datetime_int = aircraft_datetime_int + coach_time + walk_time) %>%
+    sim_aircraft_route_time(coach_dist = coach_dist,
+                            base_walk_dist = base_walk_dist) %>% 
+    sim_passenger_route_time(walk_dist = walk_dist) %>% 
+    mutate(route_datetime_int = aircraft_datetime_int + 
+             aircraft_route_time + passenger_route_time) %>%
     get_datetime_alternates(column_prefixes = c("route")) %>% 
-    select(-c(coach_time, walk_time, 
+    select(-c(aircraft_route_time, passenger_route_time, 
               aircraft_datetime_int, aircraft_datetime_posix, 
               aircraft_time_int, aircraft_date_posix)) %>%
     arrange(route_datetime_int) %>% 

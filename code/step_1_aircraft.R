@@ -141,8 +141,6 @@ sim_nationality_split <- function(aircrafts_arrivals, hubs, prop_nationality,
   return(aircrafts_with_simmed_nationality)
 }
 
-# TODO: function for walk time baseline
-
 complete_aircrafts_arrivals <- function(aircrafts_arrivals, 
                                         hubs,
                                         countries,

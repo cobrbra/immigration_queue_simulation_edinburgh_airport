@@ -96,7 +96,10 @@ list(
                aircrafts_arrivals = example_aircrafts_arrivals,
                seed = 10)),
   tar_target(example_passengers_after_routes,
-             get_passengers_after_routes(example_passenger_arrivals)),
+             get_passengers_after_routes(example_passenger_arrivals,
+                                         coach_dist = coach_dist,
+                                         walk_dist = walk_dist,
+                                         base_walk_dist)),
   
   tar_target(delay_dist,
              list(prop_delayed = .21,
@@ -106,6 +109,15 @@ list(
                   mean_early_time = 21*60,
                   on_time_window = 15*60*2 # window length, to seconds, double sided 
              )),
+  tar_target(coach_dist,
+             list(mean = 23*60,
+                  sd = 6*60)),
+  tar_target(walk_dist,
+             list(contact_inter = 5,
+                  coached_inter = 1)),
+  tar_target(base_walk_dist,
+             list(min = 3*60,
+                  max = 12*60)),
   
   # For passenger count and nationality
   tar_target(EU_plus_hubs_raw, here("params/nationality_info/EU_plus_hubs.txt"), format = "file"),
