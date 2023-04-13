@@ -60,11 +60,10 @@ list(
                aircrafts_reference = aircrafts)),
   tar_target(filtered_observed_aircrafts_arrivals,
              filter_arrivals_for_equivalent_weeks(observed_aircrafts_arrivals = observed_aircrafts_arrivals,
-                                                  UK_plus_countries = UK_plus_countries)),
+                                                  UK_plus_countries = countries$UK_plus)),
   tar_target(n_passenger_quantiles, 
              process_aircrafts_quantiles(observed_aircrafts_arrivals, 
-                                         hubs = hubs, UK_plus_countries,
-                                         EU_plus_countries, load_factor)),
+                                         hubs = hubs, countries = countries, load_factor)),
   
   # Making the future aircraft arrivals dataset accessible
   tar_target(future_aircrafts_arrivals_raw,
@@ -84,8 +83,7 @@ list(
                aircrafts = example_aircraft_arrivals,
                hubs = hubs,
                prop_nationality = prop_nationality,
-               UK_plus_countries = UK_plus_countries,
-               EU_plus_countries = EU_plus_countries,
+               countries = countries,
                load_factor = load_factor)),
   tar_target(example_passengers_after_route,
              get_passengers_after_route(example_passenger_arrivals)),
@@ -110,14 +108,13 @@ list(
   tar_target(EU_plus_countries_raw,
              here("params/nationality_info/EU_plus_countries.txt"), 
              format = "file"),
-  tar_target(EU_plus_countries,
-             colnames(read_delim(EU_plus_countries_raw, delim = ","))),
-  
   tar_target(UK_plus_countries_raw,
              here("params/nationality_info/UK_plus_countries.txt"), 
              format = "file"),
-  tar_target(UK_plus_countries,
-             colnames(read_delim(UK_plus_countries_raw, delim = ","))),
+
+  tar_target(countries,
+             list(UK_plus = colnames(read_delim(UK_plus_countries_raw, delim = ",")),
+                  EU_plus = colnames(read_delim(EU_plus_countries_raw, delim = ",")))),
   
   tar_target(prop_nationality_raw,
              here("params/nationality_info/nationality_proportions.txt"),

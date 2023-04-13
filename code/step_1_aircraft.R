@@ -43,13 +43,12 @@ get_n_passengers <- function(max_passengers, load_factor, seed = NULL){
 get_airport_classification <- function(airport_country, 
                                        airport_3letter, 
                                        hubs,
-                                       UK_plus_countries,
-                                       EU_plus_countries){
+                                       countries){
   
     airport_classification <- case_when(
-      airport_country %in% UK_plus_countries ~ "UK_plus",
+      airport_country %in% countries$UK_plus ~ "UK_plus",
       airport_3letter %in% hubs$EU_plus ~ "EU_plus_hub",
-      airport_country %in% EU_plus_countries ~ "EU_plus_nonhub",
+      airport_country %in% countries$EU_plus ~ "EU_plus_nonhub",
       airport_3letter %in% hubs$other ~ "other_hub",
       TRUE ~ "other_nonhub")
 
@@ -88,7 +87,7 @@ sim_airport_classification <- function(n_passengers, quantile_list, seed = NULL)
 # TODO: function for walk time baseline
 
 get_nationality_split <- function(aircrafts, hubs, prop_nationality, 
-                                  UK_plus_countries, EU_plus_countries,
+                                  countries,
                                   seed = NULL){
   
   if (!is.null(seed)) {set.seed(seed)}
@@ -104,9 +103,8 @@ get_nationality_split <- function(aircrafts, hubs, prop_nationality,
       mutate(airport_classification = get_airport_classification(
         airport_country = dep_country,
         airport_3letter = dep_airport,
-        hubs,
-        UK_plus_countries,
-        EU_plus_countries = EU_plus_countries
+        hubs = hubs,
+        countries = countries
       ))
   }
   else{
@@ -160,8 +158,7 @@ sim_delay_times <- function(flight_id,
 get_passengers_after_aircrafts <- function(aircrafts, 
                                           hubs,
                                           prop_nationality,
-                                          UK_plus_countries,
-                                          EU_plus_countries,
+                                          countries,
                                           load_factor,
                                           seed = NULL){
   
@@ -174,8 +171,7 @@ get_passengers_after_aircrafts <- function(aircrafts,
     mutate(coached = if_else(is.na(coached), get_coached_status(flight_id), coached)) %>% 
     get_nationality_split(hubs = hubs, 
                           prop_nationality = prop_nationality, 
-                          UK_plus_countries = UK_plus_countries, 
-                          EU_plus_countries = EU_plus_countries)
+                          countries = countries)
   
   n_passengers_aircraft <- aircrafts_with_passengers$n_passengers
   n_passengers <- sum(n_passengers_aircraft)

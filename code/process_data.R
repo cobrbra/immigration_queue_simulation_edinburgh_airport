@@ -289,8 +289,7 @@ process_future_coached_levels <- function(file) {
 
 
 process_aircrafts_quantiles <- function(aircrafts, 
-                                        hubs, UK_plus_countries,
-                                        EU_plus_countries, load_factor, 
+                                        hubs, countries, load_factor, 
                                         seed = NULL
 ){
   
@@ -298,13 +297,12 @@ process_aircrafts_quantiles <- function(aircrafts,
   
   ac <- aircrafts
   
-  ac <- ac[!ac$dep_country %in% targets::tar_read(UK_plus_countries), ]
+  ac <- ac[!ac$dep_country %in% countries$UK_plus, ]
   
   ac_class <- get_airport_classification(airport_country = ac$dep_country, 
                                          airport_3letter = ac$dep_airport, 
                                          hubs = hubs,
-                                         UK_plus_countries =  UK_plus_countries,
-                                         EU_plus_countries = EU_plus_countries)
+                                         countries = countries)
   
   ac_pass <- get_n_passengers(max_passengers = ac$max_passengers, 
                               load_factor = load_factor,
