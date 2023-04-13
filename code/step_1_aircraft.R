@@ -61,7 +61,7 @@ sim_coached_status <- function(aircrafts_arrivals, coached_levels, seed = NULL) 
     mutate(year = format(sched_aircraft_datetime_posix, "%Y")) %>% 
     group_by(year) %>% 
     nest() %>% 
-    inner_join(coached_levels) %>% 
+    inner_join(coached_levels, by = "year") %>% 
     unnest(data) %>% 
     ungroup() %>% 
     mutate(coached = as.logical(rbinom(nrow(.), 1, prob = prob_coached))) %>% 
@@ -247,7 +247,7 @@ complete_aircrafts_arrivals <- function(aircrafts_arrivals,
                           countries = countries)
     
   
-  # check_aircrafts_arrivals(completed_aircrafts_arrivals, complete = TRUE)
+  check_aircrafts_arrivals(completed_aircrafts_arrivals, complete = TRUE)
   return(completed_aircrafts_arrivals)
 }
 
