@@ -99,7 +99,8 @@ list(
              get_passengers_after_routes(example_passenger_arrivals,
                                          coach_dist = coach_dist,
                                          walk_dist = walk_dist,
-                                         base_walk_dist)),
+                                         base_walk_dist,
+                                         seed = 1)),
   
   tar_target(delay_dist,
              list(prop_delayed = .21,
