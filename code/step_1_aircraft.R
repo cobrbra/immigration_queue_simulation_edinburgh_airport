@@ -25,7 +25,7 @@ check_passengers_after_aircraft <- function(passengers_after_aircraft) {
 }
 
 
-get_n_passengers <- function(max_passengers, load_factor, seed = NULL){
+sim_n_passsengers <- function(max_passengers, load_factor, seed = NULL){
   
   if (!is.null(seed)) {set.seed(seed)}
   
@@ -166,7 +166,7 @@ get_passengers_after_aircrafts <- function(aircrafts,
   
   aircrafts_with_passengers <- aircrafts %>% 
     mutate(n_passengers = if_else(is.na(n_passengers),
-                                  get_n_passengers(max_passengers, load_factor),
+                                  sim_n_passsengers(max_passengers, load_factor),
                                   n_passengers)) %>% 
     mutate(coached = if_else(is.na(coached), get_coached_status(flight_id), coached)) %>% 
     get_nationality_split(hubs = hubs, 

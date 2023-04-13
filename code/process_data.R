@@ -304,7 +304,7 @@ process_aircrafts_quantiles <- function(aircrafts,
                                          hubs = hubs,
                                          countries = countries)
   
-  ac_pass <- get_n_passengers(max_passengers = ac$max_passengers, 
+  ac_pass <- sim_n_passengers(max_passengers = ac$max_passengers, 
                               load_factor = load_factor,
                               seed = seed)
   
