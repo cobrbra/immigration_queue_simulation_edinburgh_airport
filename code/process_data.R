@@ -41,10 +41,7 @@ necessary_aircrafts_arrivals_columns <- c(
 
 necessary_complete_aircrafts_arrivals_columns <- c(
   "flight_id",
-  "sched_aircracft_datetime_int",
-  "sched_aircraft_time_int",
-  "sched_aircraft_datetime_posix",
-  "sched_aircraft_date_posix",
+  "sched_aircraft_datetime_int",
   "max_passengers"
 )
 
@@ -57,17 +54,17 @@ check_aircrafts_arrivals <- function(aircrafts_observed_arrivals) {
                                    colnames(aircrafts_observed_arrivals))
   if (any(necessary_columns_missing)) {
     stop(
-      paste(c("Aircraft Observed Arrivals should contain columns",
+      paste(c("Aircraft arrivals should contain columns",
               necessary_aircrafts_arrivals_columns[necessary_columns_missing]), 
             collapse = " ")
     )
   }
   
   necessary_complete_columns_missing <- !(necessary_complete_aircrafts_arrivals_columns %in% 
-                                        colnames(aircrafts_observed_arrivals %>% keep(~all(is.na(.x)))))
+                                        colnames(aircrafts_observed_arrivals %>% keep(~all(!is.na(.x)))))
   if (any(necessary_complete_columns_missing)) {
     stop(
-      paste(c("Aircraft Observed Arrivals should contain complete columns:",
+      paste(c("Aircraft arrivals should contain complete columns:",
               necessary_complete_aircrafts_arrivals_columns[necessary_complete_columns_missing]),
             collapse = " ")
     )
@@ -100,6 +97,7 @@ simulate_aircrafts_arrivals <- function(n_aircrafts = 5, seed = NULL) {
     flight_id = paste0("F", str_pad(1:n_aircrafts, 10, pad = "0")),
     dep_country = c("UK", rep("NETHERLANDS", n_aircrafts - 1)),
     dep_airport = c("LGW", rep("AMS", n_aircrafts - 1)),
+    airport_classification = c("UK_plus", rep("EU_plus_hub", n_aircrafts - 1)),
     ac_type = "A320",
     des_rwy = 1,
     sched_aircraft_datetime_int = 800000 + cumsum(rexp(n = n_aircrafts, rate = 1e-3)),
@@ -168,6 +166,7 @@ process_aircrafts_arrivals <- function(folder_name,
     mutate(flight_id = id,
            dep_country = country,
            dep_airport = iata_code,
+           airport_classification = rep(NA, nrow(aircrafts_observed_arrivals)),
            n_passengers = rep(NA, nrow(aircrafts_observed_arrivals)),
            coached = rep(NA, nrow(aircrafts_observed_arrivals)),
            walk_time = rep(NA, nrow(aircrafts_observed_arrivals)),
@@ -179,6 +178,7 @@ process_aircrafts_arrivals <- function(folder_name,
            "dep_country",
            "dep_airport",
            "ac_type",
+           "airport_classification",
            "sched_aircraft_datetime_int",
            "aircraft_datetime_int",
            "sched_aircraft_datetime_posix",
@@ -218,6 +218,7 @@ process_future_aircrafts_arrivals <- function(file) {
     mutate(flight_id = paste0("F", str_pad(1:n_future_flights, 10, pad = "0")),
            dep_country = rep(NA, n_future_flights),
            dep_airport = rep(NA, n_future_flights),
+           airport_classification = rep(NA, n_future_flights),
            ac_type = rep(NA, n_future_flights),
            aircraft_datetime_int = rep(NA, n_future_flights),
            aircraft_time_int = rep(NA, n_future_flights),
@@ -226,7 +227,7 @@ process_future_aircrafts_arrivals <- function(file) {
            des_rwy = rep(NA, n_future_flights),
            max_passengers = n_passengers,
            coached = rep(NA, n_future_flights)) %>% 
-    select(flight_id, dep_country, dep_airport, ac_type,
+    select(flight_id, dep_country, dep_airport, airport_classification, ac_type,
            aircraft_datetime_int,aircraft_time_int, aircraft_datetime_posix, aircraft_date_posix,
            sched_aircraft_datetime_int, sched_aircraft_time_int, sched_aircraft_datetime_posix, sched_aircraft_date_posix,
            des_rwy, max_passengers, n_passengers, coached)
