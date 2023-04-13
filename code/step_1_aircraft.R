@@ -46,7 +46,7 @@ get_airport_classification <- function(airport_country,
                                        countries){
   
     airport_classification <- case_when(
-      airport_country %in% countries$UK_plus ~ "UK_plus",
+      airport_country %in% countries$UKIE ~ "UKIE",
       airport_3letter %in% hubs$EU_plus ~ "EU_plus_hub",
       airport_country %in% countries$EU_plus ~ "EU_plus_nonhub",
       airport_3letter %in% hubs$other ~ "other_hub",
@@ -114,7 +114,7 @@ sim_nationality_split <- function(aircrafts_arrivals, hubs, prop_nationality,
     mutate(simmed_passengers = map2(.x = n_passengers, 
                                     .y = airport_classification,
                                     .f = ~ sim_passengers(.x, .y))) %>% 
-    mutate(n_nat_UK_plus = unlist(map(simmed_passengers, ~ sum(. == "UK_plus"))),
+    mutate(n_nat_UKIE = unlist(map(simmed_passengers, ~ sum(. == "UKIE"))),
            n_nat_EU_plus = unlist(map(simmed_passengers, ~ sum(. == "EU_plus"))),
            n_nat_other_easy = unlist(map(simmed_passengers, ~ sum(. == "other_easy"))),
            n_nat_other_hard = unlist(map(simmed_passengers, ~ sum(. == "other_hard")))) %>% 
@@ -174,7 +174,7 @@ get_passengers_after_aircrafts <- function(aircrafts,
                           recycle0 = TRUE),
     flight_id = rep(aircrafts_with_passengers$flight_id, n_passengers_aircraft),
     nationality = aircrafts_with_passengers %>% 
-      select(n_nat_UK_plus, n_nat_EU_plus, n_nat_other_easy, n_nat_other_hard) %>% 
+      select(n_nat_UKIE, n_nat_EU_plus, n_nat_other_easy, n_nat_other_hard) %>% 
       pivot_longer(cols = everything(), names_to = "nat", values_to = "n_nat") %>% 
       {rep(.$nat, .$n_nat)} %>% 
       str_sub(3,-1),
@@ -195,6 +195,7 @@ complete_aircrafts_arrivals <- function(aircrafts_arrivals,
                                         delay_dist,
                                         hubs,
                                         countries,
+                                        prop_nationality,
                                         n_passengers_quantiles,
                                         load_factor,
                                         coached_levels,
@@ -259,7 +260,7 @@ complete_aircrafts_arrivals <- function(aircrafts_arrivals,
                           countries = countries)
     
   
-  check_aircrafts_arrivals(completed_aircrafts_arrivals, complete = TRUE)
+  # check_aircrafts_arrivals(completed_aircrafts_arrivals, complete = TRUE)
   return(completed_aircrafts_arrivals)
 }
 

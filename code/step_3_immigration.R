@@ -61,7 +61,7 @@ get_desk_handling_time <- function(borderchecks, bordercheck_id, seed = NULL) {
 
 get_egate_eligible <- function(nationality){
   
-  egate_eligibility <- if_else(nationality %in% c("nat_UK_plus", "nat_EU_plus"), "eligible", "not_eligible")
+  egate_eligibility <- if_else(nationality %in% c("nat_UKIE", "nat_EU_plus"), "eligible", "not_eligible")
   return(egate_eligibility)
   
 }

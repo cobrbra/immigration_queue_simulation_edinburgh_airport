@@ -112,7 +112,7 @@ simulate_aircrafts_arrivals <- function(n_aircrafts = 5, seed = NULL) {
     flight_id = paste0("F", str_pad(1:n_aircrafts, 10, pad = "0")),
     dep_country = c("UK", rep("NETHERLANDS", n_aircrafts - 1)),
     dep_airport = c("LGW", rep("AMS", n_aircrafts - 1)),
-    airport_classification = c("UK_plus", rep("EU_plus_hub", n_aircrafts - 1)),
+    airport_classification = c("UKIE", rep("EU_plus_hub", n_aircrafts - 1)),
     ac_type = "A320",
     des_rwy = 1,
     sched_aircraft_datetime_int = 800000 + cumsum(rexp(n = n_aircrafts, rate = 1e-3)),
@@ -259,7 +259,7 @@ process_future_aircrafts_arrivals <- function(file) {
   return(future_aircraft_arrivals)
 }
 
-filter_arrivals_for_equivalent_weeks <- function(observed_aircrafts_arrivals, UK_plus_countries) {
+filter_arrivals_for_equivalent_weeks <- function(observed_aircrafts_arrivals, UKIE_countries) {
   observed_aircrafts_arrivals %>% 
     mutate(Year = format(sched_aircraft_datetime_posix, format = "%Y")) %>% 
     filter(((sched_aircraft_date_posix >= as.Date("2022-07-11")) &
@@ -270,7 +270,7 @@ filter_arrivals_for_equivalent_weeks <- function(observed_aircrafts_arrivals, UK
               (sched_aircraft_date_posix <= as.Date("2020-07-17"))) |
              ((sched_aircraft_date_posix >= as.Date("2019-07-08")) &
               (sched_aircraft_date_posix <= as.Date("2019-07-14")))) %>% 
-    filter(!(dep_country %in% UK_plus_countries)) %>% 
+    filter(!(dep_country %in% UKIE_countries)) %>% 
     return()
 }
 
@@ -295,7 +295,7 @@ process_aircrafts_quantiles <- function(aircrafts,
   
   ac <- aircrafts
   
-  ac <- ac[!ac$dep_country %in% countries$UK_plus, ]
+  ac <- ac[!ac$dep_country %in% countries$UKIE, ]
   
   ac_class <- get_airport_classification(airport_country = ac$dep_country, 
                                          airport_3letter = ac$dep_airport, 
