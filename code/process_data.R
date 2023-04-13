@@ -349,10 +349,5 @@ simulate_future_airport_classification <- function(aircrafts, quantile_list, see
   
 }
 
-complete_aircrafts_arrivals <- function(aircrafts_arrivals) {
-  
-  check_aircrafts_arrivals(complete_aircrafts_arrivals, complete = TRUE)
-  return(complete_aircrafts_arrivals)
-}
 
 
