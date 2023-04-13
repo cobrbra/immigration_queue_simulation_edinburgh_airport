@@ -52,21 +52,23 @@ check_aircrafts_arrivals <- function(aircrafts_observed_arrivals) {
   if (!is.data.frame(aircrafts_observed_arrivals)) {
     stop("Aircraft schedule should be dataframe.")
   }
-
-  if (any(!(necessary_aircrafts_arrivals_columns %in% 
-            colnames(aircrafts_observed_arrivals)))) {
+  
+  necessary_columns_missing <- !(necessary_aircrafts_arrivals_columns %in% 
+                                   colnames(aircrafts_observed_arrivals))
+  if (any(necessary_columns_missing)) {
     stop(
       paste(c("Aircraft Observed Arrivals should contain columns",
-              necessary_aircrafts_arrivals_columns), 
+              necessary_aircrafts_arrivals_columns[necessary_columns_missing]), 
             collapse = " ")
     )
   }
   
-  if (any(!(necessary_complete_aircrafts_arrivals_columns %in% 
-            colnames(aircrafts_observed_arrivals %>% keep(~all(is.na(.x))))))) {
+  necessary_complete_columns_missing <- !(necessary_complete_aircrafts_arrivals_columns %in% 
+                                        colnames(aircrafts_observed_arrivals %>% keep(~all(is.na(.x)))))
+  if (any(necessary_complete_columns_missing)) {
     stop(
       paste(c("Aircraft Observed Arrivals should contain complete columns:",
-              necessary_complete_aircrafts_arrivals_columns),
+              necessary_complete_aircrafts_arrivals_columns[necessary_complete_columns_missing]),
             collapse = " ")
     )
   }
