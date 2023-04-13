@@ -246,8 +246,7 @@ get_passengers_after_aircrafts <- function(aircrafts_arrivals, seed = NULL){
     coached = rep(aircrafts_arrivals$coached, aircrafts_arrivals$n_passengers),
     sched_aircraft_date_posix = rep(aircrafts_arrivals$sched_aircraft_date_posix, aircrafts_arrivals$n_passengers)
   ) %>% 
-    sample_frac(1) %>% 
-    arrange(aircraft_datetime_posix)
+    sample_frac(1) 
   
   check_passengers_after_aircrafts(passengers)
   return(passengers)
