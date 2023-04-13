@@ -83,15 +83,19 @@ list(
   
   
   # Simulating passengers from simulated arrivals
-  tar_target(example_aircraft_arrivals,
+  tar_target(example_coached_levels,
+             data.frame(year = "1970",
+                        prob_coached = .15)),
+  tar_target(example_aircrafts_arrivals,
              simulate_aircrafts_arrivals(seed = 8)),
   tar_target(example_passenger_arrivals,
              get_passengers_after_aircrafts(
-               aircrafts = example_aircraft_arrivals,
+               aircrafts = example_aircrafts_arrivals,
                hubs = hubs,
                prop_nationality = prop_nationality,
                countries = countries,
-               load_factor = load_factor)),
+               load_factor = load_factor,
+               coached_levels = example_coached_levels)),
   tar_target(example_passengers_after_route,
              get_passengers_after_route(example_passenger_arrivals)),
   

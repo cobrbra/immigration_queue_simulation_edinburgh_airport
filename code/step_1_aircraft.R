@@ -169,6 +169,7 @@ get_passengers_after_aircrafts <- function(aircrafts,
                                           prop_nationality,
                                           countries,
                                           load_factor,
+                                          coached_levels,
                                           seed = NULL){
   
   if (!is.null(seed)) {set.seed(seed)}
@@ -177,7 +178,7 @@ get_passengers_after_aircrafts <- function(aircrafts,
     mutate(n_passengers = if_else(is.na(n_passengers),
                                   sim_n_passengers(max_passengers, load_factor),
                                   n_passengers)) %>% 
-    mutate(coached = if_else(is.na(coached), get_coached_status(flight_id), coached)) %>% 
+    sim_coached_status(coached_levels = coached_levels) %>% 
     get_nationality_split(hubs = hubs, 
                           prop_nationality = prop_nationality, 
                           countries = countries)
@@ -213,6 +214,7 @@ complete_aircrafts_arrivals <- function(aircrafts_arrivals,
                                         hubs,
                                         countries,
                                         n_passengers_quantiles,
+                                        load_factor,
                                         seed = NULL) {
   if (!is.null(seed)) {set.seed(seed)}
   completed_aircrafts_arrivals <- aircrafts_arrivals
@@ -253,6 +255,12 @@ complete_aircrafts_arrivals <- function(aircrafts_arrivals,
     else {
       stop("Aircraft arrivals must either have complete n_passengers or dep_country/dep_airport.")
     }
+  }
+  
+  # Simulate number of passengers
+  if (all(is.na(completed_aircrafts_arrivals$n_passengers))) {
+    completed_aircrafts_arrivals <- completed_aircrafts_arrivals %>% 
+      mutate(n_passengers = sim_n_passengers(max_passengers, load_factor))
   }
   
   # check_aircrafts_arrivals(completed_aircrafts_arrivals, complete = TRUE)
