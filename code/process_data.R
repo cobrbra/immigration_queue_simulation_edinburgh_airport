@@ -74,6 +74,16 @@ check_aircrafts_arrivals <- function(observed_aircrafts_arrivals,
             collapse = " ")
     )
   }
+  
+  necessary_columns_not_complete <- !(necessary_aircrafts_arrivals_columns %in% 
+                                        colnames(observed_aircrafts_arrivals %>% keep(~all(!is.na(.x)))))
+  if (complete & any(necessary_columns_not_complete)) {
+    stop(
+      paste(c("Complete aircraft arrivals should contain complete columns:",
+              necessary_aircrafts_arrivals_columns[necessary_columns_not_complete]),
+            collapse = " ")
+    )
+  }
 }
 
 get_datetime_alternates <- function(events_with_datetime_int, 
