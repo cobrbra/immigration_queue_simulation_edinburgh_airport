@@ -226,11 +226,15 @@ process_future_aircrafts_arrivals <- function(file) {
            aircraft_date_posix = rep(NA, n_future_flights),
            des_rwy = rep(NA, n_future_flights),
            max_passengers = n_passengers,
-           coached = rep(NA, n_future_flights)) %>% 
+           coached = rep(NA, n_future_flights),
+           n_nat_UKIE = rep(NA, n_future_flights),
+           n_nat_EU_plus = rep(NA, n_future_flights),
+           n_nat_other_easy = rep(NA, n_future_flights),
+           n_nat_other_hard = rep(NA, n_future_flights)) %>% 
     select(flight_id, dep_country, dep_airport, airport_classification, ac_type,
            aircraft_datetime_int,aircraft_time_int, aircraft_datetime_posix, aircraft_date_posix,
            sched_aircraft_datetime_int, sched_aircraft_time_int, sched_aircraft_datetime_posix, sched_aircraft_date_posix,
-           des_rwy, max_passengers, n_passengers, coached)
+           des_rwy, max_passengers, n_passengers, coached, n_nat_UKIE, n_nat_EU_plus, n_nat_other_easy, n_nat_other_hard)
   
   check_aircrafts_arrivals(future_aircraft_arrivals)
   return(future_aircraft_arrivals)
