@@ -45,7 +45,7 @@ necessary_complete_aircrafts_arrivals_columns <- c(
   "sched_aircraft_time_int",
   "sched_aircraft_datetime_posix",
   "sched_aircraft_date_posix",
-  "max_passengers",
+  "max_passengers"
 )
 
 check_aircrafts_arrivals <- function(aircrafts_observed_arrivals) {
