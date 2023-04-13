@@ -15,51 +15,78 @@ process_airports <- function(file) {
 }
 
 process_aircrafts <- function(file) {
-  aircraft_cols <- c("aircraft_name", "long_code", "short_code", "max_passengers", "country_of_origin")
+  aircraft_cols <- c("aircraft_name", "long_code", "short_code", 
+                     "max_passengers", "country_of_origin")
   read_delim(file, 
              delim = ";",
              col_names = aircraft_cols, 
              na = "\\N")
 }
 
+necessary_aircrafts_arrivals_columns <- c(
+  "flight_id",
+  "airport_classification",
+  "aircraft_datetime_int",
+  "aircraft_time_int",
+  "aircraft_datetime_posix",
+  "aircraft_date_posix",
+  "sched_aircraft_datetime_int",
+  "sched_aircraft_time_int",
+  "sched_aircraft_datetime_posix",
+  "sched_aircraft_date_posix",
+  "max_passengers",
+  "n_passengers",
+  "coached"
+)
+
+necessary_complete_aircrafts_arrivals_columns <- c(
+  "flight_id",
+  "sched_aircracft_datetime_int",
+  "sched_aircraft_time_int",
+  "sched_aircraft_datetime_posix",
+  "sched_aircraft_date_posix",
+  "max_passengers",
+)
 
 check_aircrafts_arrivals <- function(aircrafts_observed_arrivals) {
   if (!is.data.frame(aircrafts_observed_arrivals)) {
     stop("Aircraft schedule should be dataframe.")
   }
-  necessary_columns <- c(
-    "flight_id",
-    "dep_country",
-    "dep_airport",
-    "ac_type",
-    "aircraft_datetime_int",
-    "aircraft_time_int",
-    "aircraft_datetime_posix",
-    "aircraft_date_posix",
-    "sched_aircraft_datetime_int",
-    "sched_aircraft_time_int",
-    "sched_aircraft_datetime_posix",
-    "sched_aircraft_date_posix",
-    "des_rwy",
-    "max_passengers",
-    "n_passengers",
-    "coached"
-  )
-  if (any(!(necessary_columns %in% colnames(aircrafts_observed_arrivals)))) {
+
+  if (any(!(necessary_aircrafts_arrivals_columns %in% 
+            colnames(aircrafts_observed_arrivals)))) {
     stop(
-      paste(c("Aircraft Observed Arrivals should contain columns", necessary_columns), 
-            collapse = " "))
+      paste(c("Aircraft Observed Arrivals should contain columns",
+              necessary_aircrafts_arrivals_columns), 
+            collapse = " ")
+    )
+  }
+  
+  if (any(!(necessary_complete_aircrafts_arrivals_columns %in% 
+            colnames(aircrafts_observed_arrivals %>% keep(~all(is.na(.x))))))) {
+    stop(
+      paste(c("Aircraft Observed Arrivals should contain complete columns:",
+              necessary_complete_aircrafts_arrivals_columns),
+            collapse = " ")
+    )
   }
 }
 
-get_datetime_alternates <- function(events_with_datetime_int, column_prefixes = c("aircraft")) {
+get_datetime_alternates <- function(events_with_datetime_int, 
+                                    column_prefixes = c("aircraft")) {
   for (column_prefix in column_prefixes) {
-    events_with_datetime_int[[paste0(column_prefix, "_datetime_posix")]] <- events_with_datetime_int[[paste0(column_prefix, "_datetime_int")]] %>% 
-      as.POSIXct(origin = "1970-01-01 00:00:00")
-    events_with_datetime_int[[paste0(column_prefix, "_date_posix")]] <- events_with_datetime_int[[paste0(column_prefix, "_datetime_posix")]] %>% 
-      as.Date()
-    events_with_datetime_int[[paste0(column_prefix, "_time_int")]] <- events_with_datetime_int[[paste0(column_prefix, "_datetime_int")]] -
-      86400 * as.numeric(events_with_datetime_int[[paste0(column_prefix, "_date_posix")]] - as.Date('1970-01-01 00:00:00'))
+    events_with_datetime_int[[paste0(column_prefix, "_datetime_posix")]] <- 
+      events_with_datetime_int[[paste0(column_prefix, "_datetime_int")]] %>% 
+        as.POSIXct(origin = "1970-01-01 00:00:00")
+    events_with_datetime_int[[paste0(column_prefix, "_date_posix")]] <- 
+      events_with_datetime_int[[paste0(column_prefix, "_datetime_posix")]] %>% 
+        as.Date()
+    events_with_datetime_int[[paste0(column_prefix, "_time_int")]] <- 
+      events_with_datetime_int[[paste0(column_prefix, "_datetime_int")]] -
+        86400 * as.numeric(
+          events_with_datetime_int[[paste0(column_prefix, "_date_posix")]] - 
+            as.Date('1970-01-01 00:00:00')
+        )
   }
   return(events_with_datetime_int)
 }
