@@ -141,7 +141,6 @@ process_aircrafts_arrivals <- function(folder_name,
            dep_airport = iata_code,
            n_passengers = rep(NA, nrow(aircrafts_observed_arrivals)),
            coached = rep(NA, nrow(aircrafts_observed_arrivals)),
-           taxi_time = rep(NA, nrow(aircrafts_observed_arrivals)),
            walk_time = rep(NA, nrow(aircrafts_observed_arrivals)),
            n_nat_UKIE = rep(NA, nrow(aircrafts_observed_arrivals)),
            n_nat_EU_plus = rep(NA, nrow(aircrafts_observed_arrivals)),
@@ -163,7 +162,6 @@ process_aircrafts_arrivals <- function(folder_name,
            "max_passengers",
            "n_passengers",
            "coached",
-           "taxi_time",
            "walk_time",
            "n_nat_UKIE",
            "n_nat_EU_plus",
@@ -211,18 +209,14 @@ process_future_aircrafts_arrivals <- function(file) {
 filter_arrivals_for_equivalent_weeks <- function(aircrafts_observed_arrivals, UK_plus_countries) {
   aircrafts_observed_arrivals %>% 
     mutate(Year = format(sched_aircraft_datetime_posix, format = "%Y")) %>% 
-    filter(((Year == 2022) & 
-              (sched_aircraft_date_posix >= as.Date("2022-07-11")) &
+    filter(((sched_aircraft_date_posix >= as.Date("2022-07-11")) &
               (sched_aircraft_date_posix <= as.Date("2022-07-17"))) |
-             ((Year == 2021) & 
-                (sched_aircraft_date_posix >= as.Date("2021-07-12")) &
-                (sched_aircraft_date_posix <= as.Date("2021-07-18"))) |
-             ((Year == 2020) & 
-                (sched_aircraft_date_posix >= as.Date("2020-07-13")) &
-                (sched_aircraft_date_posix <= as.Date("2020-07-17"))) |
-             ((Year == 2019) &
-                (sched_aircraft_date_posix >= as.Date("2019-07-08")) &
-                (sched_aircraft_date_posix <= as.Date("2019-07-14")))) %>% 
+             ((sched_aircraft_date_posix >= as.Date("2021-07-12")) &
+              (sched_aircraft_date_posix <= as.Date("2021-07-18"))) |
+             ((sched_aircraft_date_posix >= as.Date("2020-07-13")) &
+              (sched_aircraft_date_posix <= as.Date("2020-07-17"))) |
+             ((sched_aircraft_date_posix >= as.Date("2019-07-08")) &
+              (sched_aircraft_date_posix <= as.Date("2019-07-14")))) %>% 
     filter(!(dep_country %in% UK_plus_countries)) %>% 
     return()
 }
