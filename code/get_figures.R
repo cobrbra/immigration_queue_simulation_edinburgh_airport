@@ -57,13 +57,15 @@ get_figures <- function(future_aircrafts_arrivals, future_coached_levels, filter
     summarise(`Total Passengers` = sum(max_passengers)) %>% 
     mutate(coached_status = "Unknown") 
   
-  figures$future_passenger_burden_fig <- (future_aircrafts_arrivals) %>% # future_aircrafts_arrivals %>% #
-    mutate(Year = format(sched_aircraft_datetime_posix, format = "%Y")) %>% 
-    group_by(Year) %>% 
-    summarise(`Total Passengers` = sum(n_passengers)) %>% 
-    inner_join((future_coached_levels), by = "Year") %>% 
-    mutate(`Total Passengers` = `Total Passengers` * Percent) %>% 
-    select(Year, `Total Passengers`, coached_status) %>% 
+  figures$future_passenger_burden_fig <- (future_aircrafts_arrivals) %>%
+    mutate(year = format(sched_aircraft_datetime_posix, format = "%Y")) %>% 
+    group_by(year) %>% 
+    summarise(total_passengers = sum(n_passengers)) %>% 
+    inner_join((future_coached_levels), by = "year") %>% 
+    mutate(Coached = total_passengers * coached,
+           Contact = total_passengers * (1-coached)) %>% 
+    pivot_longer(c(Coached, Contact), names_to = "coached_status", values_to = "Total Passengers") %>% 
+    select(Year = year, `Total Passengers`, coached_status) %>% 
     bind_rows(observed_max_passengers_per_year) %>% 
     mutate(coached_status = factor(coached_status, levels = c("Contact", "Coached", "Unknown"))) %>%
     ggplot(aes(x = Year, y = `Total Passengers`, fill = coached_status)) + 
