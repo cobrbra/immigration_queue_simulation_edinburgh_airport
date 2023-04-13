@@ -279,8 +279,8 @@ process_future_coached_levels <- function(file) {
             range = "assumptions!B21:G22",
             col_names = c("coached_status", "2023", "2024", "2025", "2026", "2027")) %>% 
     filter(coached_status == "% of arriving flights coached") %>% 
-    pivot_longer(cols = - coached_status, names_to = "year", values_to = "coached") %>% 
-    select(year, coached)
+    pivot_longer(cols = - coached_status, names_to = "year", values_to = "prob_coached") %>% 
+    select(year, prob_coached)
   
   return(future_coached_levels)
 }

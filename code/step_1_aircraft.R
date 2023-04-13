@@ -55,10 +55,19 @@ get_airport_classification <- function(airport_country,
   return(airport_classification)
 }
 
-get_coached_status <- function(flight_id, prob_coached = .15, seed = NULL) {
+sim_coached_status <- function(aircrafts_arrivals, coached_levels, seed = NULL) {
   if (!is.null(seed)) {set.seed(seed)}
-  coached <- as.logical(rbinom(length(flight_id), 1, prob = prob_coached))
-  return(coached)
+  aircrafts_arrivals <- aircrafts_arrivals %>% 
+    mutate(year = format(sched_aircraft_datetime_posix, "%Y")) %>% 
+    group_by(year) %>% 
+    nest() %>% 
+    inner_join(coached_levels) %>% 
+    unnest(data) %>% 
+    ungroup() %>% 
+    mutate(coached = as.logical(rbinom(nrow(.), 1, prob = prob_coached))) %>% 
+    select(-c(year, prob_coached))
+      
+  return(aircrafts_arrivals)
 }
 
 sim_airport_classification <- function(n_passengers, quantile_list, seed = NULL){

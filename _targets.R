@@ -74,8 +74,12 @@ list(
              format = "file"),
   tar_target(future_aircrafts_arrivals,
              process_future_aircrafts_arrivals(future_aircrafts_arrivals_raw)),
+  
   tar_target(future_coached_levels,
              process_future_coached_levels(future_aircrafts_arrivals_raw)),
+  tar_target(observed_coached_levels,
+             data.frame(year = as.character(2019:2022),
+                        prob_coached = .15)),
   
   
   # Simulating passengers from simulated arrivals

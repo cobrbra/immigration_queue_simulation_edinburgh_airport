@@ -62,8 +62,8 @@ get_figures <- function(future_aircrafts_arrivals, future_coached_levels, filter
     group_by(year) %>% 
     summarise(total_passengers = sum(n_passengers)) %>% 
     inner_join((future_coached_levels), by = "year") %>% 
-    mutate(Coached = total_passengers * coached,
-           Contact = total_passengers * (1-coached)) %>% 
+    mutate(Coached = total_passengers * prob_coached,
+           Contact = total_passengers * (1-prob_coached)) %>% 
     pivot_longer(c(Coached, Contact), names_to = "coached_status", values_to = "Total Passengers") %>% 
     select(Year = year, `Total Passengers`, coached_status) %>% 
     bind_rows(observed_max_passengers_per_year) %>% 
