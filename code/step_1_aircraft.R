@@ -230,8 +230,7 @@ get_passengers_after_aircrafts <- function(aircrafts_arrivals, seed = NULL){
   n_passengers_total <- sum(aircrafts_arrivals$n_passengers)
 
   passengers <- data.frame(
-    passenger_id = paste0("P", str_pad(seq_len(n_passengers_total), 10, pad = "0"),
-                          recycle0 = TRUE),
+    passenger_id = seq_len(n_passengers_total),
     flight_id = rep(aircrafts_arrivals$flight_id, aircrafts_arrivals$n_passengers),
     nationality = aircrafts_arrivals %>% 
       select(n_nat_UKIE, n_nat_EU_plus, n_nat_other_easy, n_nat_other_hard) %>% 
