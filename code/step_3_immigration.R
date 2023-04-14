@@ -54,9 +54,7 @@ get_egate_handling_times <- function(bordercheck_egates,
   return (bordercheck_handling_times)
 }
 
-
-
-get_desk_handling_time <- function(borderchecks, bordercheck_id, seed = NULL) {
+sim_desk_handling_time <- function(borderchecks, bordercheck_id, seed = NULL) {
   # TODO: input nationality as well
   if (!is.null(seed)) {set.seed(seed)}
   bordercheck_handling_time <- max(0, rnorm(1, mean = borderchecks$bordercheck_means[bordercheck_id], sd = borderchecks$bordercheck_sd))
@@ -64,6 +62,14 @@ get_desk_handling_time <- function(borderchecks, bordercheck_id, seed = NULL) {
   return (bordercheck_handling_time)
 }
 
+alt_sim_desk_handling_times <- function(borderchecks, n_passengers) {
+  n_borderchecks <- length(borderchecks$bordercheck_means)
+  return(matrix(rnorm(n_borderchecks*n_passengers,
+                      mean = rep(borderchecks$bordercheck_means, n_passengers),
+                      sd = borderchecks$bordercheck_sd), 
+                n_borderchecks,
+                n_passengers))
+}
 
 get_egate_eligible <- function(nationality){
   
@@ -133,6 +139,95 @@ sim_egate_queue <- function(passengers_egate_matrix, bordercheck_egates) {
   return(passengers_egate_matrix)
 }
 
+sim_desk_queue <- function(passengers_desk_matrix, 
+                           passengers_failed_matrix, 
+                           bordercheck_desks,
+                           failed_egate_priority) {
+  
+  n_desks <- bordercheck_desks$n_borderchecks
+  bordercheck_times <- rep(0, times = n_desks)
+  n_passengers_desk <- nrow(passengers_desk_matrix)
+  n_passengers_failed <- nrow(passengers_failed_matrix)
+  still_passengers_left <- TRUE
+  i_desk <- i_failed <- 1
+  desk_handling_times <- alt_sim_desk_handling_times(bordercheck_desks,
+                                                     n_passengers_desk)
+  failed_handling_times <- alt_sim_desk_handling_times(bordercheck_desks,
+                                                       n_passengers_failed)
+  while(still_passengers_left){
+    
+    if(i_desk > n_passengers_desk){
+      next_desk_arrival_time <- Inf
+    } else {
+      next_desk_arrival_time <- passengers_desk_matrix[i_desk, "route_datetime_int"]
+    }
+    
+    if(i_failed > n_passengers_failed){
+      next_failed_arrival_time <- Inf
+    } else {
+      next_failed_arrival_time <- passengers_failed_matrix[i_failed, "bordercheck_egate_end_time"]
+    }
+    
+    next_arrival_time <- min(next_desk_arrival_time, next_failed_arrival_time)
+    
+    # if a desk is idle, update their time
+    bordercheck_times[bordercheck_times < next_arrival_time] <- next_arrival_time
+    
+    # decide which desk to send the passenger to
+    next_free_bordercheck <- which(bordercheck_times == min(bordercheck_times))[1] 
+    next_free_bordercheck_time <- min(bordercheck_times)
+    
+    # decide who will be handled
+    if(next_failed_arrival_time > next_free_bordercheck_time){
+      # no failed passengers yet
+      next_passenger <- "desk"
+    } else if(next_desk_arrival_time > next_free_bordercheck_time){
+      # no desk passengers yet
+      next_passenger <- "failed"
+    } else if(is.infinite(next_failed_arrival_time)){
+      # all failed already processed
+      next_passenger <- "desk"
+    } else if(is.infinite(next_desk_arrival_time)){
+      # all desk already processed
+      next_passenger <- "failed"
+    } else {
+      # both desk and failed passenger waiting
+      next_passenger <- ifelse(runif(1) < failed_egate_priority, "failed", "desk")
+    }
+    
+    # how long it takes to handle passenger
+    if(next_passenger == "desk"){
+      handling_time <- desk_handling_times[next_free_bordercheck, i_desk]
+      # update accordingly for passenger
+      passengers_desk_matrix[i_desk, "bordercheck_start_time"] <- next_free_bordercheck_time
+      passengers_desk_matrix[i_desk, "bordercheck_end_time"] <- next_free_bordercheck_time + handling_time
+      passengers_desk_matrix[i_desk, "bordercheck_handled"] <- bordercheck_desks$bordercheck_ids[next_free_bordercheck]
+      
+      i_desk <- i_desk + 1
+      
+    } else {
+      handling_time <- failed_handling_times[next_free_bordercheck, i_failed]
+      # update accordingly for passenger
+      passengers_failed_matrix[i_failed, "bordercheck_start_time"] <- next_free_bordercheck_time
+      passengers_failed_matrix[i_failed, "bordercheck_end_time"] <- next_free_bordercheck_time + handling_time
+      passengers_failed_matrix[i_failed, "bordercheck_handled"] <- bordercheck_desks$bordercheck_ids[next_free_bordercheck]
+      
+      i_failed <- i_failed + 1
+      
+    }
+    
+    # update desks 
+    bordercheck_times[next_free_bordercheck] <- bordercheck_times[next_free_bordercheck] + handling_time
+    
+    if((i_desk + i_failed - 2) == n_passengers_desk + n_passengers_failed){
+      still_passengers_left <- FALSE
+    }
+    
+  }
+  return(list(passengers_desk_matrix = passengers_desk_matrix, 
+              passengers_failed_matrix = passengers_failed_matrix))
+}
+
 immigration_queue <- function(passengers, 
                   bordercheck_desks, bordercheck_egates, 
                   egate_uptake_prop, egate_failure_prop, 
@@ -176,101 +271,16 @@ immigration_queue <- function(passengers,
   failed_numeric_columns <- c("bordercheck_egate_end_time", "bordercheck_start_time", "bordercheck_end_time",
                               "bordercheck_handled")
   passengers_failed_matrix <- get_numeric_matrix(passengers_failed, failed_numeric_columns)
-  n_passengers_failed <- dim(passengers_failed)[1]
   
   ### now let's look at the desk queue, where we input the failed egate passengers
   
-  n_borderchecks <- bordercheck_desks$n_borderchecks
-  bordercheck_times <- rep(0, times = n_borderchecks)
+  simulated_desk_queue <- sim_desk_queue(passengers_desk_matrix,
+                                         passengers_failed_matrix,
+                                         bordercheck_desks,
+                                         failed_egate_priority)
   
-  n_passengers_desk <- dim(passengers_desk)[1]
-  
-  n_total <- n_passengers_desk + n_passengers_failed
-  
-  
-  
-  still_passengers_left <- TRUE
-  
-  i_desk <- 1
-  i_failed <- 1
-  
-  while(still_passengers_left){
-    
-    if(i_desk > n_passengers_desk){
-      next_desk_arrival_time <- Inf
-    } else {
-      next_desk_arrival_time <- passengers_desk_matrix[i_desk, "route_datetime_int"]
-    }
-    
-    
-    if(i_failed > n_passengers_failed){
-      next_failed_arrival_time <- Inf
-    } else {
-      next_failed_arrival_time <- passengers_failed_matrix[i_failed, "bordercheck_egate_end_time"]
-    }
-    
-    
-    next_arrival_time <- min(next_desk_arrival_time, next_failed_arrival_time)
-    
-    # if a desk is idle, update their time
-    bordercheck_times[bordercheck_times < next_arrival_time] <- next_arrival_time
-    
-    # decide which desk to send the passenger to
-    next_free_bordercheck <- which(bordercheck_times == min(bordercheck_times))[1] 
-    next_free_bordercheck_time <- min(bordercheck_times)
-    
-    
-    
-    # decide who will be handled
-    if(next_failed_arrival_time > next_free_bordercheck_time){
-      # no failed passengers yet
-      next_passenger <- "desk"
-    } else if(next_desk_arrival_time > next_free_bordercheck_time){
-      # no desk passengers yet
-      next_passenger <- "failed"
-    } else if(is.infinite(next_failed_arrival_time)){
-      # all failed already processed
-      next_passenger <- "desk"
-    } else if(is.infinite(next_desk_arrival_time)){
-      # all desk already processed
-      next_passenger <- "failed"
-    } else {
-      # both desk and failed passenger waiting
-      next_passenger <- ifelse(runif(1) < failed_egate_priority, "failed", "desk")
-    }
-    
-    # how long it takes to handle passenger
-    handling_time <- get_desk_handling_time(bordercheck_desks, next_free_bordercheck) 
-    if(next_passenger == "desk"){
-      
-      # update accordingly for passenger
-      passengers_desk_matrix[i_desk, "bordercheck_start_time"] <- next_free_bordercheck_time
-      passengers_desk_matrix[i_desk, "bordercheck_end_time"] <- next_free_bordercheck_time + handling_time
-      passengers_desk_matrix[i_desk, "bordercheck_handled"] <- bordercheck_desks$bordercheck_ids[next_free_bordercheck]
-      
-      i_desk <- i_desk + 1
-      
-    } else {
-   
-      # update accordingly for passenger
-      passengers_failed_matrix[i_failed, "bordercheck_start_time"] <- next_free_bordercheck_time
-      passengers_failed_matrix[i_failed, "bordercheck_end_time"] <- next_free_bordercheck_time + handling_time
-      passengers_failed_matrix[i_failed, "bordercheck_handled"] <- bordercheck_desks$bordercheck_ids[next_free_bordercheck]
-      
-      i_failed <- i_failed + 1
-      
-    }
-    
-    # update desks 
-    bordercheck_times[next_free_bordercheck] <- bordercheck_times[next_free_bordercheck] + handling_time
-    
-    if((i_desk + i_failed - 2) == n_total ){
-      still_passengers_left <- FALSE
-    }
-   
-  }
-  passengers_failed[, failed_numeric_columns] <- passengers_failed_matrix
-  passengers_desk[, desk_numeric_columns] <- passengers_desk_matrix
+  passengers_failed[, failed_numeric_columns] <- simulated_desk_queue$passengers_failed_matrix
+  passengers_desk[, desk_numeric_columns] <- simulated_desk_queue$passengers_desk_matrix
   
   passengers_egate$egate_handling_time <- NULL
   passengers_failed$egate_handling_time <- NULL
