@@ -1,8 +1,4 @@
 library(tidyverse)
-library(here) 
-library(scales)
-library(readxl)
-
 
 seed = 1234
 n_egates = 10
@@ -13,7 +9,7 @@ if (!is.null(seed)) {set.seed(seed)}
 # generate desks
 n_desks <- 9
 desk_means <- pmax(0, rnorm(n_desks, mean = 90, sd = 5))
-desk_ids <- paste0("D", str_pad(1:n_desks, 2, pad = "0"))
+desk_ids <- seq_len(n_desks)
 bordercheck_desks <- list(n_borderchecks = n_desks, 
                           bordercheck_means = desk_means,
                           bordercheck_sd = 14,
@@ -21,7 +17,7 @@ bordercheck_desks <- list(n_borderchecks = n_desks,
 
 # generate egates
 egate_mean <- 45
-egate_ids <- paste0("E", str_pad(1:n_egates, 2, pad = "0"))
+egate_ids <- seq_len(n_egates)
 bordercheck_egates <- list(n_borderchecks = n_egates, 
                            bordercheck_mean = egate_mean,
                            bordercheck_sd = 5,
@@ -45,13 +41,14 @@ simulated_passengers <- simulated_passengers_before_routes %>%
 
 
 sim_queue_kpis <- function(passengers_after_routes,
-                                bordercheck_egates,
-                                egate_uptake_prop,
-                                kpis,
-                                egate_failure_prop,
-                                failed_egate_priority,
-                                seed,
-                                progress_bar = FALSE) {
+                           bordercheck_egates,
+                           egate_uptake_prop,
+                           wait_time_kpis,
+                           queue_length_kpis,
+                           egate_failure_prop,
+                           failed_egate_priority,
+                           seed,
+                           progress_bar = FALSE) {
   
   simulated_queues <- passengers_after_routes %>% 
     nest(route_data = -sched_aircraft_date_posix) %>% 
@@ -63,18 +60,25 @@ sim_queue_kpis <- function(passengers_after_routes,
                                                 egate_failure_prop = egate_failure_prop, 
                                                 failed_egate_priority = failed_egate_priority, 
                                                 seed = seed),
-                            .progress = ifelse(progress_bar, "simming queues", FALSE))) %>% 
+                            .progress = ifelse(progress_bar, "simulating queues", FALSE))) %>% 
     select(-route_data) %>% 
     unnest(queue_data) %>% 
-    nest(year_data = - year)
+    nest(year_data = - year) %>% 
+    mutate(queue_lengths = map(year_data, get_queue_lengths, 
+                               .progress = ifelse(progress_bar, "getting queue lengths", FALSE)))
 
-  for (kpi in kpis) {
+  for (kpi in wait_time_kpis) {
     kpi_func = get(kpi)
     simulated_queues[[kpi]] <- map_dbl(simulated_queues$year_data, kpi_func)
   }
   
+  for (kpi in queue_length_kpis) {
+    kpi_func = get(kpi)
+    simulated_queues[[kpi]]
+  }
+  
   simulated_queue_kpis <- simulated_queues %>% 
-    select(-year_data)
+    select(-c(year_data, queue_lengths))
   
   return(simulated_queue_kpis)
 }
@@ -84,7 +88,8 @@ sim_queue_kpis <- function(passengers_after_routes,
 simulated_kpi <- simulated_passengers %>% 
   sim_queue_kpis(bordercheck_egates,
                  egate_uptake_prop,
-                 kpis = list("mean_wait_time", "sla_wait_time"),
+                 wait_time_kpis = list("mean_wait_time", "sla_wait_time"),
+                 queue_length_kpis = list(),
                  egate_failure_prop = tar_read(egate_failure_prop),
                  failed_egate_priority = tar_read(failed_egate_priority),
                  seed = seed,
@@ -92,8 +97,18 @@ simulated_kpi <- simulated_passengers %>%
   
 
 
-
+simulated_queue_data <- simulated_passengers %>% 
+  immigration_queue(bordercheck_desks = bordercheck_desks,
+                    bordercheck_egates = bordercheck_egates,
+                    egate_uptake_prop = egate_uptake_prop,
+                    egate_failure_prop = tar_read(egate_failure_prop), 
+                    failed_egate_priority = tar_read(failed_egate_priority))
   
+input_times_data <- data.frame(
+  input_time = seq(min(simulated_queue_data$route_datetime_int),
+                   max(simulated_queue_data$bordercheck_end_time),
+                   900)
+)
 
 input_times <- seq(from = as.numeric(as.POSIXct("2023-07-10 00:00:00")) , to =  as.numeric(as.POSIXct("2023-07-11 00:00:00")), by = 900)
 queue_lengths <- get_queue_length(passengers = ex_day_2023_immigration, input_times = input_times) %>% 
