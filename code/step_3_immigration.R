@@ -174,7 +174,7 @@ sim_desk_queue <- function(passengers_desk_matrix,
     bordercheck_times[bordercheck_times < next_arrival_time] <- next_arrival_time
     
     # decide which desk to send the passenger to
-    next_free_bordercheck <- which(bordercheck_times == min(bordercheck_times))[1] 
+    next_free_bordercheck <- which.min(bordercheck_times) 
     next_free_bordercheck_time <- min(bordercheck_times)
     
     # decide who will be handled
