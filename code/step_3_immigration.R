@@ -159,11 +159,8 @@ immigration_queue <- function(passengers,
     
   desk_numeric_columns <- c("route_datetime_int", "bordercheck_start_time", "bordercheck_end_time",
                             "bordercheck_handled")
-  passengers_desk <- passengers %>% 
-    filter(egate_used == "desk") 
-  passengers_desk_matrix <- passengers_desk %>% 
-    select(all_of(desk_numeric_columns)) %>% 
-    as.matrix()
+  passengers_desk <- filter(passengers, egate_used == "desk") 
+  passengers_desk_matrix <- get_numeric_matrix(passengers_desk, desk_numeric_columns)
   
   #### get all the egate passengers through
   passengers_egate_matrix <- sim_egate_queue(passengers_egate_matrix, bordercheck_egates)
@@ -171,18 +168,15 @@ immigration_queue <- function(passengers,
   
   # at this point the egate passengers are processed
   # now deal with the failed passengers
-  passengers_failed <- passengers_egate[passengers_egate$egate_failed == "failed", ]
-  passengers_failed$bordercheck_egate_end_time <- passengers_failed$bordercheck_end_time
-  passengers_failed <- passengers_failed[order(passengers_failed$bordercheck_end_time), ]
+  passengers_failed <- passengers_egate %>% 
+    filter(egate_failed == "failed") %>% 
+    mutate(bordercheck_egate_end_time = bordercheck_end_time) %>% 
+    arrange(bordercheck_end_time)
+  
   failed_numeric_columns <- c("bordercheck_egate_end_time", "bordercheck_start_time", "bordercheck_end_time",
                               "bordercheck_handled")
-  passengers_failed_matrix <- passengers_failed %>% 
-    select(all_of(failed_numeric_columns)) %>% 
-    as.matrix()
-  
+  passengers_failed_matrix <- get_numeric_matrix(passengers_failed, failed_numeric_columns)
   n_passengers_failed <- dim(passengers_failed)[1]
-  
-  
   
   ### now let's look at the desk queue, where we input the failed egate passengers
   
