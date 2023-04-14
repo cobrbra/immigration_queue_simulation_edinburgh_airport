@@ -34,11 +34,13 @@ sim_aircraft_route_time <- function(passengers, coach_dist, base_walk_dist, seed
   coach_times <- rnorm(n_flights, coach_dist$mean, coach_dist$sd)
   coach_times[coach_times <= 0] <- 0
   base_walk_times <- runif(n_flights, base_walk_dist$min, base_walk_dist$max)
-  passengers_with_coach_time <- passengers %>% 
-    nest(flight_data = -c(coached, flight_id)) %>% 
-    mutate(aircraft_route_time = if_else(coached, coach_times, base_walk_times)) %>% 
-    unnest(flight_data)
-  return(passengers_with_coach_time)
+  flight_counts <- count(passengers, flight_id)$n
+  coach_times_long <- rep(coach_times, flight_counts)
+  base_walk_times_long <- rep(base_walk_times, flight_counts)
+  passengers_with_aircraft_route_time <- passengers %>% 
+    arrange(flight_id) %>% 
+    mutate(aircraft_route_time = if_else(coached, coach_times_long, base_walk_times_long)) 
+  return(passengers_with_aircraft_route_time)
 }
 
 sim_passenger_route_time <- function(passengers, 
@@ -65,7 +67,7 @@ get_passengers_after_routes <- function(passengers_after_aircraft,
   if (!is.null(seed)) {set.seed(seed)}
   passengers_after_routes <- passengers_after_aircraft %>% 
     sim_aircraft_route_time(coach_dist = coach_dist,
-                            base_walk_dist = base_walk_dist) %>% 
+                            base_walk_dist = base_walk_dist) %>%
     sim_passenger_route_time(walk_dist = walk_dist) %>% 
     mutate(route_datetime_int = aircraft_datetime_int + 
              aircraft_route_time + passenger_route_time) %>%
