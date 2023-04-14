@@ -1,7 +1,3 @@
-library(tidyverse)
-library(here)
-library(readxl)
-
 necessary_aircrafts_arrivals_columns <- c(
   "flight_id",
   "airport_classification",

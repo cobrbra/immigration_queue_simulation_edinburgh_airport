@@ -1,7 +1,3 @@
-library(tidyverse)
-library(here)
-library(xtable)
-
 get_tables <- function(future_aircrafts_arrivals, 
                        observed_aircrafts_arrivals, 
                        ...) {

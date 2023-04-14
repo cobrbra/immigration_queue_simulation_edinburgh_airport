@@ -1,7 +1,3 @@
-library(tidyverse)
-library(here)
-library(showtext)
-
 theme_edi_airport <- function() {
   font <- "Lato"
   theme_minimal() %+replace%
