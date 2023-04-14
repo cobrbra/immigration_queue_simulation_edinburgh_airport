@@ -232,11 +232,6 @@ get_passengers_after_aircrafts <- function(aircrafts_arrivals, seed = NULL){
   passengers <- data.frame(
     passenger_id = seq_len(n_passengers_total),
     flight_id = rep(aircrafts_arrivals$flight_id, aircrafts_arrivals$n_passengers),
-    nationality = aircrafts_arrivals %>% 
-      select(n_nat_UKIE, n_nat_EU_plus, n_nat_other_easy, n_nat_other_hard) %>% 
-      pivot_longer(cols = everything(), names_to = "nat", values_to = "n_nat") %>% 
-      {rep(.$nat, .$n_nat)} %>% 
-      str_sub(3,-1),
     airport_classification = rep(aircrafts_arrivals$airport_classification, aircrafts_arrivals$n_passengers),
     aircraft_datetime_int = rep(aircrafts_arrivals$aircraft_datetime_int, aircrafts_arrivals$n_passengers),
     aircraft_datetime_posix = rep(aircrafts_arrivals$aircraft_datetime_posix, aircrafts_arrivals$n_passengers),
@@ -245,7 +240,12 @@ get_passengers_after_aircrafts <- function(aircrafts_arrivals, seed = NULL){
     coached = rep(aircrafts_arrivals$coached, aircrafts_arrivals$n_passengers),
     sched_aircraft_date_posix = rep(aircrafts_arrivals$sched_aircraft_date_posix, aircrafts_arrivals$n_passengers)
   ) %>% 
-    sample_frac(1) 
+    mutate(nationality = aircrafts_arrivals %>% 
+             select(n_nat_UKIE, n_nat_EU_plus, n_nat_other_easy, n_nat_other_hard) %>% 
+             pivot_longer(cols = everything(), names_to = "nat", values_to = "n_nat") %>% 
+             {rep(.$nat, .$n_nat)} %>% 
+             str_sub(3,-1)) %>% 
+    slice_sample(prop = 1)
   
   check_passengers_after_aircrafts(passengers)
   return(passengers)
