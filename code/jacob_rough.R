@@ -3,68 +3,96 @@ library(here)
 library(scales)
 library(readxl)
 
-n_desks <- 9
-desk_means <- pmax(70, rnorm(n_desks, mean = 90, sd = 5))
-desk_ids <- paste0("D", str_pad(1:n_desks, 2, pad = "0"))
 
+seed = 1234
+n_egates = 10
+egate_uptake_prop = .8
+
+if (!is.null(seed)) {set.seed(seed)}
+
+# generate desks
+n_desks <- 9
+desk_means <- pmax(0, rnorm(n_desks, mean = 90, sd = 5))
+desk_ids <- paste0("D", str_pad(1:n_desks, 2, pad = "0"))
 bordercheck_desks <- list(n_borderchecks = n_desks, 
                           bordercheck_means = desk_means,
                           bordercheck_sd = 14,
                           bordercheck_ids = desk_ids)
 
-n_egates <- 10
-eGate_mean <- 45
-eGate_ids <- paste0("E", str_pad(1:n_egates, 2, pad = "0"))
-
+# generate egates
+egate_mean <- 45
+egate_ids <- paste0("E", str_pad(1:n_egates, 2, pad = "0"))
 bordercheck_egates <- list(n_borderchecks = n_egates, 
-                           bordercheck_mean = eGate_mean,
+                           bordercheck_mean = egate_mean,
                            bordercheck_sd = 5,
-                           bordercheck_ids = eGate_ids)
+                           bordercheck_ids = egate_ids)
 
-seed <- 1234
-simulate_future_passengers <- tar_read(future_aircrafts_arrivals) %>% 
-  mutate(aircraft_datetime_int = simulate_delay_times(flight_id, .21, .58, .21, 50*60, 21*60, seed = seed) + sched_aircraft_datetime_int) %>% 
-  get_datetime_alternates(column_prefixes = c("aircraft")) %>% 
-  mutate(Year = format(aircraft_date_posix, format = "%Y")) %>% 
-  group_by(Year) %>% 
-  nest() %>% 
-  inner_join(tar_read(future_coached_levels)) %>% 
-  filter(coached_status == "Coached") %>% 
-  unnest(data) %>% 
-  ungroup() %>% 
-  mutate(coached = get_coached_status(flight_id, prob_coached = Percent), seed = seed) %>% 
-  simulate_future_airport_classification(tar_read(n_passenger_quantiles), seed = seed) %>% 
-  get_passengers_after_aircrafts(tar_read(EU_plus_hubs), tar_read(other_hubs),
-                                 tar_read(prop_nationality), tar_read(UK_plus_countries),
-                                 tar_read(EU_plus_countries), tar_read(load_factor_mean), 
-                                 tar_read(load_factor_sd), seed = seed) 
+simulated_aircrafts <- tar_read(future_aircrafts_arrivals) %>% 
+  complete_aircrafts_arrivals(tar_read(hubs), tar_read(countries), tar_read(prop_nationality), 
+                              delay_dist = tar_read(delay_dist),
+                              n_passengers_quantiles = tar_read(n_passengers_quantiles),
+                              coached_levels = tar_read(future_coached_levels),
+                              seed = seed) 
 
-simulate_future_routes <- simulate_future_passengers %>% 
-  get_passengers_after_route(seed = seed) #%>% 
-  group_by(route_date_posix) %>% 
-  nest() %>% 
-  mutate(queue_data = map(data, 
-                          ~ immigration_queue(., bordercheck_desks = bordercheck_desks, 
-                                              bordercheck_egates = bordercheck_egates, 
-                                              egate_uptake_prop = .8, 
-                                              egate_failure_prop = tar_read(egate_failure_prop), 
-                                              failed_egate_priority = tar_read(failed_egate_priority), 
-                                              seed = seed))) %>% 
-  mutate(prop_failed_queue_time = unlist(map(queue_data, ~ mean((.$bordercheck_start_time - .$route_datetime_int) >= 15*60)))) %>% 
-  select(-data) %>% 
-  unnest(queue_data)
+simulated_passengers_before_routes <- simulated_aircrafts %>% 
+  get_passengers_after_aircrafts(seed = seed) 
 
-simulate_future %>% 
-  mutate(wait_time = bordercheck_start_time - route_datetime_int,
-         Year = format(route_date_posix, format = "%Y")) %>% 
-  group_by(Year, egate_used) %>% 
-  nest() %>% 
-  mutate(prop_failing_sla = unlist(map(data, ~ mean(.$wait_time >= 15*60)))) %>% 
-  ggplot(aes(x = Year, y = prop_failing_sla, fill = egate_used)) + 
-    geom_col(position = "dodge") + 
-    scale_fill_manual(values = edi_airport_colours) +
-    # theme_edi_airport() +
-    labs(y = "Proportion of passengers with wait times breaching SLA")
+simulated_passengers <- simulated_passengers_before_routes %>% 
+  get_passengers_after_routes(tar_read(coach_dist),
+                              tar_read(walk_dist),
+                              tar_read(base_walk_dist),
+                              seed = seed)
+
+
+sim_queue_kpis <- function(passengers_after_routes,
+                                bordercheck_egates,
+                                egate_uptake_prop,
+                                kpis,
+                                egate_failure_prop,
+                                failed_egate_priority,
+                                seed,
+                                progress_bar = FALSE) {
+  
+  simulated_queues <- passengers_after_routes %>% 
+    nest(route_data = -sched_aircraft_date_posix) %>% 
+    mutate(year = format(sched_aircraft_date_posix, "%Y")) %>% 
+    mutate(queue_data = map(route_data, 
+                            ~ immigration_queue(., bordercheck_desks = bordercheck_desks, 
+                                                bordercheck_egates = bordercheck_egates, 
+                                                egate_uptake_prop = egate_uptake_prop, 
+                                                egate_failure_prop = egate_failure_prop, 
+                                                failed_egate_priority = failed_egate_priority, 
+                                                seed = seed),
+                            .progress = ifelse(progress_bar, "simming queues", FALSE))) %>% 
+    select(-route_data) %>% 
+    unnest(queue_data) %>% 
+    nest(year_data = - year)
+
+  for (kpi in kpis) {
+    kpi_func = get(kpi)
+    simulated_queues[[kpi]] <- map_dbl(simulated_queues$year_data, kpi_func)
+  }
+  
+  simulated_queue_kpis <- simulated_queues %>% 
+    select(-year_data)
+  
+  return(simulated_queue_kpis)
+}
+
+
+
+simulated_kpi <- simulated_passengers %>% 
+  sim_queue_kpis(bordercheck_egates,
+                 egate_uptake_prop,
+                 kpis = list("mean_wait_time", "sla_wait_time"),
+                 egate_failure_prop = tar_read(egate_failure_prop),
+                 failed_egate_priority = tar_read(failed_egate_priority),
+                 seed = seed,
+                 progress_bar = TRUE)
+  
+
+
+
   
 
 input_times <- seq(from = as.numeric(as.POSIXct("2023-07-10 00:00:00")) , to =  as.numeric(as.POSIXct("2023-07-11 00:00:00")), by = 900)
@@ -102,7 +130,7 @@ ex_week_2023_passengers %>%
 
 
 
-delay_times <- tar_read(aircrafts_observed_arrivals) %>% 
+delay_times <- tar_read(observed_aircrafts_arrivals) %>% 
   mutate(Year = format(sched_aircraft_datetime_posix, format = "%Y")) %>% 
   filter(Year == 2019,
          sched_aircraft_date_posix >= as.Date("2019-06-01"),
