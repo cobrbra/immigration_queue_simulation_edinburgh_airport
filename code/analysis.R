@@ -28,7 +28,8 @@ sim_analysis_data <- function(sim_settings,
                               walk_dist,
                               base_walk_dist,
                               egate_failure_prop,
-                              failed_egate_priority) {
+                              failed_egate_priority,
+                              queue_sample_size = 2000) {
   # generate desks
   n_desks <- 9
   desk_means <- pmax(0, rep(90, n_desks))#rnorm(n_desks, mean = 90, sd = 5))
@@ -39,7 +40,8 @@ sim_analysis_data <- function(sim_settings,
                             bordercheck_ids = desk_ids)
   
   sim_settings <- sim_settings %>% 
-    mutate(queue_length_data = vector(mode = "list", length = nrow(.))) %>% 
+    mutate(queue_length_data = vector(mode = "list", length = nrow(.)),
+           sample_queue_data = vector(mode = "list", length = nrow(.))) %>% 
     nest(non_arrivals_data = -gen_arrivals_seed)
   
   progress_counter <- 0
@@ -85,6 +87,14 @@ sim_analysis_data <- function(sim_settings,
       
       sim_settings$non_arrivals_data[[arrivals_id]]$queue_length_data[[non_arrivals_id]] <- 
         simulated_queue_lengths
+      
+      sim_settings$non_arrivals_data[[arrivals_id]]$sample_queue_data[[non_arrivals_id]] <- 
+        simulated_queue %>% 
+        select(sched_aircraft_date_posix, route_datetime_int, 
+               bordercheck_start_time, bordercheck_end_time,
+               nationality, egate_used, egate_failed) %>% 
+        mutate(wait_time = bordercheck_start_time - route_datetime_int) %>% 
+        slice_sample(n = queue_sample_size)
       
       non_arrivals_id <- non_arrivals_id + 1
       progress_counter <- progress_counter + 1
