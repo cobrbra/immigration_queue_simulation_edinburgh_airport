@@ -87,6 +87,7 @@ sim_analysis_data <- function(sim_settings,
         sim_queues(bordercheck_desks = bordercheck_desks,
                    bordercheck_egates = bordercheck_egates,
                    egate_uptake_prop = egate_uptake,
+                   elig_boost = elig_boost,
                    egate_failure_prop = (egate_failure_prop),
                    failed_egate_priority = (failed_egate_priority),
                    seed = queue_seed)
