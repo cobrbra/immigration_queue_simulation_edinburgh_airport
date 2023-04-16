@@ -7,23 +7,59 @@ get_queue_length_at_time_point <- function(time_point, passengers) {
   return(sum(not_yet_done & not_yet_started))
 }
 
-get_queue_lengths <- function(passengers, input_time_interval = 15*60){
+get_queue_lengths_for_year <- function(queue_times_for_year,
+                                       queue_data_for_year,
+                                       egate_or_desk = "egate",
+                                       input_time_interval = 15*50) {
+  queue_lengths = map_int(queue_times_for_year$queue_length_datetime_int,
+          ~ get_queue_length_at_time_point(., filter(queue_data_for_year,
+                                                     egate_used == egate_or_desk)))
+  return(queue_lengths)
+}
+
+get_queue_lengths <- function(passengers, 
+                              input_time_interval = 15*60, 
+                              progress_bar = FALSE){
   queue_lengths <- data.frame(
     queue_length_datetime_int = input_time_interval * unique(
       round(passengers$route_datetime_int/input_time_interval)
     )
-  ) %>% 
-    mutate(
-      desk_queue_length = map_int(
-        queue_length_datetime_int,
-        ~ get_queue_length_at_time_point(., filter(passengers, egate_used == "desk"))
-        ),
-      egate_queue_length = map_int(
-        queue_length_datetime_int,
-        ~ get_queue_length_at_time_point(., filter(passengers, egate_used == "egate"))
-        )
-      )
-  return(queue_lengths)
+  ) %>%
+    get_datetime_alternates("queue_length") %>%
+    mutate(year = format(queue_length_date_posix, format = "%Y")) %>% 
+    nest(year_data = - year)
+  
+  passengers <- passengers %>% 
+    mutate(year = format(sched_aircraft_date_posix, format = "%Y")) %>% 
+    nest(year_data = -year)
+  
+  queue_lengths$desk_queue_length <- map2(
+    queue_lengths$year_data,
+    passengers$year_data,
+    ~get_queue_lengths_for_year(
+      queue_times_for_year = .x, 
+      queue_data_for_year = .y,
+      egate_or_desk = "desk",
+      input_time_interval = input_time_interval),
+    .progress = "getting desk queue lengths"
+  )
+  
+  queue_lengths$egate_queue_length <- map2(
+    queue_lengths$year_data,
+    passengers$year_data,
+    ~get_queue_lengths_for_year(
+      queue_times_for_year = .x, 
+      queue_data_for_year = .y,
+      egate_or_desk = "egate",
+      input_time_interval = input_time_interval),
+    .progress = "getting egate queue lengths"
+  )
+
+  return(queue_lengths %>% unnest(c(year_data, desk_queue_length, egate_queue_length)))
+}
+
+get_queue_kpis <- function(queue_data) {
+  
 }
 
 sim_queue_kpis <- function(passengers_after_routes,
