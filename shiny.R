@@ -46,11 +46,12 @@ server <- function(input, output) {
     # input <- list(n_egates = 14,
     #               egate_uptake = 1.,
     #               elig_boost = 0)
-    sim_settings %>% 
+    tar_read(shiny_sim_data) %>% 
       unnest(queue_length_data) %>% 
       pivot_longer(cols = c(desk_queue_length, egate_queue_length), 
                    names_to = "Check Type",
                    values_to = "Queue Length") %>% 
+      mutate(`Check Type` = if_else(`Check Type` == "desk_queue_length", "Desk", "eGate")) %>% 
       filter(n_egates == input$n_egates,
              egate_uptake == input$egate_uptake,
              elig_boost == input$elig_boost) %>% 
