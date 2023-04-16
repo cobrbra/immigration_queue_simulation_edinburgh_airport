@@ -9,14 +9,14 @@ generate_sim_settings <- function(seed = 1234,
   gen_queue_seeds <- sample(1:100000, size = n_gen_queues)
   sim_settings <- tibble(
     gen_arrivals_seed = rep(gen_arrivals_seeds, 
-                            each = lenght(n_egates_range) * n_gen_queues * length(egate_uptake_range) * length(elig_boost_range),
+                            each = length(n_egates_range) * n_gen_queues * length(egate_uptake_range) * length(elig_boost_range),
                             times = 1),
     n_egates = rep(n_egates_range, 
                    each = n_gen_arrivals * n_gen_queues * length(egate_uptake_range), 
                    times = length(elig_boost_range)),
     gen_queue_seed = rep(gen_queue_seeds, 
                          each = n_gen_arrivals * length(n_egates_range), 
-                         times =  lenght(egate_uptake_range) * length(elig_boost_range)),
+                         times =  length(egate_uptake_range) * length(elig_boost_range)),
     egate_uptake = rep(egate_uptake_range,
                        each = n_gen_arrivals,
                        times = length(n_egates_range) * n_gen_queues * length(elig_boost_range)),
@@ -53,19 +53,19 @@ sim_analysis_data <- function(sim_settings,
     nest(non_arrivals_data = -gen_arrivals_seed)
   
   progress_counter <- 0
-  for (arrivals_id in seq_len(n_gen_arrivals)) {
+  for (arrivals_id in seq_len(nrow(sim_settings))) {
     arrivals_seed <- sim_settings$gen_arrivals_seed[[arrivals_id]]
-    simulated_passengers <- tar_read(future_aircrafts_arrivals) %>% 
+    simulated_passengers <- (future_aircrafts_arrivals) %>% 
       complete_aircrafts_arrivals(
-        tar_read(hubs), tar_read(countries), tar_read(prop_nationality),
-        delay_dist = tar_read(delay_dist), 
-        n_passengers_quantiles = tar_read(n_passengers_quantiles),
-        coached_levels = tar_read(future_coached_levels),
+        (hubs), (countries), (prop_nationality),
+        delay_dist = (delay_dist), 
+        n_passengers_quantiles = (n_passengers_quantiles),
+        coached_levels = (future_coached_levels),
         seed = arrivals_seed) %>% 
       get_passengers_after_aircrafts(seed = arrivals_seed) %>% 
-      get_passengers_after_routes(coach_dist = tar_read(coach_dist), 
-                                  walk_dist = tar_read(walk_dist),
-                                  base_walk_dist = tar_read(base_walk_dist),
+      get_passengers_after_routes(coach_dist = (coach_dist), 
+                                  walk_dist = (walk_dist),
+                                  base_walk_dist = (base_walk_dist),
                                   seed = arrivals_seed)
     
     non_arrivals_id <- 1 
@@ -82,10 +82,11 @@ sim_analysis_data <- function(sim_settings,
         bordercheck_ids = seq_len(n_egates))
       
       simulated_queue <- simulated_passengers %>% 
-        sim_queues(bordercheck_egates = bordercheck_egates,
+        sim_queues(bordercheck_desks = bordercheck_desks,
+                   bordercheck_egates = bordercheck_egates,
                    egate_uptake_prop = egate_uptake,
-                   egate_failure_prop = tar_read(egate_failure_prop),
-                   failed_egate_priority = tar_read(failed_egate_priority),
+                   egate_failure_prop = (egate_failure_prop),
+                   failed_egate_priority = (failed_egate_priority),
                    seed = queue_seed)
       
       simulated_queue_lengths <- simulated_queue %>% 
