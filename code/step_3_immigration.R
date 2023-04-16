@@ -71,11 +71,16 @@ alt_sim_desk_handling_times <- function(borderchecks, n_passengers) {
                 n_passengers))
 }
 
-get_egate_eligible <- function(nationality){
+get_egate_eligible <- function(nationality, elig_boost = .0){
   
-  egate_eligibility <- if_else(nationality %in% c("nat_UKIE", "nat_EU_plus"), "eligible", "not_eligible")
+  egate_eligibility <- if_else(nationality %in% c("nat_UKIE", "nat_EU_plus"), 
+                               true = "eligible", 
+                               false = sample(c("eligible", "not_eligible"), 
+                                              size = length(nationality),
+                                              prob = c(elig_boost, 1 - elig_boost),
+                                              replace = TRUE))
+  
   return(egate_eligibility)
-  
 }
 
 
@@ -229,14 +234,17 @@ sim_desk_queue <- function(passengers_desk_matrix,
 }
 
 immigration_queue <- function(passengers, 
-                  bordercheck_desks, bordercheck_egates, 
-                  egate_uptake_prop, egate_failure_prop, 
-                  failed_egate_priority, 
-                  seed = NULL){
+                              bordercheck_desks, 
+                              bordercheck_egates, 
+                              egate_uptake_prop, 
+                              elig_boost,
+                              egate_failure_prop, 
+                              failed_egate_priority, 
+                              seed = NULL){
   
   if (!is.null(seed)) {set.seed(seed)}
   passengers <- passengers %>% 
-    mutate(egate_eligibility = get_egate_eligible(nationality),
+    mutate(egate_eligibility = get_egate_eligible(nationality, elig_boost),
            bordercheck_start_time = numeric(n()), 
            bordercheck_end_time = numeric(n()),
            bordercheck_handled = numeric(n())) %>% 
@@ -300,6 +308,7 @@ sim_queues <- function(passengers_after_routes,
                        bordercheck_desks,
                        bordercheck_egates,
                        egate_uptake_prop,
+                       elig_boost,
                        egate_failure_prop,
                        failed_egate_priority,
                        seed,
@@ -312,6 +321,7 @@ sim_queues <- function(passengers_after_routes,
                             ~ immigration_queue(., bordercheck_desks = bordercheck_desks, 
                                                 bordercheck_egates = bordercheck_egates, 
                                                 egate_uptake_prop = egate_uptake_prop, 
+                                                elig_boost = elig_boost,
                                                 egate_failure_prop = egate_failure_prop, 
                                                 failed_egate_priority = failed_egate_priority, 
                                                 seed = seed),
