@@ -1,7 +1,6 @@
 library(here)
 library(targets)
 library(tidyverse)
-library(lenght)
 library(showtext)
 
 tar_source(files = c(
