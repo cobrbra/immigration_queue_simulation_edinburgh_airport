@@ -297,12 +297,13 @@ immigration_queue <- function(passengers,
 }
 
 sim_queues <- function(passengers_after_routes,
-                           bordercheck_egates,
-                           egate_uptake_prop,
-                           egate_failure_prop,
-                           failed_egate_priority,
-                           seed,
-                           progress_bar = FALSE) {
+                       bordercheck_desks,
+                       bordercheck_egates,
+                       egate_uptake_prop,
+                       egate_failure_prop,
+                       failed_egate_priority,
+                       seed,
+                       progress_bar = FALSE) {
   
   simulated_queues <- passengers_after_routes %>% 
     nest(route_data = -sched_aircraft_date_posix) %>% 
