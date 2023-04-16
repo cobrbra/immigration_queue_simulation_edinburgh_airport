@@ -27,6 +27,8 @@ tar_source(files = c(
   here("code/step_1_aircraft.R"),
   here("code/step_2_route.R"),
   here("code/step_3_immigration.R"),
+  here("code/kpis.R"),
+  here("code/analysis.R"),
   here("code/get_figures.R"),
   here("code/get_tables.R")
   )
