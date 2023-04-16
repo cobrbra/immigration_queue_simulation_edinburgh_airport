@@ -7,23 +7,11 @@ generate_sim_settings <- function(seed = 1234,
   set.seed(seed)
   gen_arrivals_seeds <- sample(1:100000, size = n_gen_arrivals)
   gen_queue_seeds <- sample(1:100000, size = n_gen_queues)
-  sim_settings <- tibble(
-    gen_arrivals_seed = rep(gen_arrivals_seeds, 
-                            each = length(n_egates_range) * n_gen_queues * length(egate_uptake_range) * length(elig_boost_range),
-                            times = 1),
-    n_egates = rep(n_egates_range, 
-                   each = n_gen_arrivals * n_gen_queues * length(egate_uptake_range), 
-                   times = length(elig_boost_range)),
-    gen_queue_seed = rep(gen_queue_seeds, 
-                         each = n_gen_arrivals * length(n_egates_range), 
-                         times =  length(egate_uptake_range) * length(elig_boost_range)),
-    egate_uptake = rep(egate_uptake_range,
-                       each = n_gen_arrivals,
-                       times = length(n_egates_range) * n_gen_queues * length(elig_boost_range)),
-    elig_boost = rep(elig_boost_range,
-                     each = 1,
-                     times = n_gen_arrivals * length(n_egates_range) * n_gen_queues * length(egate_uptake_range))
-    )
+  sim_settings <- crossing(gen_arrivals_seed = gen_arrivals_seeds, 
+                           gen_queue_seed = gen_queue_seeds, 
+                           n_egates = n_egates_range, 
+                           egate_uptake = egate_uptake_range, 
+                           elig_boost = elig_boost_range)
   return(sim_settings)
 }
 
