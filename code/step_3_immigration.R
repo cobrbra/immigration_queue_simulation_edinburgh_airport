@@ -296,7 +296,30 @@ immigration_queue <- function(passengers,
   
 }
 
-
+sim_queues <- function(passengers_after_routes,
+                           bordercheck_egates,
+                           egate_uptake_prop,
+                           egate_failure_prop,
+                           failed_egate_priority,
+                           seed,
+                           progress_bar = FALSE) {
+  
+  simulated_queues <- passengers_after_routes %>% 
+    nest(route_data = -sched_aircraft_date_posix) %>% 
+    mutate(year = format(sched_aircraft_date_posix, "%Y")) %>% 
+    mutate(queue_data = map(route_data, 
+                            ~ immigration_queue(., bordercheck_desks = bordercheck_desks, 
+                                                bordercheck_egates = bordercheck_egates, 
+                                                egate_uptake_prop = egate_uptake_prop, 
+                                                egate_failure_prop = egate_failure_prop, 
+                                                failed_egate_priority = failed_egate_priority, 
+                                                seed = seed),
+                            .progress = ifelse(progress_bar, "simulating queues", FALSE))) %>% 
+    select(-route_data) %>% 
+    unnest(queue_data)
+  
+  return(simulated_queues)
+}
 
 
 get_passengers_after_immigration <- function(passengers_after_route) {
