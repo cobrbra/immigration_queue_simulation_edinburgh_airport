@@ -168,7 +168,9 @@ list(
                                coached_levels = future_coached_levels, 
                                coach_dist = coach_dist,
                                walk_dist = walk_dist,
-                               base_walk_dist = base_walk_dist)),
+                               base_walk_dist = base_walk_dist,
+                               egate_failure_prop = egate_failure_prop,
+                               failed_egate_priority = failed_egate_priority)),
   
   # Trackable report outputs
   tar_target(figures,

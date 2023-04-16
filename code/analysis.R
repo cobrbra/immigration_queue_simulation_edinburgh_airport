@@ -38,7 +38,9 @@ sim_analysis_data <- function(sim_settings,
                               coached_levels,
                               coach_dist,
                               walk_dist,
-                              base_walk_dist) {
+                              base_walk_dist,
+                              egate_failure_prop,
+                              failed_egate_priority) {
   # generate desks
   n_desks <- 9
   desk_means <- pmax(0, rep(90, n_desks))#rnorm(n_desks, mean = 90, sd = 5))
@@ -55,12 +57,12 @@ sim_analysis_data <- function(sim_settings,
   progress_counter <- 0
   for (arrivals_id in seq_len(nrow(sim_settings))) {
     arrivals_seed <- sim_settings$gen_arrivals_seed[[arrivals_id]]
-    simulated_passengers <- (future_aircrafts_arrivals) %>% 
+    simulated_passengers <- (aircrafts_arrivals) %>% 
       complete_aircrafts_arrivals(
         (hubs), (countries), (prop_nationality),
         delay_dist = (delay_dist), 
         n_passengers_quantiles = (n_passengers_quantiles),
-        coached_levels = (future_coached_levels),
+        coached_levels = (coached_levels),
         seed = arrivals_seed) %>% 
       get_passengers_after_aircrafts(seed = arrivals_seed) %>% 
       get_passengers_after_routes(coach_dist = (coach_dist), 
