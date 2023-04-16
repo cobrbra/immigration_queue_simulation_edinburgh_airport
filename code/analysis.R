@@ -100,7 +100,8 @@ sim_analysis_data <- function(sim_settings,
       
       non_arrivals_id <- non_arrivals_id + 1
       progress_counter <- progress_counter + 1
-      progress_prop <- progress_counter / nrow(sim_settings$non_arrivals_data[[arrivals_id]])
+      progress_prop <- progress_counter / 
+        (nrow(sim_settings$non_arrivals_data[[arrivals_id]])*nrow(sim_settings))
       message(paste0(round(progress_prop*100), "%"))
     }
   }
