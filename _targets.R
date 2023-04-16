@@ -51,7 +51,7 @@ list(
   tar_target(aircrafts,
              process_aircrafts(aircrafts_raw)),
   
-  # Making the historical aircraft arrivals dataset accessible
+  # Making the observed aircraft arrivals dataset accessible
   tar_target(observed_aircrafts_arrivals_raw,
          here("raw_data/observed_aircrafts_arrivals/"),
          format = "file"),
@@ -84,7 +84,7 @@ list(
                         prob_coached = .15)),
   
   
-  # Simulating passengers from simulated arrivals
+  # Example workflow for small arrivals datasets
   tar_target(example_coached_levels,
              data.frame(year = "1970",
                         prob_coached = .15)),
@@ -104,6 +104,7 @@ list(
                                          base_walk_dist,
                                          seed = 1)),
   
+  # Competitions=specified distributional assumptions
   tar_target(delay_dist,
              list(prop_delayed = .21,
                   prop_on_time = .58,
@@ -122,7 +123,7 @@ list(
              list(min = 3*60,
                   max = 12*60)),
   
-  # For passenger count and nationality
+  # Parameter choices: nationality, countries and airports
   tar_target(EU_plus_hubs_raw, here("params/nationality_info/EU_plus_hubs.txt"), format = "file"),
   tar_target(other_hubs_raw, here("params/nationality_info/other_hubs.txt"), format = "file"),
 
@@ -147,11 +148,29 @@ list(
   tar_target(prop_nationality,
              read_delim(prop_nationality_raw, delim = ";")),
   
+  # Parameter choices: miscellaneous
   tar_target(load_factor, list(mean = .95, sd = .1)),
 
   tar_target(egate_failure_prop, .05),
   tar_target(failed_egate_priority, .75),
   
+  # Generation of shiny data
+  tar_target(shiny_sim_settings,
+             generate_sim_settings()),
+  tar_target(shiny_sim_data,
+             sim_analysis_data(sim_settings = shiny_sim_settings,
+                               aircrafts_arrivals = future_aircrafts_arrivals,
+                               hubs = hubs,
+                               countries = countries,
+                               prop_nationality = prop_nationality,
+                               delay_dist = delay_dist,
+                               n_passengers_quantiles = n_passengers_quantiles, 
+                               coached_levels = future_coached_levels, 
+                               coach_dist = coach_dist,
+                               walk_dist = walk_dist,
+                               base_walk_dist = base_walk_dist)),
+  
+  # Trackable report outputs
   tar_target(figures,
              get_figures(future_aircrafts_arrivals = future_aircrafts_arrivals,
                          future_coached_levels = future_coached_levels,
