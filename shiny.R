@@ -22,7 +22,7 @@ ui <- fluidPage(
         min = 0.0,
         max = 1,
         value = 0.0,
-        step = .1
+        step = .5
       ),
       sliderInput(
         inputId = "egate_uptake",
