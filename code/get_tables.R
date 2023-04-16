@@ -13,7 +13,7 @@ get_tables <- function(future_aircrafts_arrivals,
     group_by(Year) %>% 
     nest() %>% 
     mutate(
-      `Number of Flights` = map_dbl(data, nrow),
+      `Number of Flights` = map_int(data, nrow),
       `Start Date` = map_chr(data, ~ format(min(.$sched_aircraft_date_posix),
                                             format = "%d/%m")),
       `End Date` = map_chr(data, ~ format(max(.$sched_aircraft_date_posix),
@@ -26,7 +26,7 @@ get_tables <- function(future_aircrafts_arrivals,
     group_by(Year) %>% 
     nest() %>% 
     mutate(
-      `Number of Flights` = format(map_dbl(data, nrow),
+      `Number of Flights` = format(map_int(data, nrow),
                                    big.mark = ","),
       `Start Date` = map_chr(data, ~ format(min(.$sched_aircraft_date_posix),
                                             format = "%d/%m")),
