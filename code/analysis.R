@@ -3,7 +3,7 @@ generate_sim_settings <- function(seed = 1234,
                                   n_gen_queues = 1,
                                   n_egates_range = seq(10, 14, by = 2),
                                   egate_uptake_range = seq(.6, 1., by = .2),
-                                  elig_boost_range = seq(0., 0., 1.)) {
+                                  elig_boost_range = seq(0., 1., .5)) {
   set.seed(seed)
   gen_arrivals_seeds <- sample(1:100000, size = n_gen_arrivals)
   gen_queue_seeds <- sample(1:100000, size = n_gen_queues)
