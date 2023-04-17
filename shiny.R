@@ -120,7 +120,7 @@ server <- function(input, output) {
         labs(x = "Date and time",
              y = "Queue length") + 
         scale_colour_manual(labels = c("Desk", "eGate"), 
-                            values = edi_airport_colours[1:2],
+                            values = edi_airport_colours[2:1],
                             drop = FALSE)
 
   })
@@ -141,7 +141,7 @@ server <- function(input, output) {
         labs(x = "Date and time",
              y = "Wait time (mins)") + 
         scale_colour_manual(labels = c("Desk", "eGate"), 
-                            values = edi_airport_colours[1:2],
+                            values = edi_airport_colours[2:1],
                             drop = FALSE)
   })
   
@@ -159,7 +159,7 @@ server <- function(input, output) {
         theme_minimal() + 
         labs(x = "Year", y = input$select_kpi) + 
         scale_fill_manual(labels = c("Desk", "eGate"), 
-                          values = edi_airport_colours[1:2],
+                          values = edi_airport_colours[2:1],
                           drop = FALSE)
       
   })
