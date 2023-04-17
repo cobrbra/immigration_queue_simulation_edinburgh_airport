@@ -4,8 +4,9 @@ library("ggplot2")
 library("here")
 library("stringr")
 library("lubridate")
-library(tidyverse)
-library(scales)
+library("tidyverse")
+library("scales")
+library("targets")
 
 
 ###########################
