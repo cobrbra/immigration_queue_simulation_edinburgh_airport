@@ -47,17 +47,17 @@ sim_analysis_data <- function(sim_settings,
   progress_counter <- 0
   for (arrivals_id in seq_len(nrow(sim_settings))) {
     arrivals_seed <- sim_settings$gen_arrivals_seed[[arrivals_id]]
-    simulated_passengers <- (aircrafts_arrivals) %>% 
+    simulated_passengers <- aircrafts_arrivals %>% 
       complete_aircrafts_arrivals(
-        (hubs), (countries), (prop_nationality),
-        delay_dist = (delay_dist), 
-        n_passengers_quantiles = (n_passengers_quantiles),
-        coached_levels = (coached_levels),
+        hubs, countries, prop_nationality,
+        delay_dist = delay_dist, 
+        n_passengers_quantiles = n_passengers_quantiles,
+        coached_levels = coached_levels,
         seed = arrivals_seed) %>% 
       get_passengers_after_aircrafts(seed = arrivals_seed) %>% 
-      get_passengers_after_routes(coach_dist = (coach_dist), 
-                                  walk_dist = (walk_dist),
-                                  base_walk_dist = (base_walk_dist),
+      get_passengers_after_routes(coach_dist = coach_dist, 
+                                  walk_dist = walk_dist,
+                                  base_walk_dist = base_walk_dist,
                                   seed = arrivals_seed)
     
     non_arrivals_id <- 1 
@@ -78,8 +78,8 @@ sim_analysis_data <- function(sim_settings,
                    bordercheck_egates = bordercheck_egates,
                    egate_uptake_prop = egate_uptake,
                    elig_boost = elig_boost,
-                   egate_failure_prop = (egate_failure_prop),
-                   failed_egate_priority = (failed_egate_priority),
+                   egate_failure_prop = egate_failure_prop,
+                   failed_egate_priority = failed_egate_priority,
                    seed = queue_seed)
       
       simulated_queue_lengths <- simulated_queue %>% 
