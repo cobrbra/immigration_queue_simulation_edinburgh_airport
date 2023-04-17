@@ -52,7 +52,7 @@ get_tables <- function(future_aircrafts_arrivals,
                   caption = captions[[table_name]])
     align(xtab) <- rep("c", ncol(tables[[table_index]]) + 1)
     print(xtab, 
-          file = paste0(here("tables/"), table_name, ".tex"),
+          file = here(paste0("tables/", table_name, ".tex")),
           include.rownames = FALSE,
           sanitize.colnames.function = bold)
   }

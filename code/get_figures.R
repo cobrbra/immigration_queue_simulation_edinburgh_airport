@@ -85,7 +85,7 @@ get_figures <- function(future_aircrafts_arrivals, future_coached_levels, filter
     if (is.null(figure_sizes[[figure_name]])) {
       figure_sizes[[figure_name]] <- c(7,7)
     }
-    ggsave(paste0(here("figures/"), figure_name, ".png"), 
+    ggsave(here(paste0("figures/", figure_name, ".png")), 
            figures[[figure_name]],
            width = figure_sizes[[figure_name]][1],
            height = figure_sizes[[figure_name]][2])
