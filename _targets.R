@@ -151,7 +151,7 @@ list(
   # Parameter choices: miscellaneous
   tar_target(load_factor, list(mean = .95, sd = .1)),
 
-  tar_target(egate_failure_prop, .05),
+  tar_target(egate_failure_prop, .09),
   tar_target(failed_egate_priority, .75),
   
   # Generation of shiny data
