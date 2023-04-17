@@ -1,6 +1,6 @@
 Arriving_from;UKIE;EU_plus;other_easy;other_hard
 UKIE;0.25;0.25;0.25;0.25
-EU_plus_hub;0.2;0.4;0.3;0.1
-EU_plus_nonhub;0.3;0.5;0.15;0.05
+EU_plus_hub;0.3;0.45;0.15;0.1
+EU_plus_nonhub;0.3;0.6;0.05;0.05
 other_hub;0.3;0.3;0.3;0.1
-other_nonhub;0.3;0.3;0.3;0.1
+other_nonhub;0.3;0.2;0.4;0.1

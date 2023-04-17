@@ -38,8 +38,9 @@ vignettes/*.pdf
 # R Environment Variables
 .Renviron
 
-# Raw Data
+# Data
 raw_data
+shiny_data
 
 # targets metadata
 _targets/meta/meta
