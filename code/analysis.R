@@ -29,13 +29,13 @@ sim_analysis_data <- function(sim_settings,
                               base_walk_dist,
                               egate_failure_prop,
                               failed_egate_priority,
-                              queue_sample_size = 2000) {
+                              queue_sample_size = 2500) {
   # generate desks
   n_desks <- 9
   desk_means <- pmax(0, rep(90, n_desks))#rnorm(n_desks, mean = 90, sd = 5))
   desk_ids <- seq_len(n_desks)
   bordercheck_desks <- list(n_borderchecks = n_desks, 
-                            bordercheck_means = desk_means,
+                            bordercheck_means = desk_means,   
                             bordercheck_sd = 14,
                             bordercheck_ids = desk_ids)
   
