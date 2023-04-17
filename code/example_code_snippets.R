@@ -56,6 +56,8 @@ simulated_queue %>%
   ylim(0, NA) + 
   facet_wrap(~year, nrow = 1, scales = "free_x")
 
+
+#### EXAMPLE MULTIPLE DATASETS
 sim_settings <- generate_sim_settings()
 sim_results <- sim_analysis_data(sim_settings,
                                  tar_read(future_aircrafts_arrivals), 
@@ -76,33 +78,3 @@ sim_results$queue_length_data[[1]] %>%
   geom_point() + 
   facet_wrap(~year, scales = "free_x", nrow = 1) +
   theme_minimal()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

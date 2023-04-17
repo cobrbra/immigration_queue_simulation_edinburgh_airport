@@ -1,21 +1,27 @@
-check_passengers_after_aircraft <- function(passengers_after_aircraft) {
+necessary_passengers_arrivals_columns <- c(
+  "passenger_id",
+  "flight_id",
+  "nationality",
+  "airport_classification",
+  "coached",
+  "aircraft_datetime_int",
+  "aircraft_time_int",
+  "aircraft_datetime_posix",
+  "aircraft_date_posix",
+  "sched_aircraft_date_posix"
+)
+
+check_passengers_after_aircrafts <- function(passengers_after_aircraft) {
   if (!is.data.frame(passengers_after_aircraft)) {
     stop("Passengers from aircraft should be dataframe.")
   }
-  necessary_columns <- c(
-    "passenger_id",
-    "flight_id",
-    "nationality",
-    "airport_classification",
-    "coached",
-    "aircraft_datetime_int",
-    "aircraft_time_int",
-    "aircraft_datetime_posix",
-    "aircraft_date_posix"
-)
-  if (any(!(necessary_columns %in% colnames(passengers_after_aircraft)))) {
+  
+  necessary_columns_missing <- !(necessary_passengers_arrivals_columns %in% 
+                                   colnames(passengers_after_aircraft))
+  if (any(necessary_columns_missing)) {
     stop(
-      paste(c("Passengers from aircraft should contain columns", necessary_columns), 
+      paste(c("Passengers from aircraft should contain columns",
+              necessary_passengers_arrivals_columns[necessary_columns_missing]), 
             collapse = " "))
   }
   
@@ -24,74 +30,100 @@ check_passengers_after_aircraft <- function(passengers_after_aircraft) {
   }
 }
 
+get_airport_classification <- function(airport_country, 
+                                       airport_3letter, 
+                                       hubs,
+                                       countries){
+  
+  airport_classification <- case_when(
+    airport_country %in% countries$UKIE ~ "UKIE",
+    airport_3letter %in% hubs$EU_plus ~ "EU_plus_hub",
+    airport_country %in% countries$EU_plus ~ "EU_plus_nonhub",
+    airport_3letter %in% hubs$other ~ "other_hub",
+    TRUE ~ "other_nonhub")
+  
+  return(airport_classification)
+}
 
-get_n_passengers <- function(max_passengers, load_factor_mean, 
-                             load_factor_sd, seed = NULL){
+sim_airport_classification <- function(n_passengers, quantile_list, seed = NULL){
   
   if (!is.null(seed)) {set.seed(seed)}
   
-  load_factor <- rnorm(n = length(max_passengers),
-                       mean = load_factor_mean, sd = load_factor_sd) 
-  load_factor <- pmin(load_factor, 1)
-  load_factor <- pmax(load_factor, 0)
+  n_aircrafts <- length(n_passengers)
+  quantiles <- quantile_list$quantiles
+  table_for_sampling <- quantile_list$table
   
-  n_passengers <- round(max_passengers * load_factor)
+  ap_classifications <- rownames(table_for_sampling)
+  
+  airport_classification <- numeric(n_aircrafts)
+  
+  selected_quantiles <- map(n_passengers, ~ sum(. > quantiles) + 1)
+  airport_classification <- map_chr(selected_quantiles, 
+                                ~sample(x = ap_classifications, 
+                                        size = 1, 
+                                        prob = table_for_sampling[, .]))
+  
+  return(airport_classification)
+  
+}
+
+sim_coached_status <- function(aircrafts_arrivals, coached_levels, seed = NULL) {
+  if (!is.null(seed)) {set.seed(seed)}
+  aircrafts_arrivals <- aircrafts_arrivals %>% 
+    mutate(year = format(sched_aircraft_datetime_posix, "%Y")) %>% 
+    group_by(year) %>% 
+    nest() %>% 
+    inner_join(coached_levels, by = "year") %>% 
+    unnest(data) %>% 
+    ungroup() %>% 
+    mutate(coached = as.logical(rbinom(nrow(.), 1, prob = prob_coached))) %>% 
+    select(-c(year, prob_coached))
+  
+  return(aircrafts_arrivals)
+}
+
+sim_delay_times <- function(flight_id, 
+                            delay_dist,
+                            seed = NULL) {
+  if (!is.null(seed)) {set.seed(seed)}
+  n_flights <- length(flight_id)
+  simulated_delay_status <- sample(c("delayed", "on-time", "early"), 
+                                   size = n_flights,
+                                   prob = c(delay_dist$prop_delayed,
+                                            delay_dist$prop_on_time,
+                                            delay_dist$prop_early),
+                                   replace = TRUE)
+  simulated_delay <- case_when(
+    simulated_delay_status == "early" ~ - delay_dist$on_time_window/2 - 
+      rexp(n = n_flights, rate = 1/(delay_dist$mean_early_time - delay_dist$on_time_window/2)),
+    simulated_delay_status == "on-time" ~ 
+      runif(n = n_flights, - delay_dist$on_time_window/2, delay_dist$on_time_window/2),
+    simulated_delay_status == "delayed" ~ delay_dist$on_time_window/2 + 
+      rexp(n = n_flights, rate = 1/(delay_dist$mean_delay_time - delay_dist$on_time_window/2))
+  ) 
+  return(simulated_delay)
+}
+
+sim_n_passengers <- function(max_passengers, load_factor, seed = NULL){
+  
+  if (!is.null(seed)) {set.seed(seed)}
+  
+  load_factors <- rnorm(n = length(max_passengers),
+                       mean = load_factor$mean, sd = load_factor$sd) 
+  load_factors <- pmin(load_factors, 1)
+  load_factors <- pmax(load_factors, 0)
+  
+  n_passengers <- round(max_passengers * load_factors)
   
   return(n_passengers)
 }
 
-
-get_airport_classification <- function(airport_country, 
-                                       airport_3letter, 
-                                       EU_plus_hubs, 
-                                       other_hubs, 
-                                       UK_plus_countries,
-                                       EU_plus_countries){
-  
-    airport_classification <- case_when(
-      airport_country %in% UK_plus_countries ~ "UK_plus",
-      airport_3letter %in% EU_plus_hubs ~ "EU_plus_hub",
-      airport_country %in% EU_plus_countries ~ "EU_plus_nonhub",
-      airport_3letter %in% other_hubs ~ "other_hub",
-      TRUE ~ "other_nonhub")
-
-  return(airport_classification)
-}
-
-get_coached_status <- function(flight_id, prob_coached = .15, seed = NULL) {
-  if (!is.null(seed)) {set.seed(seed)}
-  coached <- as.logical(rbinom(length(flight_id), 1, prob = prob_coached))
-  return(coached)
-}
-
-# TODO: function for walk time baseline
-
-get_nationality_split <- function(aircrafts, EU_plus_hubs, other_hubs, prop_nationality, 
-                                  UK_plus_countries, EU_plus_countries,
-                                  seed = NULL){
+sim_nationality_split <- function(aircrafts_arrivals, hubs, prop_nationality, 
+                                  countries, seed = NULL){
   
   if (!is.null(seed)) {set.seed(seed)}
   
-  if(!all(dim(prop_nationality) == c(5, 5))){stop("Prop Nationality needs to be 5x5.")}
-  
-  n_aircrafts <- dim(aircrafts)[1]
-  
-  if (!("airport_classification" %in% colnames(aircrafts)) | 
-      (("airport_classification" %in% colnames(aircrafts)) & 
-       any(is.na(aircrafts[["airport_classification"]])))) {
-    aircrafts_with_airport_class <- aircrafts %>% 
-      mutate(airport_classification = get_airport_classification(
-        airport_country = dep_country,
-        airport_3letter = dep_airport,
-        EU_plus_hubs = EU_plus_hubs, 
-        other_hubs = other_hubs, 
-        UK_plus_countries = UK_plus_countries, 
-        EU_plus_countries = EU_plus_countries
-      ))
-  }
-  else{
-    aircrafts_with_airport_class <- aircrafts
-  }
+  if(!all(dim(prop_nationality) == c(5, 5))){stop("prop_nationality needs to be 5x5.")}
   
   sim_passengers <- function(n_passenegers, airport_classification) {
     sample(x = colnames(prop_nationality)[-1],
@@ -101,90 +133,124 @@ get_nationality_split <- function(aircrafts, EU_plus_hubs, other_hubs, prop_nati
     )
   }
   
-  aircrafts_with_simmed_nationality <- aircrafts_with_airport_class %>% 
+  aircrafts_with_simmed_nationality <- aircrafts_arrivals %>% 
     mutate(simmed_passengers = map2(.x = n_passengers, 
                                     .y = airport_classification,
                                     .f = ~ sim_passengers(.x, .y))) %>% 
-    mutate(n_nat_UK_plus = unlist(map(simmed_passengers, ~ sum(. == "UK_plus"))),
-           n_nat_EU_plus = unlist(map(simmed_passengers, ~ sum(. == "EU_plus"))),
-           n_nat_other_easy = unlist(map(simmed_passengers, ~ sum(. == "other_easy"))),
-           n_nat_other_hard = unlist(map(simmed_passengers, ~ sum(. == "other_hard")))) %>% 
+    mutate(n_nat_UKIE = map_dbl(simmed_passengers, ~ sum(. == "UKIE")),
+           n_nat_EU_plus = map_dbl(simmed_passengers, ~ sum(. == "EU_plus")),
+           n_nat_other_easy = map_dbl(simmed_passengers, ~ sum(. == "other_easy")),
+           n_nat_other_hard = map_dbl(simmed_passengers, ~ sum(. == "other_hard"))) %>% 
     select(-simmed_passengers)
   
   return(aircrafts_with_simmed_nationality)
 }
 
-simulate_delay_times <- function(flight_id, 
-                                 prop_flights_delayed, 
-                                 prop_flights_on_time, 
-                                 prop_flights_early,
-                                 mean_delay_time,
-                                 mean_early_time,
-                                 on_time_window = 30*60, 
-                                 seed = NULL) {
+complete_aircrafts_arrivals <- function(aircrafts_arrivals, 
+                                        hubs,
+                                        countries,
+                                        prop_nationality,
+                                        delay_dist = NULL,
+                                        n_passengers_quantiles = NULL,
+                                        load_factor = NULL,
+                                        coached_levels = NULL,
+                                        seed = NULL) {
   if (!is.null(seed)) {set.seed(seed)}
-  n_flights <- length(flight_id)
-  simulated_delay_status <- sample(c("delayed", "on-time", "early"), 
-                                   size = n_flights,
-                                   prob = c(prop_flights_delayed,
-                                            prop_flights_on_time,
-                                            prop_flights_early),
-                                   replace = TRUE)
-  simulated_delay <- case_when(
-    simulated_delay_status == "early" ~ - on_time_window/2 - rexp(n = n_flights, rate = 1/(mean_early_time - on_time_window/2)),
-    simulated_delay_status == "on-time" ~ runif(n = n_flights, -on_time_window/2, on_time_window/2),
-    simulated_delay_status == "delayed" ~ on_time_window/2 + rexp(n = n_flights, rate = 1/(mean_delay_time-on_time_window/2))
-  ) 
-  return(simulated_delay)
+  completed_aircrafts_arrivals <- aircrafts_arrivals
+  
+  # Simulate aircraft delays
+  if (all(is.na(completed_aircrafts_arrivals$aircraft_datetime_int))) {
+    if (is.null(delay_dist)) stop("must supply delay_dist to complete_aircrafts_arrivals")
+    completed_aircrafts_arrivals <- completed_aircrafts_arrivals %>% 
+      mutate(aircraft_datetime_int =
+               sched_aircraft_datetime_int + sim_delay_times(flight_id, delay_dist)
+      )
+  }
+  
+  # Get full datetime columns
+  completed_aircrafts_arrivals <- get_datetime_alternates(
+    completed_aircrafts_arrivals,
+    column_prefixes = c("sched_aircraft", "aircraft")
+  )
+  
+  # Get or simulate airport classification
+  if (all(is.na(completed_aircrafts_arrivals$airport_classification))) {
+    if (all(!is.na(completed_aircrafts_arrivals$dep_country)) &
+        all(!is.na(completed_aircrafts_arrivals$dep_airport))) {
+      completed_aircrafts_arrivals <- completed_aircrafts_arrivals %>% 
+        mutate(airport_classification = get_airport_classification(
+          airport_country = dep_country,
+          airport_3letter = dep_airport,
+          hubs = hubs,
+          countries = countries
+        ))
+    } 
+    else if (all(!is.na(completed_aircrafts_arrivals$n_passengers))) {
+      if (is.null(n_passengers_quantiles)) stop("must supply n_passengers_quantiles to complete_aircrafts_arrivals")
+      completed_aircrafts_arrivals <- completed_aircrafts_arrivals %>% 
+        mutate(airport_classification = sim_airport_classification(
+          n_passengers,
+          n_passengers_quantiles
+        ))
+    }
+    else {
+      stop("Aircraft arrivals must either have complete n_passengers or dep_country/dep_airport.")
+    }
+  }
+  
+  # Simulate number of passengers
+  if (all(is.na(completed_aircrafts_arrivals$n_passengers))) {
+    if (is.null(load_factor)) stop("must supply load_factor to complete_aircrafts_arrivals")
+    completed_aircrafts_arrivals <- completed_aircrafts_arrivals %>% 
+      mutate(n_passengers = sim_n_passengers(max_passengers, load_factor))
+  }
+  
+  # Simulate coached status
+  if(all(is.na(completed_aircrafts_arrivals$coached))) {
+    if (is.null(coached_levels)) stop("must supply coached_levels to complete_aircraft_arrivals")
+    completed_aircrafts_arrivals <- completed_aircrafts_arrivals %>% 
+      sim_coached_status(coached_levels = coached_levels)
+  }
+  
+  # Simulate nationality breakdown
+  completed_aircrafts_arrivals <- completed_aircrafts_arrivals %>% 
+    sim_nationality_split(hubs = hubs, 
+                          prop_nationality = prop_nationality, 
+                          countries = countries)
+  
+  
+  check_aircrafts_arrivals(completed_aircrafts_arrivals, complete = TRUE)
+  return(completed_aircrafts_arrivals)
 }
 
-
-get_passengers_after_aircrafts <- function(aircrafts, 
-                                          EU_plus_hubs,
-                                          other_hubs,
-                                          prop_nationality,
-                                          UK_plus_countries,
-                                          EU_plus_countries,
-                                          load_factor_mean,
-                                          load_factor_sd,
-                                          seed = NULL){
+get_passengers_after_aircrafts <- function(aircrafts_arrivals, seed = NULL){
   
   if (!is.null(seed)) {set.seed(seed)}
   
-  aircrafts_with_passengers <- aircrafts %>% 
-    mutate(n_passengers = if_else(is.na(n_passengers),
-                                  get_n_passengers(max_passengers, load_factor_mean, load_factor_sd),
-                                  n_passengers)) %>% 
-    mutate(coached = if_else(is.na(coached), get_coached_status(flight_id), coached)) %>% 
-    get_nationality_split(EU_plus_hubs = EU_plus_hubs,
-                          other_hubs = other_hubs, 
-                          prop_nationality = prop_nationality, 
-                          UK_plus_countries = UK_plus_countries, 
-                          EU_plus_countries = EU_plus_countries)
-  
-  n_passengers_aircraft <- aircrafts_with_passengers$n_passengers
-  n_passengers <- sum(n_passengers_aircraft)
+  n_passengers_total <- sum(aircrafts_arrivals$n_passengers)
 
   passengers <- data.frame(
-    
-    passenger_id = paste0("P", str_pad(seq_len(n_passengers), 10, pad = "0"),
-                          recycle0 = TRUE),
-    flight_id = rep(aircrafts_with_passengers$flight_id, n_passengers_aircraft),
-    nationality = aircrafts_with_passengers %>% 
-      select(n_nat_UK_plus, n_nat_EU_plus, n_nat_other_easy, n_nat_other_hard) %>% 
-      pivot_longer(cols = everything(), names_to = "nat", values_to = "n_nat") %>% 
-      {rep(.$nat, .$n_nat)} %>% 
-      str_sub(3,-1),
-    airport_classification = rep(aircrafts_with_passengers$airport_classification, n_passengers_aircraft),
-    aircraft_datetime_int = rep(aircrafts_with_passengers$aircraft_datetime_int, n_passengers_aircraft),
-    aircraft_datetime_posix = rep(aircrafts_with_passengers$aircraft_datetime_posix, n_passengers_aircraft),
-    aircraft_time_int = rep(aircrafts_with_passengers$aircraft_time_int, n_passengers_aircraft),
-    aircraft_date_posix = rep(aircrafts_with_passengers$aircraft_date_posix, n_passengers_aircraft),
-    coached = rep(aircrafts_with_passengers$coached, n_passengers_aircraft)
+    passenger_id = seq_len(n_passengers_total),
+    flight_id = rep(aircrafts_arrivals$flight_id, aircrafts_arrivals$n_passengers),
+    airport_classification = rep(aircrafts_arrivals$airport_classification, aircrafts_arrivals$n_passengers),
+    aircraft_datetime_int = rep(aircrafts_arrivals$aircraft_datetime_int, aircrafts_arrivals$n_passengers),
+    aircraft_datetime_posix = rep(aircrafts_arrivals$aircraft_datetime_posix, aircrafts_arrivals$n_passengers),
+    aircraft_time_int = rep(aircrafts_arrivals$aircraft_time_int, aircrafts_arrivals$n_passengers),
+    aircraft_date_posix = rep(aircrafts_arrivals$aircraft_date_posix, aircrafts_arrivals$n_passengers),
+    coached = rep(aircrafts_arrivals$coached, aircrafts_arrivals$n_passengers),
+    sched_aircraft_date_posix = rep(aircrafts_arrivals$sched_aircraft_date_posix, aircrafts_arrivals$n_passengers)
   ) %>% 
-    sample_frac(1)
+    mutate(nationality = aircrafts_arrivals %>% 
+             select(n_nat_UKIE, n_nat_EU_plus, n_nat_other_easy, n_nat_other_hard) %>% 
+             pivot_longer(cols = everything(), names_to = "nat", values_to = "n_nat") %>% 
+             {rep(.$nat, .$n_nat)} %>% 
+             str_sub(3,-1)) %>% 
+    slice_sample(prop = 1)
   
-  check_passengers_after_aircraft(passengers)
+  check_passengers_after_aircrafts(passengers)
   return(passengers)
 }
+
+
+
 
