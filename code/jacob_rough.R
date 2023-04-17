@@ -42,7 +42,7 @@ simulated_arrivals <- tar_read(future_aircrafts_arrivals) %>%
 simulated_queue <- simulated_arrivals %>% 
   sim_queues(bordercheck_desks = bordercheck_desks, 
              bordercheck_egates = bordercheck_egates, 
-             egate_uptake_prop = .9, elig_boost = 0.95, 
+             egate_uptake_prop = .7, elig_boost = 0, 
              egate_failure_prop = tar_read(egate_failure_prop), 
              failed_egate_priority = tar_read(failed_egate_priority),
              seed = 1)
