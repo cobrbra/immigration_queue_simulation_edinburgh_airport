@@ -1,62 +1,89 @@
 ### QUEUE LENGTH ###
 
-
-get_queue_length_at_time_point <- function(time_point, passengers) {
-  not_yet_done <- passengers$bordercheck_start_time > time_point
-  not_yet_started <- passengers$route_datetime_int < time_point
-  return(sum(not_yet_done & not_yet_started))
-}
-
-get_queue_lengths_for_year <- function(queue_times_for_year,
-                                       queue_data_for_year,
-                                       egate_or_desk = "egate",
-                                       input_time_interval = 15*50) {
-  queue_lengths = map_int(queue_times_for_year$queue_length_datetime_int,
-          ~ get_queue_length_at_time_point(., filter(queue_data_for_year,
-                                                     egate_used == egate_or_desk)))
+get_queue_lengths <- function(passengers,
+                                  input_time_interval = 15*60) {
+  passengers <- passengers %>%
+    mutate(egate_used = factor(egate_used, levels = c("desk", "egate")),
+           rounded_bordercheck_start_time = input_time_interval * (
+             round(bordercheck_start_time / input_time_interval)),
+           rounded_route_datetime_int = input_time_interval * (
+             round(route_datetime_int / input_time_interval))) %>% 
+    select(egate_used, rounded_route_datetime_int, rounded_bordercheck_start_time)
+  
+  queue_lengths <- full_join(count(passengers, egate_used, rounded_route_datetime_int),
+                             count(passengers, egate_used, rounded_bordercheck_start_time),
+                             by = c("rounded_route_datetime_int" = "rounded_bordercheck_start_time", "egate_used"),
+                             suffix = c("_route", "_border")) %>% 
+    mutate_if(is.numeric, coalesce, 0) %>% 
+    arrange(rounded_route_datetime_int) %>% 
+    pivot_wider(names_from = egate_used, values_from = c(n_border, n_route), values_fill = 0, names_expand = TRUE) %>% 
+    mutate(desk_queue_length = cumsum(n_route_desk - n_border_desk),
+           egate_queue_length = cumsum(n_route_egate - n_border_egate)) %>% 
+    select(queue_length_datetime_int = rounded_route_datetime_int, desk_queue_length, egate_queue_length) %>% 
+    get_datetime_alternates(c("queue_length")) %>% 
+    mutate(year = format(queue_length_date_posix, "%Y"))
+  
   return(queue_lengths)
+  
 }
 
-get_queue_lengths <- function(passengers, 
-                              input_time_interval = 15*60, 
-                              progress_bar = FALSE){
-  queue_lengths <- data.frame(
-    queue_length_datetime_int = input_time_interval * unique(
-      round(passengers$route_datetime_int/input_time_interval)
-    )
-  ) %>%
-    get_datetime_alternates("queue_length") %>%
-    mutate(year = format(queue_length_date_posix, format = "%Y")) %>% 
-    nest(year_data = - year)
-  
-  passengers <- passengers %>% 
-    mutate(year = format(sched_aircraft_date_posix, format = "%Y")) %>% 
-    nest(year_data = -year)
-  
-  queue_lengths$desk_queue_length <- map2(
-    queue_lengths$year_data,
-    passengers$year_data,
-    ~get_queue_lengths_for_year(
-      queue_times_for_year = .x, 
-      queue_data_for_year = .y,
-      egate_or_desk = "desk",
-      input_time_interval = input_time_interval),
-    .progress = "getting desk queue lengths"
-  )
-  
-  queue_lengths$egate_queue_length <- map2(
-    queue_lengths$year_data,
-    passengers$year_data,
-    ~get_queue_lengths_for_year(
-      queue_times_for_year = .x, 
-      queue_data_for_year = .y,
-      egate_or_desk = "egate",
-      input_time_interval = input_time_interval),
-    .progress = "getting egate queue lengths"
-  )
 
-  return(queue_lengths %>% unnest(c(year_data, desk_queue_length, egate_queue_length)))
-}
+# get_queue_length_at_time_point <- function(time_point, passengers) {
+#   not_yet_done <- passengers$bordercheck_start_time > time_point
+#   not_yet_started <- passengers$route_datetime_int < time_point
+#   return(sum(not_yet_done & not_yet_started))
+# }
+# 
+# get_queue_lengths_for_year <- function(queue_times_for_year,
+#                                        queue_data_for_year,
+#                                        egate_or_desk = "egate",
+#                                        input_time_interval = 15*50) {
+#   queue_lengths = map_int(queue_times_for_year$queue_length_datetime_int,
+#                           ~ get_queue_length_at_time_point(., filter(queue_data_for_year,
+#                                                                      egate_used == egate_or_desk)))
+#   return(queue_lengths)
+# }
+
+# get_queue_lengths <- function(passengers, 
+#                               input_time_interval = 15*60, 
+#                               progress_bar = FALSE){
+#   queue_lengths <- data.frame(
+#     queue_length_datetime_int = input_time_interval * unique(
+#       round(passengers$route_datetime_int/input_time_interval)
+#     )
+#   ) %>%
+#     get_datetime_alternates("queue_length") %>%
+#     mutate(year = format(queue_length_date_posix, format = "%Y")) %>% 
+#     nest(year_data = - year)
+#   
+#   passengers <- passengers %>% 
+#     mutate(year = format(sched_aircraft_date_posix, format = "%Y")) %>% 
+#     nest(year_data = -year)
+#   
+#   queue_lengths$desk_queue_length <- map2(
+#     queue_lengths$year_data,
+#     passengers$year_data,
+#     ~get_queue_lengths_for_year(
+#       queue_times_for_year = .x, 
+#       queue_data_for_year = .y,
+#       egate_or_desk = "desk",
+#       input_time_interval = input_time_interval),
+#     .progress = "getting desk queue lengths"
+#   )
+#   
+#   queue_lengths$egate_queue_length <- map2(
+#     queue_lengths$year_data,
+#     passengers$year_data,
+#     ~get_queue_lengths_for_year(
+#       queue_times_for_year = .x, 
+#       queue_data_for_year = .y,
+#       egate_or_desk = "egate",
+#       input_time_interval = input_time_interval),
+#     .progress = "getting egate queue lengths"
+#   )
+# 
+#   return(queue_lengths %>% unnest(c(year_data, desk_queue_length, egate_queue_length)))
+# }
 
 mean_wait_time <- function(queue_data) {
   return(mean(queue_data$bordercheck_start_time - queue_data$route_datetime_int)/60)
