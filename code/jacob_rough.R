@@ -14,6 +14,8 @@ tar_source(files = c(
   here("code/get_tables.R")
 ))
 
+##### EXAMPLE SINGLE DATASET
+
 # generate desks
 n_desks <- 9
 desk_means <- pmax(0, rep(90, n_desks))#rnorm(n_desks, mean = 90, sd = 5))
