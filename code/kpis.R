@@ -58,60 +58,77 @@ get_queue_lengths <- function(passengers,
   return(queue_lengths %>% unnest(c(year_data, desk_queue_length, egate_queue_length)))
 }
 
-get_queue_kpis <- function(queue_data) {
-  
-}
-
-sim_queue_kpis <- function(passengers_after_routes,
-                           bordercheck_egates,
-                           egate_uptake_prop,
-                           wait_time_kpis,
-                           queue_length_kpis,
-                           egate_failure_prop,
-                           failed_egate_priority,
-                           seed,
-                           progress_bar = FALSE) {
-  
-  simulated_queues <- passengers_after_routes %>% 
-    nest(route_data = -sched_aircraft_date_posix) %>% 
-    mutate(year = format(sched_aircraft_date_posix, "%Y")) %>% 
-    mutate(queue_data = map(route_data, 
-                            ~ immigration_queue(., bordercheck_desks = bordercheck_desks, 
-                                                bordercheck_egates = bordercheck_egates, 
-                                                egate_uptake_prop = egate_uptake_prop, 
-                                                egate_failure_prop = egate_failure_prop, 
-                                                failed_egate_priority = failed_egate_priority, 
-                                                seed = seed),
-                            .progress = ifelse(progress_bar, "simulating queues", FALSE))) %>% 
-    select(-route_data) %>% 
-    unnest(queue_data) %>% 
-    nest(year_data = - year) %>% 
-    mutate(queue_lengths = map(year_data, get_queue_lengths, 
-                               .progress = ifelse(progress_bar, "getting queue lengths", FALSE)))
-  
-  for (kpi in wait_time_kpis) {
-    kpi_func = get(kpi)
-    simulated_queues[[kpi]] <- map_dbl(simulated_queues$year_data, kpi_func)
-  }
-  
-  for (kpi in queue_length_kpis) {
-    kpi_func = get(kpi)
-    simulated_queues[[kpi]]
-  }
-  
-  simulated_queue_kpis <- simulated_queues %>% 
-    select(-c(year_data, queue_lengths))
-  
-  return(simulated_queue_kpis)
-}
-
 mean_wait_time <- function(queue_data) {
-  return(mean(queue_data$bordercheck_start_time - queue_data$route_datetime_int))
+  return(mean(queue_data$bordercheck_start_time - queue_data$route_datetime_int)/60)
 }
 
-sla_wait_time <- function(queue_data, threshold_minutes = 60) {
-  return(mean((queue_data$bordercheck_start_time - queue_data$route_datetime_int) > threshold_minutes*60))
+wait_time_60 <- function(queue_data) {
+  return(mean((queue_data$bordercheck_start_time - queue_data$route_datetime_int) < 60*60))
 }
+
+wait_time_25 <- function(queue_data) {
+  return(mean((queue_data$bordercheck_start_time - queue_data$route_datetime_int) < 25*60))
+}
+
+wait_time_15 <- function(queue_data) {
+  return(mean((queue_data$bordercheck_start_time - queue_data$route_datetime_int) < 15*60))
+}
+
+queue_data_kpis <- list(
+  "Mean wait (mins)" = mean_wait_time, 
+  "Proportion waits < 1hr" = wait_time_60, 
+  "Proportion waits < 25mins" = wait_time_25, 
+  "Proportion waits < 15mins" = wait_time_15
+)
+
+
+
+# get_queue_kpis <- function(queue_data) {
+#   
+# }
+# 
+# sim_queue_kpis <- function(passengers_after_routes,
+#                            bordercheck_egates,
+#                            egate_uptake_prop,
+#                            wait_time_kpis,
+#                            queue_length_kpis,
+#                            egate_failure_prop,
+#                            failed_egate_priority,
+#                            seed,
+#                            progress_bar = FALSE) {
+#   
+#   simulated_queues <- passengers_after_routes %>% 
+#     nest(route_data = -sched_aircraft_date_posix) %>% 
+#     mutate(year = format(sched_aircraft_date_posix, "%Y")) %>% 
+#     mutate(queue_data = map(route_data, 
+#                             ~ immigration_queue(., bordercheck_desks = bordercheck_desks, 
+#                                                 bordercheck_egates = bordercheck_egates, 
+#                                                 egate_uptake_prop = egate_uptake_prop, 
+#                                                 egate_failure_prop = egate_failure_prop, 
+#                                                 failed_egate_priority = failed_egate_priority, 
+#                                                 seed = seed),
+#                             .progress = ifelse(progress_bar, "simulating queues", FALSE))) %>% 
+#     select(-route_data) %>% 
+#     unnest(queue_data) %>% 
+#     nest(year_data = - year) %>% 
+#     mutate(queue_lengths = map(year_data, get_queue_lengths, 
+#                                .progress = ifelse(progress_bar, "getting queue lengths", FALSE)))
+#   
+#   for (kpi in wait_time_kpis) {
+#     kpi_func = get(kpi)
+#     simulated_queues[[kpi]] <- map_dbl(simulated_queues$year_data, kpi_func)
+#   }
+#   
+#   for (kpi in queue_length_kpis) {
+#     kpi_func = get(kpi)
+#     simulated_queues[[kpi]]
+#   }
+#   
+#   simulated_queue_kpis <- simulated_queues %>% 
+#     select(-c(year_data, queue_lengths))
+#   
+#   return(simulated_queue_kpis)
+# }
 
 
 # NOTE: I've muted out the wait times functions below,
