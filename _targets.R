@@ -156,7 +156,9 @@ list(
   
   # Generation of shiny data
   tar_target(shiny_sim_settings,
-             generate_sim_settings()),
+             generate_sim_settings(n_egates_range = seq(10, 20, 2),
+                                   egate_uptake_range = seq(0.6, 1., 0.1),
+                                   elig_boost_range = seq(0, 1, 0.25))),
   tar_target(shiny_sim_data,
              sim_analysis_data(sim_settings = shiny_sim_settings,
                                aircrafts_arrivals = future_aircrafts_arrivals,
