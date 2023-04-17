@@ -83,7 +83,7 @@ sim_analysis_data <- function(sim_settings,
                    seed = queue_seed)
       
       simulated_queue_lengths <- simulated_queue %>% 
-        get_queue_lengths(progress_bar = TRUE)
+        get_queue_lengths()
       
       sim_settings$non_arrivals_data[[arrivals_id]]$queue_length_data[[non_arrivals_id]] <- 
         simulated_queue_lengths
