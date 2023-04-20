@@ -74,7 +74,7 @@ get_figures <- function(future_aircrafts_arrivals, future_coached_levels,
     mutate(coached_status = factor(coached_status, levels = c("Contact", "Coached", "Unknown"))) %>%
     ggplot(aes(x = Year, y = `Total Passengers`, fill = coached_status)) + 
     geom_col(position = position_stack(reverse = TRUE)) +
-    labs(title = "Passenger pressure forecasted to increase beyond pre-Covid levels") + 
+    # labs(title = "Passenger pressure forecasted to increase beyond pre-Covid levels") + 
     theme_edi_airport() +
     theme(legend.title = element_blank()) +
     scale_fill_manual(values = edi_airport_colours[c(4,5,6)]) +
