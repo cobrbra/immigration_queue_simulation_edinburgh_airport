@@ -235,7 +235,7 @@ We now describe how we process the competition data sets to calculate the \glspl
 
 \begin{figure}[!ht]
     \centering
-    \includegraphics[width=\textwidth]{figures/workflow_fig.png}
+    \includegraphics[width=1.1\textwidth]{figures/workflow_fig.png}
      \caption{
     .} \label{fig:workflow_fig}
 \end{figure}
@@ -262,7 +262,7 @@ Not all passengers eligible to use \glspl{egate} will do so. The decision to use
 
 Those who are eligible to use \glspl{egate} and choose to do so join the \gls{egate} queue. Once a passenger reaches the front of the queue and a free \gls{egate} becomes available they step into the \gls{egate} and are processed according to the provided transaction time. Most passengers finish this process successfully and exit the \gls{egate} on the other side, which completes their immigration and they exit the system.
 
-A small fraction of passengers does not pass the \gls{egate} successfully. They are prompted to step out of the \gls{egate} back into the hall and have not completed immigration yet. Instead, they need to be processed by a \gls{bfo}. For that, these passengers are directed towards a separate queuing area in the middle of the hall that brings them towards the front of the desk queue. When a desk becomes available passengers that have failed the \gls{egate} have priority over the passenger at the front of the desk queue with a defined probability. Once they reach a desk, they are processed like any other passenger and exit the system.
+A small fraction of passengers does not pass the \gls{egate} successfully. They are prompted to step out of the \gls{egate} back into the hall and have not completed immigration yet. Instead, they need to be processed by a \gls{bfo}. For that, these passengers are directed towards a separate queuing area in the middle of the hall that brings them towards the front of the desk queue. When a desk becomes available passengers that have failed the \gls{egate} have priority over the passenger at the front of the desk queue with a defined probability. Once they reach a desk, they are processed like any other passenger from the desk queue and exit the system.
 
 
 
@@ -271,9 +271,6 @@ A small fraction of passengers does not pass the \gls{egate} successfully. They 
 Based on the methodology described in Section~\ref{sec:methods} we have simulated a variety of scenarios. There are three key parameters that we vary across simulations (1) the number of \glspl{egate}, (2) the \gls{egate} eligibility, and (3) the \gls{egate} uptake. This now allows us to make recommendations for the appropriate number of \glspl{egate} to cope with future demand on border operations at Edinburgh Airport. Robustness considerations are subsequently undertaken in Section~\ref{sec:robustness}. 
 
 \subsection{Number of eGates}
-
-this number can be put into perspective by comparing it to the existing number of eGates at UK airports and funding to  deliver a programme to install up to 70 gates, which can be found here: \cite{Inspection_eGates} \\
-
 
 It is implicitly assumed that the lowest feasible number of \glspl{egate} is of interest to Edinburgh Airport. Based on our extensive simulation we recommend the \gls{egate} strategy outlined in Table~\ref{tab:recommendation}. 
 
@@ -297,13 +294,14 @@ This strategy has been chosen such that XXXX \% of passengers wait less than XXX
 
 The number of recommended \glspl{egate} is to be understood as the number of \glspl{egate} required to be in operation. If maintenance and unplanned disruption exceed the historically low level \cite{Inspection_eGates}, this needs to be taken into account. 
 
-Our recommendation implies the purchase of a total XX new \glspl{egate}, as there are currently 10 \glspl{egate} in operation at Edinburgh Airport. To put this number into perspective, the Home Office has approved funding of up to 70 \glspl{egate} UK-wide to increase capacity at larger airports \cite{Inspection_eGates}. 
+Our recommendation implies the purchase of a total XX new \glspl{egate}, as there are currently 10 \glspl{egate} in operation at Edinburgh Airport. To put this number into perspective, the Home Office has approved funding of up to 70 \glspl{egate} UK-wide to increase capacity at larger airports \cite{Inspection_eGates}. with Edinburgh being among the top ten busiest airports in the UK \cite{busiestairport}, it does not seem unreasonable to assume that XXX new \glspl{egate} are built over the course of five years. 
 
 
 \subsection{Hall Layout}
-we talk about the split of queue space in the big hall \\
-this is a nice bonus they hinted at in the description, so I think we should include some info here (could be less detailed)
+The \gls{sla} considers a total queue length. However, the queue space for desk and \glspl{egate} is separated by dividers, which are typically not moved. We therefore need to consider the given split of the hall space to accurately access whether the queue reaches outside of the hall. This is the case if either queue exceeds its allocated space, not just if the queue length increases beyond 500. 
 
+For our recommended set up
+ 
 
 \section{Robustness Considerations} \label{sec:robustness}
 relate to service level agreement \\
