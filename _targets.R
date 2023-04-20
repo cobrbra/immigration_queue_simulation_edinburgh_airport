@@ -203,13 +203,19 @@ list(
                                walk_dist = walk_dist,
                                base_walk_dist = base_walk_dist,
                                egate_failure_prop = egate_failure_prop,
-                               failed_egate_priority = failed_egate_priority)),
+                               failed_egate_priority = failed_egate_priority,
+                               save_data = TRUE)),
   
   # Trackable report outputs
   tar_target(figures,
              get_figures(future_aircrafts_arrivals = future_aircrafts_arrivals,
                          future_coached_levels = future_coached_levels,
-                         filtered_observed_aircrafts_arrivals = filtered_observed_aircrafts_arrivals)),
+                         filtered_observed_aircrafts_arrivals = filtered_observed_aircrafts_arrivals,
+                         window_aircrafts_arrivals = window_aircrafts_arrivals,
+                         window_queue = window_queue,
+                         coach_dist = coach_dist,
+                         walk_dist = walk_dist,
+                         base_walk_dist = base_walk_dist)),
   tar_target(tables,
              get_tables(future_aircrafts_arrivals = future_aircrafts_arrivals,
                         observed_aircrafts_arrivals = observed_aircrafts_arrivals))
