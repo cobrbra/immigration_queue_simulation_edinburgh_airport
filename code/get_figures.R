@@ -31,12 +31,20 @@ theme_edi_airport <- function() {
         size = 30
       ),
       
+      strip.text = element_text(
+        family = font, 
+        size = 30),
+      
       axis.text.x = element_text(            #margin for axis text
         margin=margin(5, b = 10))
     ) 
 }
 
-get_figures <- function(future_aircrafts_arrivals, future_coached_levels, filtered_observed_aircrafts_arrivals, ...) {
+get_figures <- function(future_aircrafts_arrivals, future_coached_levels, 
+                        filtered_observed_aircrafts_arrivals, 
+                        window_aircrafts_arrivals,
+                        window_queue,
+                        coach_dist, walk_dist, base_walk_dist, ...) {
   # results <- targets::tar_read(example_results) # Use for debugging, COMMENT WHEN RUNNING TARGETS
   font_add_google("Lato")
   showtext_auto()
@@ -73,6 +81,70 @@ get_figures <- function(future_aircrafts_arrivals, future_coached_levels, filter
     scale_y_continuous(labels = scales::comma)
   figure_sizes$future_passenger_burden_fig <- c(7, 3)
   
+  panel_1 <- window_aircrafts_arrivals %>% 
+    mutate(coached = factor(if_else(coached, "Coached", "Contact"),
+                            levels = c("Contact", "Coached"))) %>% 
+    ggplot(aes(x = sched_aircraft_datetime_posix, y = n_passengers)) + 
+    geom_segment(aes(xend = aircraft_datetime_posix,
+                     yend = n_passengers),
+                 arrow = arrow(length = unit(0.2, "cm"))) + 
+    geom_point(size = 2, shape = 15) + 
+    theme_edi_airport() + 
+    theme(plot.title = element_text(size = 30, hjust = .5, margin = margin(0,0,10,0)),
+          axis.title.y = element_text(margin = margin(0, 5, 0, 0))) +
+    labs(x = "", y = "Number of Passengers", title = "Aircraft Arrivals") +
+    xlim(as.POSIXct("2023-07-11 08:00:00"), as.POSIXct("2023-07-11 10:00:00")) + 
+    ylim(0,200) 
+  
+  panel_2 <- window_aircrafts_arrivals %>% 
+    get_passengers_after_aircrafts(seed = 123) %>% 
+    get_passengers_after_routes(coach_dist, walk_dist, base_walk_dist,
+                                seed = 123) %>% 
+    
+    ggplot(aes(x = route_datetime_posix, 
+               fill = flight_id)) + 
+    geom_histogram(position = position_stack(reverse = TRUE)) + 
+    theme_edi_airport() + 
+    theme(legend.position = "none",
+          plot.title = element_text(size = 30, hjust = .5, margin = margin(0, 0, 10, 0)),
+          axis.title.y = element_text(margin = margin(0, 5, 0, 0))) + 
+    labs(x = "", y = "Number of Passengers", title = "Passenger Arrivals") + 
+    scale_fill_manual(values = rep(edi_airport_colours[-(1:2)], 3)) +
+    xlim(as.POSIXct("2023-07-11 08:00:00"), as.POSIXct("2023-07-11 10:00:00")) + 
+    ylim(0,200) 
+  
+  panel_3 <- bind_rows(
+    window_queue %>% 
+      mutate(kpi = (bordercheck_start_time - route_datetime_int)/60,
+             check = if_else(egate_used == "desk", "Desk", "eGate"),
+             fac = "Wait Time (mins)") %>% 
+      select(route_datetime_posix, check, kpi, fac),
+    window_queue %>%
+      get_queue_lengths(input_time_interval = 60) %>% 
+      pivot_longer(c(desk_queue_length, egate_queue_length), 
+                   names_to = "check", values_to = "kpi") %>% 
+      mutate(check = if_else(check == "desk_queue_length", "Desk", "eGate"),
+             fac = "Queue Length") %>% 
+      select(route_datetime_posix = queue_length_datetime_posix, check, kpi, fac)
+  ) %>% 
+    ggplot(aes(x = route_datetime_posix, y = kpi, colour = check)) + 
+    geom_point() + 
+    theme_edi_airport() + 
+    theme(legend.title = element_blank(), axis.title = element_blank()) + 
+    scale_colour_manual(values = edi_airport_colours[2:1]) + 
+    facet_wrap(~fac, ncol = 1, scales = "free_y") +
+    xlim(as.POSIXct("2023-07-11 08:00:00"), as.POSIXct("2023-07-11 10:00:00")) 
+  
+  figures$workflow_fig <- plot_grid(
+    plot_grid(NULL, 
+              plot_grid(panel_1, panel_2, ncol = 2), 
+              NULL, 
+              ncol = 1, rel_heights = c(.15, 1, .15)),
+    NULL,
+    panel_3,
+    nrow = 1,
+    rel_widths = c(1, -.08, .8))
+  figure_sizes$workflow_fig <- c(10,4)
   
   # figures$figure_1 <- ...  + 
     # theme_edi_airport() +

@@ -10,7 +10,7 @@ library(here)
 
 # Set target options:
 tar_option_set(
-  packages = c("here", "readxl", "scales", "showtext", "tidyverse", "xtable"), # packages that your targets need to run
+  packages = c("here", "readxl", "scales", "showtext", "tidyverse", "xtable", "cowplot"), # packages that your targets need to run
   format = "rds" # default storage format
   # Set other options as needed.
 )
@@ -84,25 +84,56 @@ list(
                         prob_coached = .15)),
   
   
-  # Example workflow for small arrivals datasets
-  tar_target(example_coached_levels,
-             data.frame(year = "1970",
-                        prob_coached = .15)),
-  tar_target(example_aircrafts_arrivals,
-             sim_example_aircrafts_arrivals(seed = 8) %>% 
-               complete_aircrafts_arrivals(hubs = hubs, 
-                                           countries = countries, 
-                                           prop_nationality = prop_nationality)),
-  tar_target(example_passenger_arrivals,
-             get_passengers_after_aircrafts(
-               aircrafts_arrivals = example_aircrafts_arrivals,
-               seed = 10)),
-  tar_target(example_passengers_after_routes,
-             get_passengers_after_routes(example_passenger_arrivals,
-                                         coach_dist = coach_dist,
-                                         walk_dist = walk_dist,
-                                         base_walk_dist,
-                                         seed = 1)),
+  # # Example workflow for small arrivals datasets
+  # tar_target(example_coached_levels,
+  #            data.frame(year = "1970",
+  #                       prob_coached = .15)),
+  # tar_target(example_aircrafts_arrivals,
+  #            sim_example_aircrafts_arrivals(seed = 8) %>% 
+  #              complete_aircrafts_arrivals(hubs = hubs, 
+  #                                          countries = countries, 
+  #                                          prop_nationality = prop_nationality)),
+  # tar_target(example_passenger_arrivals,
+  #            get_passengers_after_aircrafts(
+  #              aircrafts_arrivals = example_aircrafts_arrivals,
+  #              seed = 10)),
+  # tar_target(example_passengers_after_routes,
+  #            get_passengers_after_routes(example_passenger_arrivals,
+  #                                        coach_dist = coach_dist,
+  #                                        walk_dist = walk_dist,
+  #                                        base_walk_dist, seed = 1)),
+  
+  # Example workflow for small window of future arrivals
+  
+  tar_target(window_aircrafts_arrivals,
+             future_aircrafts_arrivals %>% 
+               complete_aircrafts_arrivals((hubs), (countries), 
+                                           (prop_nationality), (delay_dist), 
+                                           (n_passengers_quantiles), 
+                                           (load_factor), 
+                                           (future_coached_levels), seed = 123) %>% 
+    filter(sched_aircraft_datetime_posix >= as.POSIXct("2023-07-11 08:00:00"),
+           sched_aircraft_datetime_posix <= as.POSIXct("2023-07-11 10:00:00"),
+           aircraft_datetime_posix >= as.POSIXct("2023-07-11 08:00:00"),
+           aircraft_datetime_posix <= as.POSIXct("2023-07-11 10:00:00"))),
+  tar_target(window_queue, 
+             window_aircrafts_arrivals %>% 
+               get_passengers_after_aircrafts(seed = 123) %>% 
+               get_passengers_after_routes((coach_dist), (walk_dist), 
+                                           (base_walk_dist), seed = 123) %>%
+               sim_queues(bordercheck_desks = list(n_borderchecks = 9, 
+                                                   bordercheck_means = rep(90, 9),
+                                                   bordercheck_sd = 14,
+                                                   bordercheck_ids = seq_len(9)),
+                          bordercheck_egates = list(n_borderchecks = 10, 
+                                                    bordercheck_mean = 45,
+                                                    bordercheck_sd = 5,
+                                                    bordercheck_ids = seq_len(10)),
+                          egate_uptake_prop = .8,
+                          elig_boost = 0,
+                          egate_failure_prop = (egate_failure_prop),
+                          failed_egate_priority = (failed_egate_priority),
+                          seed = 123)),
   
   # Competitions=specified distributional assumptions
   tar_target(delay_dist,
