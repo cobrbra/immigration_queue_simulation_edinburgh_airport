@@ -28,6 +28,13 @@
 \usepackage{graphicx}
 \usepackage{floatrow}
 \floatsetup[table]{capposition=top}
+\newcommand*{\figuretitle}[1]{%
+    {\centering%   <--------  will only affect the title because of the grouping (by the
+    \textbf{#1}%              braces before \centering and behind \medskip). If you remove
+    \par\medskip}%            these braces the whole body of a {figure} env will be centered.
+}
+
+
 % References
 \usepackage[colorlinks,linkcolor=black,citecolor=blue,urlcolor=blue,breaklinks = true]{hyperref}
 \usepackage[sort&compress, numbers]{natbib}
@@ -131,6 +138,7 @@ Via the modelling competition, we have been provided with an anticipated future 
 
 \begin{figure}[!ht]
     \centering
+    \figuretitle{Passenger pressure forecasted to increase beyond pre-Covid levels}
     \includegraphics[width=0.8\textwidth]{figures/future_passenger_burden_fig.png}
      \caption{
      Historical and anticipated passengers arriving in Edinburgh Airport on international (non-UKIE) flights. For anticipated arrivals, passengers are split by route (coached vs contact).} \label{fig:future_passenger_burden}
@@ -198,7 +206,7 @@ The arrivals dataset provided by the modelling competition (Section~\ref{sec:fut
 % The competition dataset contains the number of passengers on board each flight. This information is not available for the additional historical data, but can be simulated with the aircraft type, its maximum capacity, and the load factor. \jbnote{Do we need to choose an overall load factor? Also slightly unsure if we'll ever actually ever need this simulated on historical data.} \bdnote{we use it indirectly to simulate an airport classification as the load factor goes into the historical quantiles. Could also be ignored.}
 
 \paragraph{Coached vs contact}
-The competition data gives an overall split of flights that are coached or contact for each year. We assume that the decision between coached or contact is independent of all flight characteristics. Anticipated future coached vs. contact splits are shown in Figure~\ref{fig:future_passenger_burden}, with coached arrivals continuing to form a minority, albeit an increasing one, of future aircraft arrivals. We explore the effects of non-independent occurrence of coached arrivals in Section~XX \jbnote{Robustness analysis I'd like to do: repeat whatever the main analysis pipeline is, with all coached in the biggest flights}.
+The competition data gives an overall split of flights that are coached or contact for each year. We assume that the decision between coached or contact is independent of all flight characteristics. Anticipated future coached vs. contact splits are shown in Figure~\ref{fig:future_passenger_burden}, with coached arrivals continuing to form a minority, albeit an increasing one, of future aircraft arrivals. We explore the effects of non-independent occurrence of coached arrivals in Section~XX.
 
 
 \subsubsection{Route}
@@ -216,7 +224,7 @@ For this analysis we assume sufficient coaches are always available to transport
 
 
 \paragraph{eGate eligibility} 
-As only passengers from certain countries are can use \glspl{egate}, we make the percentage of passengers eligible for \glspl{egate} per aircraft dependent on the classification of the airport. For example, we assume that an aircraft from a hub is more likely to carry a variety of international passengers, of which fewer can use \glspl{egate} compared to a flight from a EU+ non-hub. \jbnote{This needs a lot of attention, in write up and in modelling approach.}
+As only passengers from certain countries are can use \glspl{egate}, we make the percentage of passengers eligible for \glspl{egate} per aircraft dependent on the classification of the airport. For example, we assume that an aircraft from a hub is more likely to carry a variety of international passengers, of which fewer can use \glspl{egate} compared to a flight from a EU+ non-hub. 
 
 \paragraph{eGate uptake} 
 Not all passengers who are eligible to use eGates choose to do so for a variety of reasons. As a base case we use a 70\% uptake, which is selectively increased in our simulation. 
@@ -235,9 +243,9 @@ We now describe how we process the competition data sets to calculate the \glspl
 
 \begin{figure}[!ht]
     \centering
+    \figuretitle{Implementation of passenger processing model allows for efficient simulation of immigration queues}
     \includegraphics[width=1.1\textwidth]{figures/workflow_fig.png}
-     \caption{
-    .} \label{fig:workflow_fig}
+     \caption{Example application of simulation workflow for three-stage passenger processing model, applied to anticipated arrivals schedule between 08:00am and 10:00am on the 11th of June, 2023. \textbf{Left}: Aircraft of different sizes arrive at Edinburgh Airport. Scheduled arrival times are given by square points, with arrows denoting simulated delays. \textbf{Centre}: Passengers disembark from their aircraft and proceed to the immigration hall via their given route (coached or contact). Passenger count is coloured by flight ID. \textbf{Right}: Passengers queue, either for a desk border check or an \gls{egate}. Queue length is reported every minute (upper panel), and queue wait time from arrival in the immigration hall to the start of the relevant border check for each passenger (lower panel).} \label{fig:workflow_fig}
 \end{figure}
 
 
