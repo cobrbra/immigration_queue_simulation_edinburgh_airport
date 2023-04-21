@@ -121,18 +121,15 @@ get_egate_usage <- function(egate_eligibility, egate_uptake_prop){
   return(egate_usage)
 }
 
-
-get_egate_failure <- function(egate_used, egate_failure_prop){
-  
+get_egate_failure <- function(egate_used, egate_failure_prop, seed = NULL) {
+  if (!is.null(seed)) {set.seed(seed)}
   n_passengers <- length(egate_used)
-  egate_failed <- rep("no_egate", times = n_passengers)
-  
-  bool_usage <- egate_used == "egate"
-  n_usage <- sum(bool_usage)
-  egate_failed[bool_usage] <- ifelse(runif(n = n_usage) < egate_failure_prop, "failed", "passed")
-  
+  egate_failed <-  sample(c("failed", "passed"),
+                          size = n_passengers,
+                          replace = TRUE,
+                          prob = c(egate_failure_prop, 1 - egate_failure_prop))
+  egate_failed[egate_used == "desk"] <- "no_egate"
   return(egate_failed)
-  
 }
 
 get_numeric_matrix <- function(df, numeric_columns) {
