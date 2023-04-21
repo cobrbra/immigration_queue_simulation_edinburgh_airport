@@ -175,8 +175,12 @@ sim_desk_queue <- function(passengers_desk_matrix,
   bordercheck_times <- rep(0, times = n_desks)
   n_passengers_desk <- nrow(passengers_desk_matrix)
   n_passengers_failed <- nrow(passengers_failed_matrix)
+  failed_desk_allocations <- sample(c("failed", "desk"), 
+                                    size = n_passengers_failed + n_passengers_desk,
+                                    replace = TRUE,
+                                    prob = c(failed_egate_priority, 1 - failed_egate_priority))
   still_passengers_left <- TRUE
-  i_desk <- i_failed <- 1
+  i_desk <- i_failed <- i_joint <- 1
   desk_handling_times <- alt_sim_desk_handling_times(bordercheck_desks,
                                                      n_passengers_desk)
   failed_handling_times <- alt_sim_desk_handling_times(bordercheck_desks,
@@ -219,7 +223,7 @@ sim_desk_queue <- function(passengers_desk_matrix,
       next_passenger <- "failed"
     } else {
       # both desk and failed passenger waiting
-      next_passenger <- ifelse(runif(1) < failed_egate_priority, "failed", "desk")
+      next_passenger <- failed_desk_allocations[i_joint]
     }
     
     # how long it takes to handle passenger
@@ -231,6 +235,7 @@ sim_desk_queue <- function(passengers_desk_matrix,
       passengers_desk_matrix[i_desk, "bordercheck_handled"] <- bordercheck_desks$bordercheck_ids[next_free_bordercheck]
       
       i_desk <- i_desk + 1
+      i_joint <- i_joint + 1
       
     } else {
       handling_time <- failed_handling_times[next_free_bordercheck, i_failed]
@@ -240,13 +245,14 @@ sim_desk_queue <- function(passengers_desk_matrix,
       passengers_failed_matrix[i_failed, "bordercheck_handled"] <- bordercheck_desks$bordercheck_ids[next_free_bordercheck]
       
       i_failed <- i_failed + 1
+      i_joint <- i_joint + 1
       
     }
     
     # update desks 
     bordercheck_times[next_free_bordercheck] <- bordercheck_times[next_free_bordercheck] + handling_time
     
-    if((i_desk + i_failed - 2) == n_passengers_desk + n_passengers_failed){
+    if((i_joint - 2) == n_passengers_desk + n_passengers_failed){
       still_passengers_left <- FALSE
     }
     
