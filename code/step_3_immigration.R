@@ -109,15 +109,15 @@ sim_boosted_egate_eligible <- function(egate_eligible, target_eligibility = 0.85
 }
 
 
-get_egate_usage <- function(egate_eligibility, egate_uptake_prop){
+sim_egate_usage <- function(egate_eligibility, egate_uptake_prop){
   
   n_passengers <- length(egate_eligibility)
-  egate_usage <- rep("desk", times = n_passengers)
+  egate_usage <- sample(c("egate", "desk"),
+                        size = n_passengers,
+                        replace = TRUE,
+                        prob = c(egate_uptake_prop, 1 - egate_uptake_prop))
   
-  bool_eligible <- egate_eligibility == "eligible"
-  n_eligible <- sum(bool_eligible)
-  egate_usage[bool_eligible] <- ifelse(runif(n = n_eligible) < egate_uptake_prop, "egate", "desk")
-  
+  egate_usage[egate_eligibility == "not_eligible"] <- "desk"
   return(egate_usage)
 }
 
@@ -271,7 +271,7 @@ immigration_queue <- function(passengers,
            bordercheck_start_time = numeric(n()), 
            bordercheck_end_time = numeric(n()),
            bordercheck_handled = numeric(n())) %>% 
-    mutate(egate_used = get_egate_usage(egate_eligibility, egate_uptake_prop)) %>% 
+    mutate(egate_used = sim_egate_usage(egate_eligibility, egate_uptake_prop)) %>% 
     mutate(egate_failed = sim_egate_failure(egate_used, egate_failure_prop)) 
   
   passengers_egate <- passengers %>% 
