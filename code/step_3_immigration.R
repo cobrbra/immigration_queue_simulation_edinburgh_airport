@@ -121,7 +121,7 @@ get_egate_usage <- function(egate_eligibility, egate_uptake_prop){
   return(egate_usage)
 }
 
-get_egate_failure <- function(egate_used, egate_failure_prop, seed = NULL) {
+sim_egate_failure <- function(egate_used, egate_failure_prop, seed = NULL) {
   if (!is.null(seed)) {set.seed(seed)}
   n_passengers <- length(egate_used)
   egate_failed <-  sample(c("failed", "passed"),
@@ -272,7 +272,7 @@ immigration_queue <- function(passengers,
            bordercheck_end_time = numeric(n()),
            bordercheck_handled = numeric(n())) %>% 
     mutate(egate_used = get_egate_usage(egate_eligibility, egate_uptake_prop)) %>% 
-    mutate(egate_failed = get_egate_failure(egate_used, egate_failure_prop)) 
+    mutate(egate_failed = sim_egate_failure(egate_used, egate_failure_prop)) 
   
   passengers_egate <- passengers %>% 
     filter(egate_used == "egate") %>% 
