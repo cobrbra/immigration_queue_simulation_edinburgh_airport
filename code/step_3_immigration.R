@@ -149,7 +149,7 @@ sim_egate_queue <- function(passengers_egate_matrix, bordercheck_egates) {
     bordercheck_times[bordercheck_times < next_arrival_time] <- next_arrival_time
     
     # decide which check to send the passenger to
-    next_free_bordercheck <- which(bordercheck_times == min(bordercheck_times))[1] 
+    next_free_bordercheck <- which.min(bordercheck_times) 
     next_free_bordercheck_time <- min(bordercheck_times)
     
     # how long it takes to handle passenger
@@ -317,7 +317,7 @@ immigration_queue <- function(passengers,
   passengers_failed$egate_handling_time <- NULL
   passengers_failed$bordercheck_egate_end_time <- NULL
   
-  passengers <- rbind(passengers_egate[passengers_egate$egate_failed == "passed", ], 
+  passengers <- bind_rows(passengers_egate[passengers_egate$egate_failed == "passed", ], 
                       passengers_desk, 
                       passengers_failed)
   passengers <- passengers %>% 
@@ -334,12 +334,10 @@ sim_queues <- function(passengers_after_routes,
                        target_eligibility,
                        egate_failure_prop,
                        failed_egate_priority,
-                       seed,
-                       progress_bar = FALSE) {
+                       seed) {
   
   simulated_queues <- passengers_after_routes %>% 
-    mutate(year = format(sched_aircraft_date_posix, "%Y")) %>% 
-    nest(year_data = -year) %>% 
+    mutate(year = as.character(year(sched_aircraft_date_posix))) %>% 
     mutate(queue_data = map(year_data, 
                             ~ immigration_queue(., bordercheck_desks = bordercheck_desks, 
                                                 bordercheck_egates = bordercheck_egates, 
@@ -347,9 +345,7 @@ sim_queues <- function(passengers_after_routes,
                                                 target_eligibility = target_eligibility,
                                                 egate_failure_prop = egate_failure_prop, 
                                                 failed_egate_priority = failed_egate_priority, 
-                                                seed = seed),
-                            .progress = ifelse(progress_bar, "simulating queues", FALSE))) %>% 
-    select(-year_data) %>% 
+                                                seed = seed))) %>% 
     unnest(queue_data)
   
   return(simulated_queues)
