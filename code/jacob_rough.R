@@ -2,6 +2,7 @@ library(here)
 library(targets)
 library(tidyverse)
 library(showtext)
+library(cowplot)
 
 tar_source(files = c(
   here("code/process_data.R"), 
@@ -14,6 +15,7 @@ tar_source(files = c(
   here("code/get_tables.R")
 ))
 
+
 ##### EXAMPLE SINGLE DATASET
 
 # generate desks
@@ -25,7 +27,7 @@ bordercheck_desks <- list(n_borderchecks = n_desks,
                           bordercheck_sd = 14,
                           bordercheck_ids = desk_ids)
 
-n_egates <- 20
+n_egates <- 10
 bordercheck_egates = list(
   n_borderchecks = n_egates, 
   bordercheck_mean = 45,
@@ -42,10 +44,15 @@ simulated_arrivals <- tar_read(future_aircrafts_arrivals) %>%
 simulated_queue <- simulated_arrivals %>% 
   sim_queues(bordercheck_desks = bordercheck_desks, 
              bordercheck_egates = bordercheck_egates, 
-             egate_uptake_prop = .7, elig_boost = 0, 
+             egate_uptake_prop = .7, target_eligibility = .85, 
              egate_failure_prop = tar_read(egate_failure_prop), 
              failed_egate_priority = tar_read(failed_egate_priority),
-             seed = 1)
+             seed = 1) 
+
+simulated_queue %>% 
+  count(year, base_egate_eligibility, egate_eligibility) %>% 
+  group_by(year) %>% 
+  mutate(n = n / sum(n))
 
 simulated_queue %>% 
   mutate(queue_time = bordercheck_start_time - route_datetime_int) %>% 
@@ -64,10 +71,14 @@ sim_results <- sim_analysis_data(sim_settings,
                                  prop_nationality = tar_read(prop_nationality), 
                                  delay_dist = tar_read(delay_dist), 
                                  n_passengers_quantiles = tar_read(n_passengers_quantiles), 
-                                 coached_levels = tar_read(coached_levels), 
+                                 egate_failure_prop = tar_read(egate_failure_prop),
+                                 failed_egate_priority = tar_read(failed_egate_priority),
+                                 coached_levels = tar_read(future_coached_levels), 
                                  coach_dist = tar_read(coach_dist), 
                                  walk_dist = tar_read(walk_dist), 
-                                 base_walk_dist = tar_read(base_walk_dist))
+                                 base_walk_dist = tar_read(base_walk_dist),
+                                 wait_time_kpis = c("mean_wait_time", "wait_time_60", "wait_time_15"),
+                                 save_data = TRUE)
 
 sim_results$queue_length_data[[1]] %>% 
   pivot_longer(c(desk_queue_length, egate_queue_length), names_to = "Check Type", values_to = "Queue Length") %>% 
@@ -76,16 +87,6 @@ sim_results$queue_length_data[[1]] %>%
   geom_point() + 
   facet_wrap(~year, scales = "free_x", nrow = 1) +
   theme_minimal()
-
-
-
-
-
-
-
-
-
-
 
 
 

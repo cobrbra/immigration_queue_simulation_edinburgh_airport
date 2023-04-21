@@ -48,12 +48,12 @@ ui <- fluidPage(
         step = 2
       ),
       sliderInput(
-        inputId = "elig_boost",
-        label = "Increased eGate eligibility:",
-        min = 0.0,
+        inputId = "target_eligibility",
+        label = "Targeted eGate eligibility:",
+        min = 0.75,
         max = 1,
-        value = 0.0,
-        step = .2
+        value = 0.85,
+        step = .05
       ),
       sliderInput(
         inputId = "egate_uptake",
@@ -100,7 +100,7 @@ server <- function(input, output) {
   
   font_add_google("Lato", "lato")
   showtext_auto()
-  # input <- list(n_egates = 12, elig_boost = .2, egate_uptake = .8, select_kpi = "Mean wait (mins)", check_filters = "Desks and eGates")
+  # input <- list(n_egates = 12, target_eligibility = .85, egate_uptake = .8, select_kpi = "Mean wait (mins)", check_filters = "Desks and eGates")
   check_filters <- list("Desks" = c("Desk"),
                         "eGates" = c("eGate"), 
                         "Desks and eGates" = c("Desk", "eGate"))
@@ -130,7 +130,7 @@ server <- function(input, output) {
       filter(`Bordercheck type` %in% check_filters[[input$check_filter]],
              n_egates == input$n_egates,
              round(egate_uptake, 8) == round(input$egate_uptake, 8),
-             round(elig_boost, 8) == round(input$elig_boost, 8),
+             round(target_eligibility, 8) == round(input$target_eligibility, 8),
              gen_arrivals_seed == gen_arrivals_seed[1],
              gen_queue_seed == gen_queue_seed[1]) %>% 
       ggplot(aes(x = queue_length_datetime_posix, 
@@ -165,7 +165,7 @@ server <- function(input, output) {
       filter(`Bordercheck type` %in% check_filters[[input$check_filter]],
              n_egates == input$n_egates,
              round(egate_uptake, 8) == round(input$egate_uptake, 8),
-             round(elig_boost, 8) == round(input$elig_boost, 8),
+             round(target_eligibility, 8) == round(input$target_eligibility, 8),
              gen_arrivals_seed == gen_arrivals_seed[1],
              gen_queue_seed == gen_queue_seed[1]) %>% 
       ggplot(aes(x = route_datetime_posix, y = wait_time / 60, colour = `Bordercheck type`)) +
@@ -197,7 +197,7 @@ server <- function(input, output) {
     sample_queue_data %>%
       filter(n_egates == input$n_egates,
              round(egate_uptake, 8) == round(input$egate_uptake, 8),
-             round(elig_boost, 8) == round(input$elig_boost, 8)) %>% 
+             round(target_eligibility, 8) == round(input$target_eligibility, 8)) %>% 
       nest(year_data = - c("year", "Bordercheck type")) %>% 
       filter(`Bordercheck type` %in% check_filters[[input$check_filter]]) %>% 
       mutate(kpi = map_dbl(year_data, ~queue_data_kpis[[input$select_kpi]](.))) %>%      
@@ -226,7 +226,7 @@ server <- function(input, output) {
     sample_queue_data %>%
       filter(n_egates == input$n_egates,
              round(egate_uptake, 8) == round(input$egate_uptake, 8),
-             round(elig_boost, 8) == round(input$elig_boost, 8)) %>% 
+             round(target_eligibility, 8) == round(input$target_eligibility, 8)) %>% 
       nest(year_data = - c("year")) %>% 
       mutate(kpi = map_dbl(year_data, ~queue_data_kpis[[input$select_kpi]](.))) %>%      
       ggplot(aes(x = year, y = kpi, fill = "Both")) + 

@@ -3,7 +3,7 @@ generate_sim_settings <- function(seed = 1234,
                                   n_gen_queues = 1,
                                   n_egates_range = seq(10, 14, by = 2),
                                   egate_uptake_range = seq(.6, 1., by = .2),
-                                  elig_boost_range = seq(0., 1., .5)) {
+                                  target_eligibility_range = seq(.75, 1., .05)) {
   set.seed(seed)
   gen_arrivals_seeds <- sample(1:100000, size = n_gen_arrivals)
   gen_queue_seeds <- sample(1:100000, size = n_gen_queues)
@@ -11,7 +11,7 @@ generate_sim_settings <- function(seed = 1234,
                            gen_queue_seed = gen_queue_seeds, 
                            n_egates = n_egates_range, 
                            egate_uptake = egate_uptake_range, 
-                           elig_boost = elig_boost_range)
+                           target_eligibility = target_eligibility_range)
   return(sim_settings)
 }
 
@@ -65,7 +65,7 @@ sim_analysis_data <- function(sim_settings,
       n_egates <- sim_settings$non_arrivals_data[[arrivals_id]]$n_egates[[non_arrivals_id]]
       queue_seed = sim_settings$non_arrivals_data[[arrivals_id]]$gen_queue_seed[[non_arrivals_id]]
       egate_uptake <- sim_settings$non_arrivals_data[[arrivals_id]]$egate_uptake[[non_arrivals_id]]
-      elig_boost <- sim_settings$non_arrivals_data[[arrivals_id]]$elig_boost[[non_arrivals_id]]
+      target_eligibility <- sim_settings$non_arrivals_data[[arrivals_id]]$target_eligibility[[non_arrivals_id]]
       
       bordercheck_egates = list(
         n_borderchecks = n_egates, 
@@ -77,30 +77,40 @@ sim_analysis_data <- function(sim_settings,
         sim_queues(bordercheck_desks = bordercheck_desks,
                    bordercheck_egates = bordercheck_egates,
                    egate_uptake_prop = egate_uptake,
-                   elig_boost = elig_boost,
+                   target_eligibility = target_eligibility,
                    egate_failure_prop = egate_failure_prop,
                    failed_egate_priority = failed_egate_priority,
                    seed = queue_seed)
       
       simulated_queue_lengths <- simulated_queue %>% 
-        get_queue_lengths()
+        get_queue_lengths(input_time_interval = input_time_interval)
       
-      sim_settings$non_arrivals_data[[arrivals_id]]$queue_length_data[[non_arrivals_id]] <- 
-        simulated_queue_lengths
+      for (kpi in wait_time_kpis) {
+        sim_settings$non_arrivals_data[[arrivals_id]][[kpi]][non_arrivals_id] <- get(kpi)(simulated_queue)
+      }
+      for (kpi in queue_length_kpis) {
+        sim_settings$non_arrivals_data[[arrivals_id]][[kpi]][non_arrivals_id] <- get(kpi)(simulated_queue_lengths)
+      }
       
-      sim_settings$non_arrivals_data[[arrivals_id]]$sample_queue_data[[non_arrivals_id]] <- 
-        simulated_queue %>% 
-        select(sched_aircraft_date_posix, route_datetime_int, 
-               bordercheck_start_time, bordercheck_end_time,
-               nationality, egate_used, egate_failed) %>% 
-        mutate(wait_time = bordercheck_start_time - route_datetime_int) %>% 
-        slice_sample(n = queue_sample_size)
+      if (save_data) {
+        sim_settings$non_arrivals_data[[arrivals_id]]$queue_length_data[[non_arrivals_id]] <- 
+          simulated_queue_lengths
+        
+        sim_settings$non_arrivals_data[[arrivals_id]]$sample_queue_data[[non_arrivals_id]] <- 
+          simulated_queue %>% 
+          select(sched_aircraft_date_posix, route_datetime_int, 
+                 bordercheck_start_time, bordercheck_end_time,
+                 nationality, egate_used, egate_failed) %>% 
+          mutate(wait_time = bordercheck_start_time - route_datetime_int) %>% 
+          slice_sample(n = queue_sample_size)
+      }
       
       non_arrivals_id <- non_arrivals_id + 1
       progress_counter <- progress_counter + 1
-      progress_prop <- progress_counter / 
-        (nrow(sim_settings$non_arrivals_data[[arrivals_id]])*nrow(sim_settings))
-      message(paste0(round(progress_prop*100), "%"))
+      if (round(100*progress_counter / n_settings) != 
+        round(100*(progress_counter - 1) / n_settings)) {
+        message(paste0(round(100*progress_counter / n_settings), "%"))
+      }
     }
   }
   

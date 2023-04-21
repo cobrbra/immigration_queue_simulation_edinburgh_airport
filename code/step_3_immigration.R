@@ -71,16 +71,41 @@ alt_sim_desk_handling_times <- function(borderchecks, n_passengers) {
                 n_passengers))
 }
 
-get_egate_eligible <- function(nationality, elig_boost = .0){
+get_egate_eligible <- function(nationality){
   
   egate_eligibility <- if_else(nationality %in% c("nat_UKIE", "nat_EU_plus"), 
                                true = "eligible", 
-                               false = sample(c("eligible", "not_eligible"), 
-                                              size = length(nationality),
-                                              prob = c(elig_boost, 1 - elig_boost),
-                                              replace = TRUE))
+                               false = "not_eligible")
   
   return(egate_eligibility)
+}
+
+sim_boosted_egate_eligible <- function(egate_eligible, target_eligibility = 0.85) {
+  n_passengers <- length(egate_eligible)
+  baseline_eligibility <- sum(egate_eligible == "eligible") / n_passengers
+  if (target_eligibility > baseline_eligibility) {
+    boosted_egate_eligible <- if_else(
+      egate_eligible == "eligible",
+      "eligible",
+      sample(c("eligible", "not_eligible"),
+             size = n_passengers,
+             prob = c((target_eligibility - baseline_eligibility)/(1-baseline_eligibility), 
+                      1 - (target_eligibility - baseline_eligibility)/(1-baseline_eligibility)),
+             replace = TRUE)
+    )
+  }
+  else {
+    boosted_egate_eligible <- if_else(
+      egate_eligible == "not_eligible",
+      "not_eligible",
+      sample(c("eligible", "not_eligible"),
+             size = n_passengers,
+             prob = c(target_eligibility / baseline_eligibility,
+                      1 - target_eligibility / baseline_eligibility),
+             replace = TRUE)
+    )
+  }
+  return(boosted_egate_eligible)
 }
 
 
@@ -237,14 +262,15 @@ immigration_queue <- function(passengers,
                               bordercheck_desks, 
                               bordercheck_egates, 
                               egate_uptake_prop, 
-                              elig_boost,
+                              target_eligibility,
                               egate_failure_prop, 
                               failed_egate_priority, 
                               seed = NULL){
   
   if (!is.null(seed)) {set.seed(seed)}
   passengers <- passengers %>% 
-    mutate(egate_eligibility = get_egate_eligible(nationality, elig_boost),
+    mutate(base_egate_eligibility = get_egate_eligible(nationality),
+           egate_eligibility = sim_boosted_egate_eligible(base_egate_eligibility, target_eligibility),
            bordercheck_start_time = numeric(n()), 
            bordercheck_end_time = numeric(n()),
            bordercheck_handled = numeric(n())) %>% 
@@ -308,25 +334,25 @@ sim_queues <- function(passengers_after_routes,
                        bordercheck_desks,
                        bordercheck_egates,
                        egate_uptake_prop,
-                       elig_boost,
+                       target_eligibility,
                        egate_failure_prop,
                        failed_egate_priority,
                        seed,
                        progress_bar = FALSE) {
   
   simulated_queues <- passengers_after_routes %>% 
-    nest(route_data = -sched_aircraft_date_posix) %>% 
     mutate(year = format(sched_aircraft_date_posix, "%Y")) %>% 
-    mutate(queue_data = map(route_data, 
+    nest(year_data = -year) %>% 
+    mutate(queue_data = map(year_data, 
                             ~ immigration_queue(., bordercheck_desks = bordercheck_desks, 
                                                 bordercheck_egates = bordercheck_egates, 
                                                 egate_uptake_prop = egate_uptake_prop, 
-                                                elig_boost = elig_boost,
+                                                target_eligibility = target_eligibility,
                                                 egate_failure_prop = egate_failure_prop, 
                                                 failed_egate_priority = failed_egate_priority, 
                                                 seed = seed),
                             .progress = ifelse(progress_bar, "simulating queues", FALSE))) %>% 
-    select(-route_data) %>% 
+    select(-year_data) %>% 
     unnest(queue_data)
   
   return(simulated_queues)
