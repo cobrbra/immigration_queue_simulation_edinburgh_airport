@@ -206,7 +206,7 @@ The arrivals dataset provided by the modelling competition (Section~\ref{sec:fut
 % The competition dataset contains the number of passengers on board each flight. This information is not available for the additional historical data, but can be simulated with the aircraft type, its maximum capacity, and the load factor. \jbnote{Do we need to choose an overall load factor? Also slightly unsure if we'll ever actually ever need this simulated on historical data.} \bdnote{we use it indirectly to simulate an airport classification as the load factor goes into the historical quantiles. Could also be ignored.}
 
 \paragraph{Coached vs contact}
-The competition data gives an overall split of flights that are coached or contact for each year. We assume that the decision between coached or contact is independent of all flight characteristics. Anticipated future coached vs. contact splits are shown in Figure~\ref{fig:future_passenger_burden}, with coached arrivals continuing to form a minority, albeit an increasing one, of future aircraft arrivals. We explore the effects of non-independent occurrence of coached arrivals in Section~XX.
+The competition data gives an overall split of flights that are coached or contact for each year. We assume that the decision between coached or contact is independent of all flight characteristics. Anticipated future coached vs. contact splits are shown in Figure~\ref{fig:future_passenger_burden}, with coached arrivals continuing to form a minority, albeit an increasing one, of future aircraft arrivals.
 
 
 \subsubsection{Route}
@@ -243,7 +243,7 @@ We now describe how we process the competition data sets to calculate the \glspl
 
 \begin{figure}[!ht]
     \centering
-    \figuretitle{Implementation of passenger processing model allows for efficient simulation of immigration queues}
+    \figuretitle{Implementation of passenger processing model allows for systematic simulation of immigration queues}
     \includegraphics[width=1.1\textwidth]{figures/workflow_fig.png}
      \caption{Example application of simulation workflow for three-stage passenger processing model, applied to anticipated arrivals schedule between 08:00am and 10:00am on the 11th of June, 2023. \textbf{Left}: Aircraft of different sizes arrive at Edinburgh Airport. Scheduled arrival times are given by square points, with arrows denoting simulated delays. \textbf{Centre}: Passengers disembark from their aircraft and proceed to the immigration hall via their given route (coached or contact). Passenger count is coloured by flight ID. \textbf{Right}: Passengers queue, either for a desk border check or an \gls{egate}. Queue length is reported every minute (upper panel), and queue wait time from arrival in the immigration hall to the start of the relevant border check for each passenger (lower panel).} \label{fig:workflow_fig}
 \end{figure}
