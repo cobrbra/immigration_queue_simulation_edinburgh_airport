@@ -101,13 +101,14 @@ wait_time_15 <- function(queue_data) {
 }
 
 
-queue_length_500_prop_days <- function(queue_lengths) {
-  prop_days_500 <- queue_lengths %>%
-    summarise(any_overflow = any(desk_queue_length + egate_queue_length > 500), .groups = c("queue_length_date_posix")) %>% 
-    pull(any_overflow) %>% 
-    mean()
-  
-  return(prop_days_500)
+queue_length_mins_above_300 <- function(queue_lengths, mins_per_point = 15) {
+  mins_above_500 <- mins_per_point * sum(queue_lengths$queue_length > 300)
+  return(mins_above_500)
+}
+
+queue_length_mins_above_375 <- function(queue_lengths, mins_per_point = 15) {
+  mins_above_500 <- mins_per_point * sum(queue_lengths$queue_length > 375)
+  return(mins_above_500)
 }
 
 
