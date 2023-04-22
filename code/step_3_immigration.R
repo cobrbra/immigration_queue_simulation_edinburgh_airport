@@ -176,7 +176,7 @@ sim_desk_queue <- function(passengers_desk_matrix,
   n_passengers_desk <- nrow(passengers_desk_matrix)
   n_passengers_failed <- nrow(passengers_failed_matrix)
   failed_desk_allocations <- sample(c("failed", "desk"), 
-                                    size = n_passengers_failed,
+                                    size = n_passengers_failed + n_passengers_desk,
                                     replace = TRUE,
                                     prob = c(failed_egate_priority, 1 - failed_egate_priority))
   still_passengers_left <- TRUE
@@ -223,7 +223,7 @@ sim_desk_queue <- function(passengers_desk_matrix,
       next_passenger <- "failed"
     } else {
       # both desk and failed passenger waiting
-      next_passenger <- failed_desk_allocations[i_failed]
+      next_passenger <- failed_desk_allocations[i_failed + i_desk - 1]
     }
     
     # how long it takes to handle passenger
@@ -244,7 +244,6 @@ sim_desk_queue <- function(passengers_desk_matrix,
       passengers_failed_matrix[i_failed, "bordercheck_handled"] <- next_free_bordercheck
       
       i_failed <- i_failed + 1
-
     }
     
     # update desks 
@@ -290,6 +289,7 @@ immigration_queue <- function(passengers,
   desk_numeric_columns <- c("route_datetime_int", "bordercheck_start_time", "bordercheck_end_time",
                             "bordercheck_handled")
   passengers_desk <- filter(passengers, egate_used == "desk") 
+  
   passengers_desk_matrix <- get_numeric_matrix(passengers_desk, desk_numeric_columns)
   
   #### get all the egate passengers through
@@ -315,8 +315,10 @@ immigration_queue <- function(passengers,
                                          failed_egate_priority)
   
   passengers_failed[, failed_numeric_columns] <- simulated_desk_queue$passengers_failed_matrix
-  passengers_desk[, desk_numeric_columns] <- simulated_desk_queue$passengers_desk_matrix
-  
+  if (nrow(simulated_desk_queue$passengers_desk_matrix) > 0) {
+    passengers_desk[, desk_numeric_columns] <- simulated_desk_queue$passengers_desk_matrix
+  }
+ 
   passengers_egate$egate_handling_time <- NULL
   passengers_failed$egate_handling_time <- NULL
   passengers_failed$bordercheck_egate_end_time <- NULL

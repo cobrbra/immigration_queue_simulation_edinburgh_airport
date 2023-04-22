@@ -10,7 +10,7 @@ library(here)
 
 # Set target options:
 tar_option_set(
-  packages = c("here", "readxl", "scales", "showtext", "tidyverse", "xtable", "cowplot"), # packages that your targets need to run
+  packages = c("here", "readxl", "scales", "showtext", "tidyverse", "xtable", "cowplot", "lubridate"), # packages that your targets need to run
   format = "rds" # default storage format
   # Set other options as needed.
 )
@@ -121,14 +121,12 @@ list(
                get_passengers_after_aircrafts(seed = 123) %>% 
                get_passengers_after_routes((coach_dist), (walk_dist), 
                                            (base_walk_dist), seed = 123) %>%
-               sim_queues(bordercheck_desks = list(n_borderchecks = 9, 
+               immigration_queue(bordercheck_desks = list(n_borderchecks = 9, 
                                                    bordercheck_means = rep(90, 9),
-                                                   bordercheck_sd = 14,
-                                                   bordercheck_ids = seq_len(9)),
+                                                   bordercheck_sd = 14),
                           bordercheck_egates = list(n_borderchecks = 10, 
                                                     bordercheck_mean = 45,
-                                                    bordercheck_sd = 5,
-                                                    bordercheck_ids = seq_len(10)),
+                                                    bordercheck_sd = 5),
                           egate_uptake_prop = .8,
                           target_eligibility = .85,
                           egate_failure_prop = (egate_failure_prop),
@@ -190,8 +188,8 @@ list(
              generate_sim_settings(n_gen_arrivals = 1,
                                    n_gen_queues = 1,
                                    n_egates_range = seq(10, 30, 2),
-                                   egate_uptake_range = seq(0.6, 1., 0.1),
-                                   target_eligibility_range = seq(0.75, 1., 0.05))),
+                                   egate_uptake_range = seq(0.6, 1, 0.1),
+                                   target_eligibility_range = seq(0.8, 1., 0.05))),
   tar_target(shiny_sim_raw_data,
              sim_analysis_data(sim_settings = shiny_sim_raw_data_settings,
                                aircrafts_arrivals = future_aircrafts_arrivals,
@@ -207,6 +205,28 @@ list(
                                egate_failure_prop = egate_failure_prop,
                                failed_egate_priority = failed_egate_priority,
                                save_data = TRUE)),
+  tar_target(shiny_sim_kpi_data_settings,
+             generate_sim_settings(n_gen_arrivals = 5,
+                                   n_gen_queues = 5,
+                                   n_egates_range = seq(10, 30, 2),
+                                   egate_uptake_range = seq(0.6, 1, 0.1),
+                                   target_eligibility_range = seq(0.8, 1., 0.05))),
+  tar_target(shiny_sim_kpi_data,
+             sim_analysis_data(sim_settings = shiny_sim_kpi_data_settings,
+                               aircrafts_arrivals = future_aircrafts_arrivals,
+                               hubs = hubs,
+                               countries = countries,
+                               prop_nationality = prop_nationality,
+                               delay_dist = delay_dist,
+                               n_passengers_quantiles = n_passengers_quantiles, 
+                               coached_levels = future_coached_levels, 
+                               coach_dist = coach_dist,
+                               walk_dist = walk_dist,
+                               base_walk_dist = base_walk_dist,
+                               egate_failure_prop = egate_failure_prop,
+                               failed_egate_priority = failed_egate_priority,
+                               wait_time_kpis = c("mean_wait_time", "wait_time_60", "wait_time_15"),
+                               save_data = FALSE)),
   
   # Trackable report outputs
   tar_target(figures,

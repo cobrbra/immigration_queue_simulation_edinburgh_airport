@@ -50,9 +50,9 @@ ui <- fluidPage(
       sliderInput(
         inputId = "target_eligibility",
         label = "Targeted eGate eligibility:",
-        min = 0.75,
+        min = 0.8,
         max = 1,
-        value = 0.85,
+        value = 0.8,
         step = .05
       ),
       sliderInput(
@@ -60,7 +60,7 @@ ui <- fluidPage(
         label = "eGate uptake:",
         min = .6,
         max = 1.,
-        value = 0.8,
+        value = 0.7,
         step = .1
       ),
       selectInput("check_filter", "Select bordercheck type(s)",
@@ -100,7 +100,8 @@ server <- function(input, output) {
   
   font_add_google("Lato", "lato")
   showtext_auto()
-  # input <- list(n_egates = 12, target_eligibility = .85, egate_uptake = .8, select_kpi = "Mean wait (mins)", check_filters = "Desks and eGates")
+  
+  # input <- list(n_egates = 10, target_eligibility = .8, egate_uptake = .6, select_kpi = "Mean wait (mins)", check_filters = "Desks and eGates")
   check_filters <- list("Desks" = c("Desk"),
                         "eGates" = c("eGate"), 
                         "Desks and eGates" = c("Desk", "eGate"))
@@ -108,6 +109,13 @@ server <- function(input, output) {
                            "#6E7D0C", "#84A193", "#EAF2D6",
                            "#0C6E7D", "#9384A1", "#D6EAF2",
                            "#2D0255", "#511166", "#B41788")
+  kpis <- list(
+    "Mean wait (mins)" = "mean_wait_time", 
+    "Proportion waits < 1hr" = "wait_time_60", 
+    "Proportion waits < 25mins" = "wait_time_25", 
+    "Proportion waits < 15mins" = "wait_time_15"
+  )
+  
   queue_length_data <- tar_read(shiny_sim_raw_data) %>% 
     select(-sample_queue_data) %>% 
     unnest(queue_length_data) %>% 
@@ -115,15 +123,18 @@ server <- function(input, output) {
                  names_to = "Bordercheck type",
                  values_to = "Queue length") %>% 
     mutate(`Bordercheck type` = factor(if_else(`Bordercheck type` == "desk_queue_length", "Desk", "eGate"),
-                                 levels = c("Desk", "eGate")))
+                                 levels = c("Desk", "eGate"))) %>% 
+    filter(gen_arrivals_seed == gen_arrivals_seed[1],
+           gen_queue_seed == gen_queue_seed[1])
   
    sample_queue_data <- tar_read(shiny_sim_raw_data) %>% 
-    unnest(sample_queue_data) %>% 
     select(-queue_length_data) %>% 
+    unnest(sample_queue_data) %>% 
     get_datetime_alternates(c("route")) %>% 
-    mutate(year = format(sched_aircraft_date_posix, format = "%Y"),
-           `Bordercheck type` = factor(if_else(egate_used == "desk", "Desk", "eGate"),
-                                 levels = c("Desk", "eGate")))
+    mutate(`Bordercheck type` = factor(if_else(egate_used == "desk", "Desk", "eGate"),
+                                 levels = c("Desk", "eGate"))) %>% 
+    filter(gen_arrivals_seed == gen_arrivals_seed[1],
+           gen_queue_seed == gen_queue_seed[1])
     
   output$queue_length_plot <- renderPlot({
     queue_length_data %>% 
@@ -165,9 +176,7 @@ server <- function(input, output) {
       filter(`Bordercheck type` %in% check_filters[[input$check_filter]],
              n_egates == input$n_egates,
              round(egate_uptake, 8) == round(input$egate_uptake, 8),
-             round(target_eligibility, 8) == round(input$target_eligibility, 8),
-             gen_arrivals_seed == gen_arrivals_seed[1],
-             gen_queue_seed == gen_queue_seed[1]) %>% 
+             round(target_eligibility, 8) == round(input$target_eligibility, 8)) %>% 
       ggplot(aes(x = route_datetime_posix, y = wait_time / 60, colour = `Bordercheck type`)) +
         geom_point() + 
         facet_wrap(~year, nrow = 1, scales = "free_x") + 
@@ -194,14 +203,16 @@ server <- function(input, output) {
   
   
   output$kpi_plot <- renderPlot({
-    sample_queue_data %>%
+    tar_read(shiny_sim_kpi_data) %>%
       filter(n_egates == input$n_egates,
              round(egate_uptake, 8) == round(input$egate_uptake, 8),
              round(target_eligibility, 8) == round(input$target_eligibility, 8)) %>% 
-      nest(year_data = - c("year", "Bordercheck type")) %>% 
-      filter(`Bordercheck type` %in% check_filters[[input$check_filter]]) %>% 
-      mutate(kpi = map_dbl(year_data, ~queue_data_kpis[[input$select_kpi]](.))) %>%      
-      ggplot(aes(x = year, y = kpi, fill = `Bordercheck type`)) + 
+      pivot_longer(cols = paste0(kpis[[input$select_kpi]], c("_desk", "_egate")),
+                   names_to = "check", values_to = "kpi") %>% 
+      summarise(kpi = mean(kpi), .by = c("year", "check")) %>% 
+      mutate(check = if_else(str_detect(check, "desk"), "Desk", "eGate")) %>% 
+      filter(check %in% check_filters[[input$check_filters]]) %>% 
+      ggplot(aes(x = year, y = kpi, fill = check)) + 
         geom_col(position = "dodge", alpha = 0.9) + 
         theme_minimal() + 
         theme(plot.title = element_text(family = "Lato",            
@@ -217,18 +228,17 @@ server <- function(input, output) {
                                         size = 30),
               legend.title = element_blank()) + 
           labs(x = "Year", y = input$select_kpi) + 
-          scale_fill_manual(labels = c("Desk", "eGate"), 
-                            values = edi_airport_colours[2:1],
-                            drop = FALSE)
+      scale_fill_manual(labels = c("Desk", "eGate"), 
+                        values = edi_airport_colours[2:1],
+                        drop = FALSE)
       
   })
   output$joint_kpi_plot <- renderPlot({
-    sample_queue_data %>%
+    tar_read(shiny_sim_kpi_data) %>%
       filter(n_egates == input$n_egates,
              round(egate_uptake, 8) == round(input$egate_uptake, 8),
              round(target_eligibility, 8) == round(input$target_eligibility, 8)) %>% 
-      nest(year_data = - c("year")) %>% 
-      mutate(kpi = map_dbl(year_data, ~queue_data_kpis[[input$select_kpi]](.))) %>%      
+      select(year, kpi = all_of(paste0(kpis[[input$select_kpi]], "_both"))) %>% 
       ggplot(aes(x = year, y = kpi, fill = "Both")) + 
       geom_col(alpha = 0.9) + 
       theme_minimal() + 

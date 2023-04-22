@@ -20,8 +20,7 @@ get_queue_lengths <- function(passengers,
     mutate(desk_queue_length = cumsum(n_route_desk - n_border_desk),
            egate_queue_length = cumsum(n_route_egate - n_border_egate)) %>% 
     select(queue_length_datetime_int = rounded_route_datetime_int, desk_queue_length, egate_queue_length) %>% 
-    get_datetime_alternates(c("queue_length")) %>% 
-    mutate(year = format(queue_length_date_posix, "%Y"))
+    get_datetime_alternates(c("queue_length"))
   
   return(queue_lengths)
   
@@ -101,12 +100,15 @@ wait_time_15 <- function(queue_data) {
   return(mean((queue_data$bordercheck_start_time - queue_data$route_datetime_int) < 15*60))
 }
 
-queue_data_kpis <- list(
-  "Mean wait (mins)" = mean_wait_time, 
-  "Proportion waits < 1hr" = wait_time_60, 
-  "Proportion waits < 25mins" = wait_time_25, 
-  "Proportion waits < 15mins" = wait_time_15
-)
+
+queue_length_500_prop_days <- function(queue_lengths) {
+  prop_days_500 <- queue_lengths %>%
+    summarise(any_overflow = any(desk_queue_length + egate_queue_length > 500), .groups = c("queue_length_date_posix")) %>% 
+    pull(any_overflow) %>% 
+    mean()
+  
+  return(prop_days_500)
+}
 
 
 

@@ -3,7 +3,8 @@ generate_sim_settings <- function(seed = 1234,
                                   n_gen_queues = 1,
                                   n_egates_range = seq(10, 14, by = 2),
                                   egate_uptake_range = seq(.6, 1., by = .2),
-                                  target_eligibility_range = seq(.75, 1., .05)) {
+                                  target_eligibility_range = seq(.75, 1., .05),
+                                  year_range = as.character(2023:2027)) {
   set.seed(seed)
   gen_arrivals_seeds <- sample(1:100000, size = n_gen_arrivals)
   gen_queue_seeds <- sample(1:100000, size = n_gen_queues)
@@ -11,7 +12,8 @@ generate_sim_settings <- function(seed = 1234,
                            gen_queue_seed = gen_queue_seeds, 
                            n_egates = n_egates_range, 
                            egate_uptake = egate_uptake_range, 
-                           target_eligibility = target_eligibility_range)
+                           target_eligibility = target_eligibility_range,
+                           year = year_range)
   return(sim_settings)
 }
 
@@ -29,20 +31,36 @@ sim_analysis_data <- function(sim_settings,
                               base_walk_dist,
                               egate_failure_prop,
                               failed_egate_priority,
-                              queue_sample_size = 2500) {
+                              wait_time_kpis = list(),
+                              queue_length_kpis = list(),
+                              queue_sample_size = 500,
+                              input_time_interval = 15*60,
+                              save_data = FALSE) {
   # generate desks
   n_desks <- 9
-  desk_means <- pmax(0, rep(90, n_desks))#rnorm(n_desks, mean = 90, sd = 5))
+  desk_means <- pmax(0, rep(90, n_desks))
   desk_ids <- seq_len(n_desks)
   bordercheck_desks <- list(n_borderchecks = n_desks, 
                             bordercheck_means = desk_means,   
                             bordercheck_sd = 14,
                             bordercheck_ids = desk_ids)
+  if (save_data) {
+    sim_settings <- sim_settings %>% 
+      mutate(queue_length_data = vector(mode = "list", length = n()),
+             sample_queue_data = vector(mode = "list", length = n()))
+  }
   
-  sim_settings <- sim_settings %>% 
-    mutate(queue_length_data = vector(mode = "list", length = nrow(.)),
-           sample_queue_data = vector(mode = "list", length = nrow(.))) %>% 
-    nest(non_arrivals_data = -gen_arrivals_seed)
+  n_settings <- nrow(sim_settings)
+  for (kpi in wait_time_kpis) {
+    sim_settings[[paste0(kpi, "_desk")]] <- numeric(n_settings)
+    sim_settings[[paste0(kpi, "_egate")]] <- numeric(n_settings)
+  }
+  for (kpi in queue_length_kpis) {
+    sim_settings[[paste0(kpi, "_desk")]] <- numeric(n_settings)
+    sim_settings[[paste0(kpi, "_egate")]] <- numeric(n_settings)
+  }
+  
+  sim_settings <- nest(sim_settings, non_arrivals_data = -gen_arrivals_seed)
   
   progress_counter <- 0
   for (arrivals_id in seq_len(nrow(sim_settings))) {
@@ -66,6 +84,7 @@ sim_analysis_data <- function(sim_settings,
       queue_seed = sim_settings$non_arrivals_data[[arrivals_id]]$gen_queue_seed[[non_arrivals_id]]
       egate_uptake <- sim_settings$non_arrivals_data[[arrivals_id]]$egate_uptake[[non_arrivals_id]]
       target_eligibility <- sim_settings$non_arrivals_data[[arrivals_id]]$target_eligibility[[non_arrivals_id]]
+      year <- sim_settings$non_arrivals_data[[arrivals_id]]$year[[non_arrivals_id]]
       
       bordercheck_egates = list(
         n_borderchecks = n_egates, 
@@ -73,8 +92,10 @@ sim_analysis_data <- function(sim_settings,
         bordercheck_sd = 5,
         bordercheck_ids = seq_len(n_egates))
       
-      simulated_queue <- simulated_passengers %>% 
-        sim_queues(bordercheck_desks = bordercheck_desks,
+      simulated_queue <- simulated_passengers[
+        as.character(year(simulated_passengers$sched_aircraft_date_posix)) == year,
+      ] %>% 
+        immigration_queue(bordercheck_desks = bordercheck_desks,
                    bordercheck_egates = bordercheck_egates,
                    egate_uptake_prop = egate_uptake,
                    target_eligibility = target_eligibility,
@@ -86,10 +107,22 @@ sim_analysis_data <- function(sim_settings,
         get_queue_lengths(input_time_interval = input_time_interval)
       
       for (kpi in wait_time_kpis) {
-        sim_settings$non_arrivals_data[[arrivals_id]][[kpi]][non_arrivals_id] <- get(kpi)(simulated_queue)
+        sim_settings$non_arrivals_data[[arrivals_id]][[paste0(kpi, "_desk")]][non_arrivals_id] <- 
+          get(kpi)(simulated_queue[simulated_queue$egate_used == "desk", ])
+        sim_settings$non_arrivals_data[[arrivals_id]][[paste0(kpi, "_egate")]][non_arrivals_id] <- 
+          get(kpi)(simulated_queue[simulated_queue$egate_used == "egate", ])
+        sim_settings$non_arrivals_data[[arrivals_id]][[paste0(kpi, "_both")]][non_arrivals_id] <- 
+          get(kpi)(simulated_queue)
+        
       }
       for (kpi in queue_length_kpis) {
-        sim_settings$non_arrivals_data[[arrivals_id]][[kpi]][non_arrivals_id] <- get(kpi)(simulated_queue_lengths)
+        sim_settings$non_arrivals_data[[arrivals_id]][[paste0(kpi, "_desk")]][non_arrivals_id] <- 
+          get(kpi)(mutate(simulated_queue_lengths, queue_length = desk_queue_length))
+        sim_settings$non_arrivals_data[[arrivals_id]][[paste0(kpi, "_egate")]][non_arrivals_id] <- 
+          get(kpi)(mutate(simulated_queue_lengths, queue_length = egate_queue_length))
+        sim_settings$non_arrivals_data[[arrivals_id]][[paste0(kpi, "_both")]][non_arrivals_id] <- 
+          get(kpi)(mutate(simulated_queue_lengths, 
+                          queue_length = egate_queue_length + desk_queue_length))
       }
       
       if (save_data) {
