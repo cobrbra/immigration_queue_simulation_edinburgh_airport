@@ -70,14 +70,54 @@ sim_results <- sim_analysis_data(sim_settings,
                                  wait_time_kpis = c("mean_wait_time", "wait_time_60", "wait_time_15"),
                                  save_data = FALSE)
 
-sim_results %>% 
-  select(-c(queue_length_data, sample_queue_data)) %>% 
-  filter(n_egates == 10,
-         egate_uptake == .8,
-         target_eligibility == .8) %>% 
-  pivot_longer(cols = c("mean_wait_time_desk", "mean_wait_time_egate"), 
-               names_to = "check", values_to = "kpi") %>% 
-  summarise(kpi = mean(kpi), .by = c("year", "check"))
+
+# EXAMPLE MULTI-SIM EXPERIMENT SPECIFYING TRAJECTORY
+
+specify_sim_settings <- function(n_egates_range,
+                                 egate_uptake_range = seq(.7, .99, length.out = 5),
+                                 target_eligibility_range = seq(.85, .96, length.out = 5),
+                                 year_range = as.character(2023:2027),
+                                 n_gen_arrivals = 1,
+                                 n_gen_queues = 1,
+                                 seed = 1234) {
+  set.seed(seed)
+  gen_arrivals_seeds <- sample(1:100000, size = n_gen_arrivals)
+  gen_queue_seeds <- sample(1:100000, size = n_gen_queues)
+  
+  specificied_settings <- data.frame(
+    year = year_range,
+    n_egates = n_egates_range,
+    egate_uptake = egate_uptake_range,
+    target_eligibility = target_eligibility_range
+  )
+  
+  generated_settings <- crossing(
+    gen_arrivals_seed = gen_arrivals_seeds,
+    gen_queue_seed = gen_queue_seeds
+  )
+  
+  return(cross_join(specificied_settings, generated_settings))
+
+}
+
+generate_sim_settings <- function(n_egates_range = seq(10, 14, by = 2),
+                                  egate_uptake_range = seq(.6, 1., by = .2),
+                                  target_eligibility_range = seq(.75, 1., .05),
+                                  year_range = as.character(2023:2027),
+                                  n_gen_arrivals = 1,
+                                  n_gen_queues = 1,
+                                  seed = 1234) {
+  set.seed(seed)
+  gen_arrivals_seeds <- sample(1:100000, size = n_gen_arrivals)
+  gen_queue_seeds <- sample(1:100000, size = n_gen_queues)
+  sim_settings <- crossing(gen_arrivals_seed = gen_arrivals_seeds, 
+                           gen_queue_seed = gen_queue_seeds, 
+                           n_egates = n_egates_range, 
+                           egate_uptake = egate_uptake_range, 
+                           target_eligibility = target_eligibility_range,
+                           year = year_range)
+  return(sim_settings)
+}
 
 
 
