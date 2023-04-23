@@ -86,8 +86,8 @@ ui <- fluidPage(
                                             "Proportion waits < 25mins", 
                                             "Proportion waits < 15mins"), 
                                      "Queue length" = 
-                                       list("Prob of minor incident (queue > 500) per day"), 
-                                            "Prob of major incident (queue > 650) per day")),
+                                       list("Minutes exceeding overflow"), 
+                                            "Minutes exceeding contingency")),
           plotOutput(outputId = "kpi_plot"),
           plotOutput(outputId = "joint_kpi_plot")
           )
@@ -113,7 +113,9 @@ server <- function(input, output) {
     "Mean wait (mins)" = "mean_wait_time", 
     "Proportion waits < 1hr" = "wait_time_60", 
     "Proportion waits < 25mins" = "wait_time_25", 
-    "Proportion waits < 15mins" = "wait_time_15"
+    "Proportion waits < 15mins" = "wait_time_15",
+    "Minutes exceeding overflow" = "queue_length_650",
+    "Minutes exceeding contingency" = "queue_length_1250"
   )
   
   queue_length_data <- tar_read(shiny_sim_raw_data) %>% 
