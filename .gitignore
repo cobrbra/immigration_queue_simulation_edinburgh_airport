@@ -8,6 +8,10 @@
 # User-specific files
 .Ruserdata
 
+# Mac-specific files
+.DS_Store
+figures/.DS_Store
+
 # Example code in package build process
 *-Ex.R
 
