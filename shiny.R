@@ -82,8 +82,7 @@ ui <- fluidPage(
           selectInput("select_kpi", "Select KPI:", 
                       choices = list("Wait time" = 
                                        list("Mean wait (mins)", 
-                                            "Proportion waits < 1hr", 
-                                            "Proportion waits < 25mins", 
+                                            "Proportion waits < 1hr",
                                             "Proportion waits < 15mins"), 
                                      "Queue length" = 
                                        list("Minutes exceeding overflow"), 
