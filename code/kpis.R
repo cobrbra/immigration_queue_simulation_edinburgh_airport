@@ -101,16 +101,30 @@ wait_time_15 <- function(queue_data) {
 }
 
 
-queue_length_mins_above_300 <- function(queue_lengths, mins_per_point = 15) {
-  mins_above_500 <- mins_per_point * sum(queue_lengths$queue_length > 300)
+queue_length_300 <- function(queue_lengths, mins_per_point = 15) {
+  mins_above_300 <- mins_per_point * sum(queue_lengths$queue_length > 300)
+  return(mins_above_300)
+}
+
+queue_length_375 <- function(queue_lengths, mins_per_point = 15) {
+  mins_above_375 <- mins_per_point * sum(queue_lengths$queue_length > 375)
+  return(mins_above_375)
+}
+
+queue_length_500 <- function(queue_lengths, mins_per_point = 15) {
+  mins_above_500 <- mins_per_point * sum(queue_lengths$queue_length > 500)
   return(mins_above_500)
 }
 
-queue_length_mins_above_375 <- function(queue_lengths, mins_per_point = 15) {
-  mins_above_500 <- mins_per_point * sum(queue_lengths$queue_length > 375)
-  return(mins_above_500)
+queue_length_650 <- function(queue_lengths, mins_per_point = 15) {
+  mins_above_650 <- mins_per_point * sum(queue_lengths$queue_length > 650)
+  return(mins_above_650)
 }
 
+queue_length_1250 <- function(queue_lengths, mins_per_point = 15) {
+  mins_above_1250 <- mins_per_point * sum(queue_lengths$queue_length > 1250)
+  return(mins_above_1250)
+}
 
 
 # get_queue_kpis <- function(queue_data) {
