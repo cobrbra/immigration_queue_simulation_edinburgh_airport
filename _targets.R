@@ -231,7 +231,7 @@ list(
   
   # Data around core recommendations
   tar_target(core_recommendation, 
-             c(n_egates = c(10, 13, 16, 20, 25))),
+             c(10, 13, 16, 20, 25)),
   tar_target(rec_fig_sim_settings,
              specify_sim_settings(n_egates_range = core_recommendation,
                                   n_gen_arrivals = 10,

@@ -7,37 +7,14 @@ get_tables <- function(future_aircrafts_arrivals,
   captions <- list()
   bold <- function(x) {paste('{\\textbf{',x,'}}', sep ='')}
   
-  
-  tables$anticipated_schedule <- future_aircrafts_arrivals %>%
-    mutate(Year = format(sched_aircraft_datetime_posix, "%Y")) %>% 
-    group_by(Year) %>% 
-    nest() %>% 
-    mutate(
-      `Number of Flights` = map_int(data, nrow),
-      `Start Date` = map_chr(data, ~ format(min(.$sched_aircraft_date_posix),
-                                            format = "%d/%m")),
-      `End Date` = map_chr(data, ~ format(max(.$sched_aircraft_date_posix),
-                                          format = "%d/%m"))) %>% 
-    select(Year, `Start Date`, `End Date`, `Number of Flights`) 
-  captions$anticipated_schedule <- "Anticipated flight schedule (non-UKIE) for 2023-2027."
-  
-  tables$observed_schedule <- (observed_aircrafts_arrivals) %>%
-    mutate(Year = as.integer(format(sched_aircraft_datetime_posix, "%Y"))) %>% 
-    group_by(Year) %>% 
-    nest() %>% 
-    mutate(
-      `Number of Flights` = format(map_int(data, nrow),
-                                   big.mark = ","),
-      `Start Date` = map_chr(data, ~ format(min(.$sched_aircraft_date_posix),
-                                            format = "%d/%m")),
-      `End Date` = map_chr(data, ~ format(max(.$sched_aircraft_date_posix),
-                                          format = "%d/%m"))) %>% 
-    select(Year, `Start Date`, `End Date`, `Number of Flights`) %>% 
-    arrange(Year)
-  captions$observed_schedule <- "Historical arrivals for Edinburgh Airport, 2019-2022."
+  tables$core_recommendation <- matrix(as.integer(tar_read(core_recommendation)), 
+                                       nrow = 1, byrow = TRUE) %>%
+      as_tibble(.name_repair = ~ as.character(2023:2027))
+  captions$core_recommendation <- c("Core recommendation for eGate construction.")
   
   # tables$table_1 <- ...
   # add code to generate new tables here
+
   
   # the code below does pre-processing to produce .tex tables to be used in the report
   
@@ -58,3 +35,31 @@ get_tables <- function(future_aircrafts_arrivals,
   }
   return(tables)
 }
+
+# tables$anticipated_schedule <- future_aircrafts_arrivals %>%
+#   mutate(Year = format(sched_aircraft_datetime_posix, "%Y")) %>% 
+#   group_by(Year) %>% 
+#   nest() %>% 
+#   mutate(
+#     `Number of Flights` = map_int(data, nrow),
+#     `Start Date` = map_chr(data, ~ format(min(.$sched_aircraft_date_posix),
+#                                           format = "%d/%m")),
+#     `End Date` = map_chr(data, ~ format(max(.$sched_aircraft_date_posix),
+#                                         format = "%d/%m"))) %>% 
+#   select(Year, `Start Date`, `End Date`, `Number of Flights`) 
+# captions$anticipated_schedule <- "Anticipated flight schedule (non-UKIE) for 2023-2027."
+# 
+# tables$observed_schedule <- (observed_aircrafts_arrivals) %>%
+#   mutate(Year = as.integer(format(sched_aircraft_datetime_posix, "%Y"))) %>% 
+#   group_by(Year) %>% 
+#   nest() %>% 
+#   mutate(
+#     `Number of Flights` = format(map_int(data, nrow),
+#                                  big.mark = ","),
+#     `Start Date` = map_chr(data, ~ format(min(.$sched_aircraft_date_posix),
+#                                           format = "%d/%m")),
+#     `End Date` = map_chr(data, ~ format(max(.$sched_aircraft_date_posix),
+#                                         format = "%d/%m"))) %>% 
+#   select(Year, `Start Date`, `End Date`, `Number of Flights`) %>% 
+#   arrange(Year)
+# captions$observed_schedule <- "Historical arrivals for Edinburgh Airport, 2019-2022."
