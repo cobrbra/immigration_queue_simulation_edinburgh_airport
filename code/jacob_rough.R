@@ -33,6 +33,11 @@ bordercheck_egates = list(
   bordercheck_mean = 45,
   bordercheck_sd = 5)
 
+
+tar_make('prop_nationality')
+tar_read(prop_nationality)
+  
+
 simulated_arrivals <- tar_read(future_aircrafts_arrivals) %>% 
   complete_aircrafts_arrivals(tar_read(hubs), tar_read(countries), tar_read(prop_nationality), 
                               tar_read(delay_dist), tar_read(n_passengers_quantiles), 
@@ -44,11 +49,12 @@ simulated_arrivals <- tar_read(future_aircrafts_arrivals) %>%
 simulated_queue <- simulated_arrivals %>% 
   immigration_queue(bordercheck_desks = bordercheck_desks, 
              bordercheck_egates = bordercheck_egates, 
-             egate_uptake_prop = .7, target_eligibility = .85, 
+             egate_uptake_prop = .7, target_eligibility = .8, 
              egate_failure_prop = tar_read(egate_failure_prop), 
-             failed_egate_priority = tar_read(failed_egate_priority),
-             seed = 1)   
+             failed_egate_priority = tar_read(failed_egate_priority))   
 
+count(simulated_queue, egate_eligibility) %>% 
+  mutate(n = n / sum(n))
 
 # EXAMPLE MULTI-SIM EXPERIMENT
 
