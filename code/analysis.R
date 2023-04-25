@@ -1,6 +1,6 @@
 specify_sim_settings <- function(n_egates_range,
-                                 egate_uptake_range = seq(.7, .99, length.out = 5),
-                                 target_eligibility_range = seq(.85, .96, length.out = 5),
+                                 egate_uptake_range = seq(.75, .99, length.out = 5),
+                                 target_eligibility_range = seq(.8, .96, length.out = 5),
                                  year_range = as.character(2023:2027),
                                  n_gen_arrivals = 1,
                                  n_gen_queues = 1,
