@@ -253,6 +253,40 @@ list(
                                wait_time_kpis = c("mean_wait_time", "wait_time_60", "wait_time_15"),
                                queue_length_kpis = c("queue_length_650", "queue_length_1250"),
                                save_data = FALSE)),
+  
+  # Data to demonstrate robustness
+  tar_target(robustness_sim_df,
+             crossing(target_eligibility = c(.85, .9, .95, .99),
+                      egate_uptake = c(.75, .8, .85, .9, .95, .99)) %>% 
+               mutate(year = "2027") %>% 
+               mutate(n_egates = tar_read(core_recommendation)[5])),
+  tar_target(robustness_sim_settings,
+             specify_sim_settings(
+               n_egates_range = robustness_sim_df$n_egates,
+               egate_uptake_range = robustness_sim_df$egate_uptake,
+               target_eligibility_range = robustness_sim_df$target_eligibility,
+               year_range = robustness_sim_df$year,
+               n_gen_arrivals = 5,
+               n_gen_queues = 5)),
+  
+  tar_target(robustness_sim_data, 
+             sim_analysis_data(robustness_sim_settings,
+                              tar_read(future_aircrafts_arrivals), 
+                              hubs = tar_read(hubs), 
+                              countries = tar_read(countries), 
+                              prop_nationality = tar_read(prop_nationality), 
+                              delay_dist = tar_read(delay_dist), 
+                              n_passengers_quantiles = tar_read(n_passengers_quantiles), 
+                              egate_failure_prop = tar_read(egate_failure_prop),
+                              failed_egate_priority = tar_read(failed_egate_priority),
+                              coached_levels = tar_read(future_coached_levels), 
+                              coach_dist = tar_read(coach_dist), 
+                              walk_dist = tar_read(walk_dist), 
+                              base_walk_dist = tar_read(base_walk_dist),
+                              wait_time_kpis = c("mean_wait_time", "wait_time_60", "wait_time_15"),
+                              queue_length_kpis = c("queue_length_650", "queue_length_1250"),
+                              save_data = FALSE)),
+  
   tar_target(rec_minus_fig_sim_settings,
              specify_sim_settings(n_egates_range = core_recommendation - c(0, 1, 1, 1, 1),
                                   n_gen_arrivals = 10,
@@ -286,7 +320,8 @@ list(
                          walk_dist = walk_dist,
                          base_walk_dist = base_walk_dist,
                          rec_fig_sim_data = rec_fig_sim_data,
-                         rec_minus_fig_sim_data = rec_minus_fig_sim_data)),
+                         rec_minus_fig_sim_data = rec_minus_fig_sim_data,
+                         robustness_sim_data)),
   tar_target(tables,
              get_tables(future_aircrafts_arrivals = future_aircrafts_arrivals,
                         observed_aircrafts_arrivals = observed_aircrafts_arrivals))

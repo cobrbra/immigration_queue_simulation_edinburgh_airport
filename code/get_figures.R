@@ -46,7 +46,8 @@ get_figures <- function(future_aircrafts_arrivals, future_coached_levels,
                         window_queue,
                         coach_dist, walk_dist, base_walk_dist, 
                         rec_fig_sim_data, 
-                        rec_minus_fig_sim_data, ...) {
+                        rec_minus_fig_sim_data, 
+                        robustness_sim_data, ...) {
   # results <- targets::tar_read(example_results) # Use for debugging, COMMENT WHEN RUNNING TARGETS
   font_add_google("Lato")
   showtext_auto()
@@ -256,6 +257,33 @@ get_figures <- function(future_aircrafts_arrivals, future_coached_levels,
     scale_fill_manual(values = edi_airport_colours[c(7, 4:6, 2:1)]) +
     scale_colour_manual(values = edi_airport_colours[c(7, 4:6, 2:1)])
   figure_sizes$minus_core_rec_fig <- c(12, 5)
+  
+  figures$robustness_fig <- (robustness_sim_data) %>% 
+    summarise(wait_time_60_egate = mean(wait_time_60_egate),
+              wait_time_60_desk = mean(wait_time_60_desk),
+              queue_length_1250_egate = mean(queue_length_1250_egate),
+              queue_length_1250_desk = mean(queue_length_1250_desk),
+              .by = c("egate_uptake", "target_eligibility", "year", "n_egates")) %>% 
+    pivot_longer(c(wait_time_60_desk, wait_time_60_egate,
+                   queue_length_1250_egate, queue_length_1250_desk), 
+                 names_to = "which_stat", values_to = "stat") %>% 
+    mutate(
+      col = case_when(
+        str_detect(which_stat, "_desk") ~ "Desk",
+        str_detect(which_stat, "_egate") ~ "eGate"),
+      target_eligibility = paste("eGate eligibility =", target_eligibility),
+      which_kpi = if_else(str_detect(which_stat, "1250"),
+                          "Contingency in use (mins)",
+                          "Proportion waits < 60mins")) %>% 
+    ggplot(aes(x = egate_uptake, y = stat, colour = col)) + 
+    geom_point(size = 4) + 
+    facet_grid(which_kpi~target_eligibility, scales = "free_y") +
+    theme_edi_airport() + 
+    theme(legend.title = element_blank(),
+          panel.spacing = unit(2, "lines")) + 
+    labs(x = "eGate Uptake", y = "") + 
+    scale_colour_manual(values = edi_airport_colours[2:1])
+  figure_sizes$robustness_fig <- c(10, 5)
   
   # figures$figure_1 <- ...  + 
     # theme_edi_airport() +
