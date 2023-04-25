@@ -182,14 +182,14 @@ get_figures <- function(future_aircrafts_arrivals, future_coached_levels,
           which_stat %in% c("egate_uptake", "target_eligibility", "overall_usage") ~ "Core Assumptions",
           str_detect(which_stat, "15") ~ "Proportion waits < 15mins", 
           str_detect(which_stat, "60") ~ "Proportion waits < 60mins",
-          str_detect(which_stat, "650") ~ "Minutes exceeding overflow",
-          str_detect(which_stat, "1250") ~ "Minutes exceeding contingency"),
+          str_detect(which_stat, "650") ~ "Contingency in use (mins)",
+          str_detect(which_stat, "1250") ~ "Exceeding contingency (mins)"),
         levels = c("Recommended Number of eGates",
                    "Core Assumptions",
                    "Proportion waits < 15mins", 
                    "Proportion waits < 60mins",
-                   "Minutes exceeding overflow", 
-                   "Minutes exceeding contingency")))
+                   "Contingency in use (mins)", 
+                   "Exceeding contingency (mins)")))
   
   figures$core_rec_fig <- core_recommendation_stats %>% 
     ggplot(aes(x = year, y = stat, fill = fill, colour = fill)) + 
