@@ -45,7 +45,8 @@ get_figures <- function(future_aircrafts_arrivals, future_coached_levels,
                         window_aircrafts_arrivals,
                         window_queue,
                         coach_dist, walk_dist, base_walk_dist, 
-                        rec_fig_sim_data, ...) {
+                        rec_fig_sim_data, 
+                        rec_minus_fig_sim_data, ...) {
   # results <- targets::tar_read(example_results) # Use for debugging, COMMENT WHEN RUNNING TARGETS
   font_add_google("Lato")
   showtext_auto()
@@ -202,6 +203,59 @@ get_figures <- function(future_aircrafts_arrivals, future_coached_levels,
     scale_fill_manual(values = edi_airport_colours[c(7, 4:6, 2:1)]) +
     scale_colour_manual(values = edi_airport_colours[c(7, 4:6, 2:1)])
   figure_sizes$core_rec_fig <- c(12, 5)
+  
+  minus_core_recommendation_stats <- rec_minus_fig_sim_data %>% 
+    summarise(wait_time_60_egate = mean(wait_time_60_egate), 
+              wait_time_60_desk = mean(wait_time_60_desk),
+              wait_time_15_desk = mean(wait_time_15_desk),
+              wait_time_15_egate = mean(wait_time_15_egate),
+              queue_length_650_egate = mean(queue_length_650_egate),
+              queue_length_650_desk = mean(queue_length_650_desk),
+              queue_length_1250_egate = mean(queue_length_1250_egate),
+              queue_length_1250_desk = mean(queue_length_1250_desk),
+              .by = c("year", "n_egates", "egate_uptake", "target_eligibility")) %>% 
+    mutate(overall_usage = egate_uptake * target_eligibility) %>% 
+    pivot_longer(cols = c(n_egates, target_eligibility, egate_uptake, overall_usage,
+                          wait_time_60_desk, wait_time_60_egate, wait_time_15_desk, wait_time_15_egate,
+                          queue_length_650_egate, queue_length_650_desk, queue_length_1250_egate, queue_length_1250_desk),
+                 names_to = "which_stat",
+                 values_to = "stat") %>%
+    mutate(
+      fill = factor(
+        case_when(
+          which_stat == "n_egates" ~ "No. eGates",
+          str_detect(which_stat, "_desk") ~ "Desk", 
+          str_detect(which_stat, "_egate") ~ "eGate",
+          which_stat == "target_eligibility" ~ "eGate Eligibility",
+          which_stat == "egate_uptake" ~ "eGate Uptake",
+          which_stat == "overall_usage" ~ "Overall eGate Usage"),
+        levels = c("No. eGates", "eGate Eligibility", "eGate Uptake", "Overall eGate Usage", "Desk", "eGate")),
+      fac = factor(
+        case_when(
+          str_detect(which_stat, "n_egates") ~ "Recommended Number of eGates",
+          which_stat %in% c("egate_uptake", "target_eligibility", "overall_usage") ~ "Core Assumptions",
+          str_detect(which_stat, "15") ~ "Proportion waits < 15mins", 
+          str_detect(which_stat, "60") ~ "Proportion waits < 60mins",
+          str_detect(which_stat, "650") ~ "Contingency in use (mins)",
+          str_detect(which_stat, "1250") ~ "Exceeding contingency (mins)"),
+        levels = c("Recommended Number of eGates",
+                   "Core Assumptions",
+                   "Proportion waits < 15mins", 
+                   "Proportion waits < 60mins",
+                   "Contingency in use (mins)", 
+                   "Exceeding contingency (mins)")))
+  
+  figures$minus_core_rec_fig <- minus_core_recommendation_stats %>% 
+    ggplot(aes(x = year, y = stat, fill = fill, colour = fill)) + 
+    geom_col(position = "dodge", alpha = 0.9) + 
+    facet_wrap(~fac, scales = "free_y", dir = "v", nrow = 2) + 
+    theme_edi_airport() +
+    theme(legend.title = element_blank(),
+          legend.position = "bottom") + 
+    labs(x = "Year", y = "")  + 
+    scale_fill_manual(values = edi_airport_colours[c(7, 4:6, 2:1)]) +
+    scale_colour_manual(values = edi_airport_colours[c(7, 4:6, 2:1)])
+  figure_sizes$minus_core_rec_fig <- c(12, 5)
   
   # figures$figure_1 <- ...  + 
     # theme_edi_airport() +
