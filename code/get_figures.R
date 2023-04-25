@@ -115,21 +115,24 @@ get_figures <- function(future_aircrafts_arrivals, future_coached_levels,
     ylim(0,200) 
   
   panel_3 <- bind_rows(
-    window_queue %>% 
-      mutate(kpi = (bordercheck_start_time - route_datetime_int)/60,
+    (window_queue) %>% 
+      mutate(wait = (bordercheck_start_time - route_datetime_int)/60,
              check = if_else(egate_used == "desk", "Desk", "eGate"),
-             fac = "Wait Time (mins)") %>% 
-      select(route_datetime_posix, check, kpi, fac),
-    window_queue %>%
+             fac = "Wait Time (mins)",
+             length = NA) %>% 
+      select(route_datetime_posix, check, wait, length, fac),
+    (window_queue) %>%
       get_queue_lengths(input_time_interval = 60) %>% 
       pivot_longer(c(desk_queue_length, egate_queue_length), 
-                   names_to = "check", values_to = "kpi") %>% 
+                   names_to = "check", values_to = "length") %>% 
       mutate(check = if_else(check == "desk_queue_length", "Desk", "eGate"),
-             fac = "Queue Length") %>% 
-      select(route_datetime_posix = queue_length_datetime_posix, check, kpi, fac)
+             fac = "Queue Length",
+             wait = NA) %>% 
+      select(route_datetime_posix = queue_length_datetime_posix, check, wait, length, fac)
   ) %>% 
-    ggplot(aes(x = route_datetime_posix, y = kpi, colour = check)) + 
-    geom_point() + 
+    ggplot(aes(x = route_datetime_posix, colour = check)) + 
+    geom_point(aes(y = wait)) +
+    geom_line(aes(y = length), size = 2) + 
     theme_edi_airport() + 
     theme(legend.title = element_blank(), axis.title = element_blank()) + 
     scale_colour_manual(values = edi_airport_colours[2:1]) + 
