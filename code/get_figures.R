@@ -131,8 +131,8 @@ get_figures <- function(future_aircrafts_arrivals, future_coached_levels,
       select(route_datetime_posix = queue_length_datetime_posix, check, wait, length, fac)
   ) %>% 
     ggplot(aes(x = route_datetime_posix, colour = check)) + 
-    geom_point(aes(y = wait)) +
-    geom_line(aes(y = length), size = 2) + 
+    geom_point(aes(y = wait), size = 0.75) +
+    geom_line(aes(y = length), size = 1) + 
     theme_edi_airport() + 
     theme(legend.title = element_blank(), axis.title = element_blank()) + 
     scale_colour_manual(values = edi_airport_colours[2:1]) + 
