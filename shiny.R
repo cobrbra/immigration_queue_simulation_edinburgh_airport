@@ -148,7 +148,7 @@ server <- function(input, output) {
       ggplot(aes(x = queue_length_datetime_posix, 
                  y = `Queue length`,
                  colour = `Bordercheck type`)) + 
-        geom_point() + 
+        geom_line(size = 2) + 
         facet_wrap(~year, nrow = 1, scales = "free_x") +
         theme_minimal() + 
         theme(plot.title = element_text(family = "Lato",            
@@ -178,7 +178,7 @@ server <- function(input, output) {
              round(egate_uptake, 8) == round(input$egate_uptake, 8),
              round(target_eligibility, 8) == round(input$target_eligibility, 8)) %>% 
       ggplot(aes(x = route_datetime_posix, y = wait_time / 60, colour = `Bordercheck type`)) +
-        geom_line() + 
+        geom_point() + 
         facet_wrap(~year, nrow = 1, scales = "free_x") + 
         theme_minimal() + 
         theme(plot.title = element_text(family = "Lato",            
