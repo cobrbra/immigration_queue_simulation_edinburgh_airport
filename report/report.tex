@@ -338,13 +338,13 @@ Given the assumed number of \gls{egate} eligibility and uptake, and our recommen
 One less eGate than core recommendation 2024-2027
 \begin{figure}[!ht]
     \centering
-    \figuretitle{With one fewer than recommended, queue length SLAs are breached}
+    \figuretitle{With one fewer eGate than recommended, queue length SLAs are breached}
     \includegraphics[width=\textwidth]{figures/minus_core_rec_fig.png}
      \caption{\textbf{Left}: Core \gls{egate} construction recommendation, with one fewer \glspl{egate} for each of the years 2024-2027. All other figures as in Figure~\ref{fig:core_rec_fig}.} \label{fig:minus_core_rec_fig}
 \end{figure}
 
 \section{Conclusion}
-Edinburgh Airport has identified strain on immigration services due to increased passenger burden as a risk to border operations over the next five years. To address this, they have asked for a simulation model to test different demand scenarios and process enhancements. We have developed such a model, which can be explored interactively via a \href{app_url}{Shiny App}. We have provided a central recommendation for the construction of X, X, X, and X new \glspl{egate} by 2024, 2025, 2026, and 2027 respectively. From extensive simulation and robustness analyses, our key conclusions are as follows.
+Edinburgh Airport has identified strain on immigration services due to increased passenger burden as a risk to border operations over the next five years. To address this, they have asked for a simulation model to test different demand scenarios and process enhancements. We have developed such a model, which can be explored interactively via a \href{app_url}{Shiny App}. We have incorporated data provided by the modelling competition and external sources to guide simulation parameters. Where we could not find appropriate data sources, we have made assumptions erring towards pessimistic values in order to evaluate worst-case scenarios. We have provided a central recommendation for the construction of X, X, X, and X new \glspl{egate} by 2024, 2025, 2026, and 2027 respectively. From extensive simulation and robustness analyses, our key conclusions are as follows.
 \begin{enumerate}
 
     \item Building five or fewer \glspl{egate} per year, queueing \glspl{kpi} for \gls{egate} passengers can stay within appropriate levels and indeed improve within the given time period.
@@ -352,10 +352,6 @@ Edinburgh Airport has identified strain on immigration services due to increased
     \item Improved \gls{egate} usage effectively mitigates dangerous desk queue scenarios, whether achieved by expanded eligibility or by increased uptake (for example via deployment of flow hosts).
     \item Under high demand scenarios (such as those anticipated by 2027), lower-than-recommended \gls{egate} construction will impact queue length and contingency usage without seriously impacting individual passenger wait times.
 \end{enumerate}
-
-
-
-Where we could not find appropriate data sources, we made assumptions that erred on the pessimistic side to avoid accidentally producing an overly optimistic scenario.
 
 No matter how many \glspl{egate} are built, they need to be used in order to have an impact on the wait times at the airport. To that extend it is important to keep \glspl{egate} uptake amongst eligible passengers high. It is therefore crucial that signage and direction are clear and prominent. Flow hosts also play a critical role as they can direct passengers to the correct queue. They are seen to be \textit{``particularly vital given high passenger usage and rapid throughput''} \cite[][paragraph 6.28]{Inspection_eGates} at the \glspl{egate}.
 
