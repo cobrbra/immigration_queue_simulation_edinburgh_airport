@@ -271,19 +271,21 @@ get_figures <- function(future_aircrafts_arrivals, future_coached_levels,
       col = case_when(
         str_detect(which_stat, "_desk") ~ "Desk",
         str_detect(which_stat, "_egate") ~ "eGate"),
-      target_eligibility = paste("eGate eligibility =", target_eligibility),
+      target_eligibility = paste0("Eligibility: ", round(100*target_eligibility), "%"),
       which_kpi = if_else(str_detect(which_stat, "1250"),
-                          "Contingency in use (mins)",
-                          "Proportion waits < 60mins")) %>% 
+                          "Contingency use (mins)",
+                          "Prop. waits <60mins")) %>% 
     ggplot(aes(x = egate_uptake, y = stat, colour = col)) + 
-    geom_point(size = 4) + 
+    geom_point(size = 2) + 
     facet_grid(which_kpi~target_eligibility, scales = "free_y") +
     theme_edi_airport() + 
     theme(legend.title = element_blank(),
-          panel.spacing = unit(2, "lines")) + 
+          panel.spacing = unit(2, "lines"),
+          strip.text = element_text(margin = margin(0,0,.2,.2, unit = "cm")),
+          axis.text.x = element_text(angle = 90)) + 
     labs(x = "eGate Uptake", y = "") + 
     scale_colour_manual(values = edi_airport_colours[2:1])
-  figure_sizes$robustness_fig <- c(10, 5)
+  figure_sizes$robustness_fig <- c(8, 4.2)
   
   # figures$figure_1 <- ...  + 
     # theme_edi_airport() +
