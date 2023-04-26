@@ -202,7 +202,8 @@ get_figures <- function(future_aircrafts_arrivals, future_coached_levels,
           legend.position = "bottom") + 
     labs(x = "Year", y = "")  + 
     scale_fill_manual(values = edi_airport_colours[c(7, 4:6, 2:1)]) +
-    scale_colour_manual(values = edi_airport_colours[c(7, 4:6, 2:1)])
+    scale_colour_manual(values = edi_airport_colours[c(7, 4:6, 2:1)]) +
+    scale_y_continuous(labels = scales::comma)
   figure_sizes$core_rec_fig <- c(12, 5)
   
   minus_core_recommendation_stats <- rec_minus_fig_sim_data %>% 
@@ -255,7 +256,8 @@ get_figures <- function(future_aircrafts_arrivals, future_coached_levels,
           legend.position = "bottom") + 
     labs(x = "Year", y = "")  + 
     scale_fill_manual(values = edi_airport_colours[c(7, 4:6, 2:1)]) +
-    scale_colour_manual(values = edi_airport_colours[c(7, 4:6, 2:1)])
+    scale_colour_manual(values = edi_airport_colours[c(7, 4:6, 2:1)]) + 
+    scale_y_continuous(labels = scales::comma)
   figure_sizes$minus_core_rec_fig <- c(12, 5)
   
   figures$robustness_fig <- (robustness_sim_data) %>% 
@@ -284,7 +286,8 @@ get_figures <- function(future_aircrafts_arrivals, future_coached_levels,
           strip.text = element_text(margin = margin(0,0,.2,.2, unit = "cm")),
           axis.text.x = element_text(angle = 90)) + 
     labs(x = "eGate Uptake", y = "") + 
-    scale_colour_manual(values = edi_airport_colours[2:1])
+    scale_colour_manual(values = edi_airport_colours[2:1]) + 
+    scale_y_continuous(labels = scales::comma)
   figure_sizes$robustness_fig <- c(8, 4.2)
   
   # figures$figure_1 <- ...  + 
