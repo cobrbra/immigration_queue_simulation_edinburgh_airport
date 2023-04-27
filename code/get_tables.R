@@ -1,5 +1,6 @@
 get_tables <- function(future_aircrafts_arrivals, 
                        observed_aircrafts_arrivals, 
+                       core_recommendation,
                        ...) {
   # results <- targets::tar_read(example_results) # Use for debugging, COMMENT WHEN RUNNING TARGETS
   
