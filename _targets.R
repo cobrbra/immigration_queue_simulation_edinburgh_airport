@@ -324,5 +324,6 @@ list(
                          robustness_sim_data)),
   tar_target(tables,
              get_tables(future_aircrafts_arrivals = future_aircrafts_arrivals,
-                        observed_aircrafts_arrivals = observed_aircrafts_arrivals))
+                        observed_aircrafts_arrivals = observed_aircrafts_arrivals,
+                        core_recommendation))
 )
