@@ -81,10 +81,12 @@ sim_analysis_data <- function(sim_settings,
   for (kpi in wait_time_kpis) {
     sim_settings[[paste0(kpi, "_desk")]] <- numeric(n_settings)
     sim_settings[[paste0(kpi, "_egate")]] <- numeric(n_settings)
+    sim_settings[[paste0(kpi, "_both")]] <- numeric(n_settings)
   }
   for (kpi in queue_length_kpis) {
     sim_settings[[paste0(kpi, "_desk")]] <- numeric(n_settings)
     sim_settings[[paste0(kpi, "_egate")]] <- numeric(n_settings)
+    sim_settings[[paste0(kpi, "_both")]] <- numeric(n_settings)
   }
   
   sim_settings <- nest(sim_settings, non_arrivals_data = -gen_arrivals_seed)
