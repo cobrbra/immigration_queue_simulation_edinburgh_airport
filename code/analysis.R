@@ -144,12 +144,11 @@ sim_analysis_data <- function(sim_settings,
       }
       for (kpi in queue_length_kpis) {
         sim_settings$non_arrivals_data[[arrivals_id]][[paste0(kpi, "_desk")]][non_arrivals_id] <- 
-          get(kpi)(mutate(simulated_queue_lengths, queue_length = desk_queue_length))
+          get(kpi)(simulated_queue_lengths, "desk")
         sim_settings$non_arrivals_data[[arrivals_id]][[paste0(kpi, "_egate")]][non_arrivals_id] <- 
-          get(kpi)(mutate(simulated_queue_lengths, queue_length = egate_queue_length))
+          get(kpi)(simulated_queue_lengths, "egate")
         sim_settings$non_arrivals_data[[arrivals_id]][[paste0(kpi, "_both")]][non_arrivals_id] <- 
-          get(kpi)(mutate(simulated_queue_lengths, 
-                          queue_length = egate_queue_length + desk_queue_length))
+          get(kpi)(simulated_queue_lengths, "both")
       }
       
       if (save_data) {

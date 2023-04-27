@@ -1,3 +1,20 @@
+### WAIT TIME ###
+mean_wait_time <- function(queue_data) {
+  return(mean(queue_data$bordercheck_start_time - queue_data$route_datetime_int)/60)
+}
+
+wait_time_60 <- function(queue_data) {
+  return(mean((queue_data$bordercheck_start_time - queue_data$route_datetime_int) < 60*60))
+}
+
+wait_time_25 <- function(queue_data) {
+  return(mean((queue_data$bordercheck_start_time - queue_data$route_datetime_int) < 25*60))
+}
+
+wait_time_15 <- function(queue_data) {
+  return(mean((queue_data$bordercheck_start_time - queue_data$route_datetime_int) < 15*60))
+}
+
 ### QUEUE LENGTH ###
 
 get_queue_lengths <- function(passengers,
@@ -24,6 +41,42 @@ get_queue_lengths <- function(passengers,
   
   return(queue_lengths)
   
+}
+
+exceeds_overflow <- function(queue_lengths, queue = "desk",
+                             hall_split= c(desk = .5, egate = .5),
+                             hall_size = 500,
+                             overflow_size = 150,
+                             mins_per_timepoint = 15) {
+  joint_queue <- pmax(queue_lengths$egate_queue_length - hall_split["egate"]*hall_size, 0) + 
+                 pmax(queue_lengths$desk_queue_length - hall_split["desk"]*hall_size, 0)
+  if (queue == "both") {
+    return(mins_per_timepoint * sum(joint_queue > overflow_size))
+  }
+  queue_exceeds_hall <- queue_lengths[[paste0(queue, "_queue_length")]] > hall_size*hall_split[queue]
+  mins_exceeding_overflow = mins_per_timepoint * sum(
+    (joint_queue > overflow_size) & queue_exceeds_hall
+  )
+  
+  return(mins_exceeding_overflow)
+}
+
+exceeds_contingency <- function(queue_lengths, queue = "desk",
+                                hall_split = c(desk = .5, egate = .5),
+                                hall_size = 500,
+                                contingency_size = 750,
+                                mins_per_timepoint = 15) {
+  joint_queue <- pmax(queue_lengths$egate_queue_length - hall_split["egate"]*hall_size, 0) + 
+                 pmax(queue_lengths$desk_queue_length - hall_split["desk"]*hall_size, 0)  
+  if (queue == "both") {
+    return(mins_per_timepoint * sum(joint_queue > contingency_size))
+  }
+  queue_exceeds_hall <- queue_lengths[[paste0(queue, "_queue_length")]] > hall_size * hall_split[queue]
+  mins_exceeding_contingency = mins_per_timepoint * sum(
+    (joint_queue > contingency_size) & queue_exceeds_hall
+  )
+  
+  return(mins_exceeding_contingency)
 }
 
 
@@ -84,47 +137,33 @@ get_queue_lengths <- function(passengers,
 #   return(queue_lengths %>% unnest(c(year_data, desk_queue_length, egate_queue_length)))
 # }
 
-mean_wait_time <- function(queue_data) {
-  return(mean(queue_data$bordercheck_start_time - queue_data$route_datetime_int)/60)
-}
 
-wait_time_60 <- function(queue_data) {
-  return(mean((queue_data$bordercheck_start_time - queue_data$route_datetime_int) < 60*60))
-}
-
-wait_time_25 <- function(queue_data) {
-  return(mean((queue_data$bordercheck_start_time - queue_data$route_datetime_int) < 25*60))
-}
-
-wait_time_15 <- function(queue_data) {
-  return(mean((queue_data$bordercheck_start_time - queue_data$route_datetime_int) < 15*60))
-}
-
-
-queue_length_300 <- function(queue_lengths, mins_per_point = 15) {
-  mins_above_300 <- mins_per_point * sum(queue_lengths$queue_length > 300)
-  return(mins_above_300)
-}
-
-queue_length_375 <- function(queue_lengths, mins_per_point = 15) {
-  mins_above_375 <- mins_per_point * sum(queue_lengths$queue_length > 375)
-  return(mins_above_375)
-}
-
-queue_length_500 <- function(queue_lengths, mins_per_point = 15) {
-  mins_above_500 <- mins_per_point * sum(queue_lengths$queue_length > 500)
-  return(mins_above_500)
-}
-
-queue_length_650 <- function(queue_lengths, mins_per_point = 15) {
-  mins_above_650 <- mins_per_point * sum(queue_lengths$queue_length > 650)
-  return(mins_above_650)
-}
-
-queue_length_1250 <- function(queue_lengths, mins_per_point = 15) {
-  mins_above_1250 <- mins_per_point * sum(queue_lengths$queue_length > 1250)
-  return(mins_above_1250)
-}
+# 
+# 
+# queue_length_300 <- function(queue_lengths, mins_per_point = 15) {
+#   mins_above_300 <- mins_per_point * sum(queue_lengths$queue_length > 300)
+#   return(mins_above_300)
+# }
+# 
+# queue_length_375 <- function(queue_lengths, mins_per_point = 15) {
+#   mins_above_375 <- mins_per_point * sum(queue_lengths$queue_length > 375)
+#   return(mins_above_375)
+# }
+# 
+# queue_length_500 <- function(queue_lengths, mins_per_point = 15) {
+#   mins_above_500 <- mins_per_point * sum(queue_lengths$queue_length > 500)
+#   return(mins_above_500)
+# }
+# 
+# queue_length_650 <- function(queue_lengths, mins_per_point = 15) {
+#   mins_above_650 <- mins_per_point * sum(queue_lengths$queue_length > 650)
+#   return(mins_above_650)
+# }
+# 
+# queue_length_1250 <- function(queue_lengths, mins_per_point = 15) {
+#   mins_above_1250 <- mins_per_point * sum(queue_lengths$queue_length > 1250)
+#   return(mins_above_1250)
+# }
 
 
 # get_queue_kpis <- function(queue_data) {

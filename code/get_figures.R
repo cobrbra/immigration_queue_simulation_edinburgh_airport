@@ -84,7 +84,7 @@ get_figures <- function(future_aircrafts_arrivals, future_coached_levels,
     scale_y_continuous(labels = scales::comma)
   figure_sizes$future_passenger_burden_fig <- c(7, 3)
   
-  panel_1 <- window_aircrafts_arrivals %>% 
+  panel_1 <- (window_aircrafts_arrivals) %>% 
     mutate(coached = factor(if_else(coached, "Coached", "Contact"),
                             levels = c("Contact", "Coached"))) %>% 
     ggplot(aes(x = sched_aircraft_datetime_posix, y = n_passengers)) + 
@@ -99,9 +99,9 @@ get_figures <- function(future_aircrafts_arrivals, future_coached_levels,
     xlim(as.POSIXct("2023-07-11 08:00:00"), as.POSIXct("2023-07-11 10:00:00")) + 
     ylim(0,200) 
   
-  panel_2 <- window_aircrafts_arrivals %>% 
+  panel_2 <- (window_aircrafts_arrivals) %>% 
     get_passengers_after_aircrafts(seed = 123) %>% 
-    get_passengers_after_routes(coach_dist, walk_dist, base_walk_dist,
+    get_passengers_after_routes((coach_dist), (walk_dist), (base_walk_dist),
                                 seed = 123) %>% 
     
     ggplot(aes(x = route_datetime_posix, 
@@ -152,20 +152,20 @@ get_figures <- function(future_aircrafts_arrivals, future_coached_levels,
     rel_widths = c(1, -.08, .8))
   figure_sizes$workflow_fig <- c(10,4)
   
-  core_recommendation_stats <- rec_fig_sim_data %>% 
+  core_recommendation_stats <- (rec_fig_sim_data) %>%
     summarise(wait_time_60_egate = mean(wait_time_60_egate), 
               wait_time_60_desk = mean(wait_time_60_desk),
               wait_time_15_desk = mean(wait_time_15_desk),
               wait_time_15_egate = mean(wait_time_15_egate),
-              queue_length_650_egate = mean(queue_length_650_egate),
-              queue_length_650_desk = mean(queue_length_650_desk),
-              queue_length_1250_egate = mean(queue_length_1250_egate),
-              queue_length_1250_desk = mean(queue_length_1250_desk),
+              exceeds_contingency_egate = mean(exceeds_contingency_egate)/60,
+              exceeds_contingency_desk = mean(exceeds_contingency_desk)/60,
+              exceeds_overflow_egate = mean(exceeds_overflow_egate)/60,
+              exceeds_overflow_desk = mean(exceeds_overflow_desk)/60,
               .by = c("year", "n_egates", "egate_uptake", "target_eligibility")) %>% 
     mutate(overall_usage = egate_uptake * target_eligibility) %>% 
     pivot_longer(cols = c(n_egates, target_eligibility, egate_uptake, overall_usage,
                           wait_time_60_desk, wait_time_60_egate, wait_time_15_desk, wait_time_15_egate,
-                          queue_length_650_egate, queue_length_650_desk, queue_length_1250_egate, queue_length_1250_desk),
+                          exceeds_contingency_egate, exceeds_contingency_desk, exceeds_overflow_egate, exceeds_overflow_desk),
                  names_to = "which_stat",
                  values_to = "stat") %>%
     mutate(
@@ -184,16 +184,16 @@ get_figures <- function(future_aircrafts_arrivals, future_coached_levels,
           which_stat %in% c("egate_uptake", "target_eligibility", "overall_usage") ~ "Core Assumptions",
           str_detect(which_stat, "15") ~ "Proportion waits < 15mins", 
           str_detect(which_stat, "60") ~ "Proportion waits < 60mins",
-          str_detect(which_stat, "650") ~ "Contingency in use (mins)",
-          str_detect(which_stat, "1250") ~ "Exceeding contingency (mins)"),
+          str_detect(which_stat, "overflow") ~ "Contingency in use (hrs)",
+          str_detect(which_stat, "contingency") ~ "Exceeding contingency (hrs)"),
         levels = c("Recommended Number of eGates",
                    "Core Assumptions",
                    "Proportion waits < 15mins", 
                    "Proportion waits < 60mins",
-                   "Contingency in use (mins)", 
-                   "Exceeding contingency (mins)")))
+                   "Contingency in use (hrs)", 
+                   "Exceeding contingency (hrs)")))
   
-  figures$core_rec_fig <- core_recommendation_stats %>% 
+  figures$core_rec_fig <- core_recommendation_stats %>%
     ggplot(aes(x = year, y = stat, fill = fill, colour = fill)) + 
     geom_col(position = "dodge", alpha = 0.9) + 
     facet_wrap(~fac, scales = "free_y", dir = "v", nrow = 2) + 
@@ -206,20 +206,20 @@ get_figures <- function(future_aircrafts_arrivals, future_coached_levels,
     scale_y_continuous(labels = scales::comma)
   figure_sizes$core_rec_fig <- c(12, 5)
   
-  minus_core_recommendation_stats <- rec_minus_fig_sim_data %>% 
+  minus_core_recommendation_stats <- (rec_minus_fig_sim_data) %>% 
     summarise(wait_time_60_egate = mean(wait_time_60_egate), 
               wait_time_60_desk = mean(wait_time_60_desk),
               wait_time_15_desk = mean(wait_time_15_desk),
               wait_time_15_egate = mean(wait_time_15_egate),
-              queue_length_650_egate = mean(queue_length_650_egate),
-              queue_length_650_desk = mean(queue_length_650_desk),
-              queue_length_1250_egate = mean(queue_length_1250_egate),
-              queue_length_1250_desk = mean(queue_length_1250_desk),
+              exceeds_contingency_egate = mean(exceeds_contingency_egate)/60,
+              exceeds_contingency_desk = mean(exceeds_contingency_desk)/60,
+              exceeds_overflow_egate = mean(exceeds_overflow_egate)/60,
+              exceeds_overflow_desk = mean(exceeds_overflow_desk)/60,
               .by = c("year", "n_egates", "egate_uptake", "target_eligibility")) %>% 
     mutate(overall_usage = egate_uptake * target_eligibility) %>% 
     pivot_longer(cols = c(n_egates, target_eligibility, egate_uptake, overall_usage,
                           wait_time_60_desk, wait_time_60_egate, wait_time_15_desk, wait_time_15_egate,
-                          queue_length_650_egate, queue_length_650_desk, queue_length_1250_egate, queue_length_1250_desk),
+                          exceeds_contingency_egate, exceeds_contingency_desk, exceeds_overflow_egate, exceeds_overflow_desk),
                  names_to = "which_stat",
                  values_to = "stat") %>%
     mutate(
@@ -238,16 +238,16 @@ get_figures <- function(future_aircrafts_arrivals, future_coached_levels,
           which_stat %in% c("egate_uptake", "target_eligibility", "overall_usage") ~ "Core Assumptions",
           str_detect(which_stat, "15") ~ "Proportion waits < 15mins", 
           str_detect(which_stat, "60") ~ "Proportion waits < 60mins",
-          str_detect(which_stat, "650") ~ "Contingency in use (mins)",
-          str_detect(which_stat, "1250") ~ "Exceeding contingency (mins)"),
+          str_detect(which_stat, "overflow") ~ "Contingency in use (hrs)",
+          str_detect(which_stat, "contingency") ~ "Exceeding contingency (hrs)"),
         levels = c("Recommended Number of eGates",
                    "Core Assumptions",
                    "Proportion waits < 15mins", 
                    "Proportion waits < 60mins",
-                   "Contingency in use (mins)", 
-                   "Exceeding contingency (mins)")))
+                   "Contingency in use (hrs)", 
+                   "Exceeding contingency (hrs)")))
   
-  figures$minus_core_rec_fig <- minus_core_recommendation_stats %>% 
+  figures$minus_core_rec_fig <- minus_core_recommendation_stats %>%
     ggplot(aes(x = year, y = stat, fill = fill, colour = fill)) + 
     geom_col(position = "dodge", alpha = 0.9) + 
     facet_wrap(~fac, scales = "free_y", dir = "v", nrow = 2) + 
@@ -263,20 +263,20 @@ get_figures <- function(future_aircrafts_arrivals, future_coached_levels,
   figures$robustness_fig <- (robustness_sim_data) %>% 
     summarise(wait_time_60_egate = mean(wait_time_60_egate),
               wait_time_60_desk = mean(wait_time_60_desk),
-              queue_length_1250_egate = mean(queue_length_1250_egate),
-              queue_length_1250_desk = mean(queue_length_1250_desk),
+              exceeds_contingency_egate = mean(exceeds_contingency_egate)/60,
+              exceeds_contingency_desk = mean(exceeds_contingency_desk)/60,
               .by = c("egate_uptake", "target_eligibility", "year", "n_egates")) %>% 
     pivot_longer(c(wait_time_60_desk, wait_time_60_egate,
-                   queue_length_1250_egate, queue_length_1250_desk), 
+                   exceeds_contingency_egate, exceeds_contingency_desk), 
                  names_to = "which_stat", values_to = "stat") %>% 
     mutate(
       col = case_when(
         str_detect(which_stat, "_desk") ~ "Desk",
         str_detect(which_stat, "_egate") ~ "eGate"),
       target_eligibility = paste0("Eligibility: ", round(100*target_eligibility), "%"),
-      which_kpi = if_else(str_detect(which_stat, "1250"),
-                          "Contingency use (mins)",
-                          "Prop. waits <60mins")) %>% 
+      which_kpi = if_else(str_detect(which_stat, "exceeds"),
+                          "Contingency use (hrs)",
+                          "Prop. waits < 1hr")) %>% 
     ggplot(aes(x = egate_uptake, y = stat, colour = col)) + 
     geom_point(size = 2) + 
     facet_grid(which_kpi~target_eligibility, scales = "free_y") +
