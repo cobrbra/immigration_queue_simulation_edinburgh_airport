@@ -37,13 +37,25 @@ firstpageonly = true
     \par\medskip}%            these braces the whole body of a {figure} env will be centered.
 }
 
+% Boxes
+\usepackage{tcolorbox}
+\definecolor{edi-dark-purple}{rgb}{0.4882812,0.046875,0.4296875}
+\definecolor{edi-light-purple}{rgb}{0.9453125,0.8359375,0.9140625}
 
 % References
-\usepackage[colorlinks,linkcolor=black,citecolor=blue,urlcolor=blue,breaklinks = true]{hyperref}
+\usepackage[
+    colorlinks,
+    linkcolor=black,
+    citecolor=edi-dark-purple, 
+    urlcolor=edi-dark-purple,
+    breaklinks = true
+]{hyperref}
+\usepackage{xurl}
 \usepackage[sort&compress, numbers]{natbib}
 \bibliographystyle{unsrtnat}
-% \setcitestyle{authoryear, open={(},close={)}}
-
+\usepackage{multicol}
+\renewcommand{\bibpreamble}{\begin{multicols}{2}}
+\renewcommand{\bibpostamble}{\end{multicols}}
 
 % Acronyms
 \usepackage[acronym, toc]{glossaries-extra}
@@ -69,12 +81,12 @@ firstpageonly = true
  \author{Isabella Deutsch and Jacob R. Bradley}
  \date{}
 
+
 \begin{document}
 \maketitle
 
 \section{Introduction}
-
-A large number of passengers arriving internationally at Edinburgh Airport need to pass through immigration. These passengers are either processed at a desk staffed by a \gls{bfo} or, for passengers of certain nationalities, at an automated \gls{egate}. With overall passenger footfall expected to increase substantially over the next five years, pressure on immigration services is also growing, and the airport will need to adapt its operations in order to accommodate its international arrivals safely and efficiently. In particular, the airport has committed to several \glspl{sla} ensuring quality of experience for arrivals. One avenue being explored to meet \glspl{sla} under increased demand is the expanded use of \glspl{egate}, both through additional construction and measures encouraging increased uptake \cite{UK_border_2025}. In this report we investigate the outcomes of these measures, providing clear recommendations for \gls{egate} construction over the next five years (2023-2027). For key results, see our one page high-level summary. To explore \gls{egate} construction and usage scenarios interactively, see our \href{app_url}{Shiny App}.
+A large number of passengers arriving internationally at Edinburgh Airport need to pass through immigration. These passengers are either processed at a desk staffed by a \gls{bfo} or, for passengers of certain nationalities, at an automated \gls{egate}. With overall passenger footfall expected to increase substantially over the next five years, pressure on immigration services is also growing, and the airport will need to adapt its operations in order to accommodate its international arrivals safely and efficiently. In particular, the airport has committed to several \glspl{sla} ensuring quality of experience for arrivals. One avenue being explored to meet \glspl{sla} under increased demand is the expanded use of \glspl{egate}, both through additional construction and measures encouraging increased uptake \cite{UK_border_2025}. In this report we investigate the outcomes of these measures, providing clear recommendations for \gls{egate} construction over the next five years (2023-2027). For key results, see our one page high-level summary. To explore \gls{egate} construction and usage scenarios interactively, see our \href{https://github.com/cobrbra/immigration_queue_simulation_edinburgh_airport}{Shiny App}.
 % This does not apply for anyone arriving from the United Kingdom (including Northern Ireland), the Crown Dependencies, and the Republic of Ireland, as there are no routine passport controls between these countries \cite{common_travel_area}.
 % Only passengers of certain nationality are eligible to use the \glspl{egate}, as defined below. There are currently 9 desks and 10 \glspl{egate} in operation at Edinburgh Airport. 
 
@@ -85,7 +97,7 @@ The overall performance of Edinburgh Airport's immigration queuing operation is 
 
 \subsection{Key Performance Indicators}
 
-Three \glspl{kpi} have been identified to form the basis of the airport's \glspl{sla}. We define \glspl{kpi} as follows.
+Three \glspl{kpi} have been identified to evaluate the airport's immigration queue process, defined as follows.
 
 \begin{itemize}
     \item \textbf{Queue length(s)}: The number of passengers queuing for a desk or \gls{egate} in the immigration hall/overflow zones at any given time.
@@ -96,12 +108,12 @@ Three \glspl{kpi} have been identified to form the basis of the airport's \glspl
 We measure \textit{queue length} at evenly spaced time points (typically every 15 minutes). Immigration \textit{wait time}, however, is measured for each arriving passenger. The relationship between queue length and \textit{contingency usage} is determined by the physical division of the immigration hall into desk and \gls{egate} queuing areas.
 
 \subsection{Service Level Agreements}
-The \glspl{sla} are derived from the \glspl{kpi} and are descriptive of passenger experience and operational pressure. They are set either internally by Edinburgh Airport, or externally by the UK Border Force. We consider two \glspl{sla} in our analysis.
+We consider the following \glspl{sla}, which are derived from \glspl{kpi} and provide targets for passenger experience and operational function. They are set internally and internally by Edinburgh Airport and the UK Border Force. 
 \begin{itemize}
     \item \textbf{Proportion of passengers with a wait time less than 15 (or 60) minutes.} \\
     This is in line with the brief and \cite{UK_border_2025}. It is indicative of the experience of individual queuing passengers.
     \item \textbf{Total time using overflow/contingency capacity.} \\
-    This describes the impact the queue has on the operations of the airport according to the queuing capacities outlined below. It can effect passengers that are not in the immigration queue through disruption of other areas of the airport.
+    This describes the impact the queue has on the operations of the airport according to the queuing capacities outlined below. It is measured across a given week of operations. Breach of this \gls{sla} may effect passengers that are not in the immigration queue through disruption of other areas of the airport.
 \end{itemize}
 
 \section{Data Sources}
@@ -176,11 +188,11 @@ We assume that the passenger nationality split depends on departure airport, and
 
 \section{Methods} \label{sec:methods}
 
-In this section we describe our methodological set up that allows us to process the provided data under different scenarios, which allows us to compare them according to their \glspl{kpi} and related \glspl{sla}.
+In this section we describe our methodology, including details of our abstract modelling framework, practical implementation, construction of a variety of demand scenarios, and system for evaluating \glspl{kpi}/\glspl{sla}.
 
 \subsection{Passenger Processing Model}
 
-    For all subsequent modelling we use a conceptual `passenger processing model' describing the steps an arriving international passenger experiences at Edinburgh Airport. Such a model is inherently a simplified view, but ideally chosen at a level of abstraction is nevertheless informative of real-world processes. The passenger processing model consist of three steps, which are outlined below and in subsequent sections:
+    For all subsequent modelling we use a conceptual `passenger processing model' describing the steps an arriving international passenger experiences at Edinburgh Airport. Such a model is inherently a simplified view, but ideally chosen at a level of abstraction is nevertheless informative of real-world processes. Our passenger processing model consist of three steps, outlined below:
 \begin{enumerate}
     \item \textbf{Aircraft}: Aircraft with passengers on board arrive at Edinburgh Airport. The aircraft taxi to their parking positions and their doors are opened. \label{step:aircraft}
     \item \textbf{Route}: Passengers make their way from their aircraft to the immigration hall, either by walking to the building (contact) or via a bus (coached). \label{step:route}
@@ -227,7 +239,7 @@ For this analysis we assume sufficient coaches are always available to transport
 
 
 
-\paragraph{eGate eligibility} 
+\paragraph{eGate eligibility}
 As only passengers from certain countries are can use \glspl{egate}, we make the percentage of passengers eligible for \glspl{egate} per aircraft dependent on the classification of the airport. For example, we assume that an aircraft from a hub is more likely to carry a variety of international passengers, of which fewer can use \glspl{egate} compared to a flight from a EU+ non-hub. 
 
 \paragraph{eGate uptake} 
@@ -243,16 +255,14 @@ Passengers who used an \gls{egate}, but failed to use it successfully, need to e
 
 \subsection{Implementation}
 
-We now describe how we process the competition data sets to calculate the \glspl{kpi} under different simulation scenarios. Figure~\ref{fig:workflow_fig} gives an illustration of our workflow for two-hour window of arriving aircraft and their passengers. 
-
+We now describe how we process competition datasets to calculate \glspl{kpi} under different simulation scenarios. Figure~\ref{fig:workflow_fig} gives an illustration of our workflow for a two-hour window of anticipated arrivals. 
 \begin{figure}[!ht]
     \centering
     \figuretitle{Implementation of passenger processing model allows for systematic simulation of immigration queues}
     \includegraphics[width=1.1\textwidth]{figures/workflow_fig.png}
+    % \vspace{-5pt}
      \caption{Example application of simulation workflow for three-stage passenger processing model, applied to anticipated arrivals schedule between 08:00am and 10:00am on the 11th of June, 2023. \textbf{Left}: Aircraft of different sizes arrive at Edinburgh Airport. Arrows from scheduled to actual arrival time. \textbf{Centre}: Passengers disembark from their aircraft and are coached or walk via contact to to immigration hall. Passenger count is coloured by flight. \textbf{Right}: Passengers queue, either for a desk border check or an \gls{egate}. Queue length is reported every minute (upper panel), and wait time from arrival in the immigration hall to the start of the relevant border check (lower panel).} \label{fig:workflow_fig}
 \end{figure}
-
-
 \subsubsection{Aircraft}
 We take the provided flight schedule data as an input of the Aircrafts step. We assume that all of the flights provided are coming from non-UKIE destinations and hence their passengers need to clear immigration at Edinburgh Airport. Based on the flight schedule we simulate the actual arrival according to the given delayed/early arrival information. Given the provided split per year we decide at random for each flight if it is coached or contact. Based on this we sample a base route time from the parking position. The passenger numbers per flight are known, and we use this information to sample a departure airport classification according to the empirical distribution obtained from the historic flight data.
 
@@ -283,9 +293,9 @@ A small fraction of passengers does not pass the \gls{egate} successfully. They 
 
 Based on the methodology described in Section~\ref{sec:methods} we have simulated a variety of scenarios. There are three key parameters that we vary across simulations (1) the number of \glspl{egate}, (2) the \gls{egate} eligibility, and (3) the \gls{egate} uptake. This now allows us to make recommendations for the appropriate number of \glspl{egate} to cope with future demand on border operations at Edinburgh Airport. Robustness considerations are subsequently undertaken in Section~\ref{sec:robustness}. 
 
-\subsection{Number of eGates}
+\subsection{Number of eGates} \label{sec:rec_num_egates}
 
-The lowest feasible number of \glspl{egate} is of interest to Edinburgh Airport. Based on our extensive simulation we recommend the \gls{egate} strategy outlined in Table~\ref{tab:core_recommendation}. 
+The lowest feasible number of \glspl{egate} is of interest to Edinburgh Airport. Based on our extensive simulations we recommend the \gls{egate} strategy outlined in Table~\ref{tab:core_recommendation}, where for each year we give the minimum recommended number of \glspl{egate} to be available by that year (including currently available \glspl{egate}). 
 
 
 \input{tables/core_recommendation}
@@ -299,11 +309,10 @@ The lowest feasible number of \glspl{egate} is of interest to Edinburgh Airport.
 %     \label{tab:recommendation}
 % \end{table}
 
-This strategy has been chosen such that 99\% of \gls{egate} passengers wait less than an hour for every year in the given period, under the assumptions of eligibility and uptake shown in Figure~\ref{fig:core_rec_fig}. Following this strategy, the number of passengers waiting for less than Edinburgh Airport's ambitious fifteen minute queue goal is always above 75\% and increases year-on-year. 
+This strategy has been chosen such that 99\% of \gls{egate} passengers wait less than an hour for every year in the given period \jbnote{and that contingency usage is never caused by \gls{egate} queues}, under the assumptions of eligibility and uptake shown in Figure~\ref{fig:core_rec_fig}. Following this strategy, the number of \gls{egate} passengers waiting for less than Edinburgh Airport's ambitious fifteen minute target is always above 75\%, and increases year-on-year. 
 
-Without changes to \gls{egate} eligibility and uptake, no amount of \gls{egate} construction will alleviate some pressure on Edinburgh Airport's desk border check queues. In Figure~\ref{fig:core_rec_fig} we see... \jbnote{not really sure what the message is here}.
+Without changes to \gls{egate} eligibility and uptake, no amount of \gls{egate} construction will alleviate some pressure on Edinburgh Airport's desk border check queues. In the simulations shown we have assumed smooth transitions in \gls{egate} eligibility and usage leading to the airport's 95\% total usage target by 2027 (see Section~\ref{subsec:choices_immigration}; bottom left panel of Figure~\ref{fig:core_rec_fig}). In this scenario, desk queue times (centre panel of Figure~\ref{fig:core_rec_fig}) are substantially lagging, and most concerningly extensive use is made of contingency capacity and even beyond contingency due to queues for desk border checks. 
 
-This figure also outlines the implications of our proposed strategy on KPI1, KPI2, SLA3, and SLA4. In particular, note that our strategy ensures that XXX. Moreover, the total queue length is under 500 XXX\% of the time.
 
 \begin{figure}[!ht]
     \centering
@@ -314,7 +323,7 @@ This figure also outlines the implications of our proposed strategy on KPI1, KPI
 
 This recommendation results in an average wait time for \glspl{egate} between XX minutes (in 20XX) and XX minutes (in 20XX). This is higher than/lower than/in line with historic waiting times across the UK. It is higher/lower than Stansted and Luton, which reported particularly low figures, and higher/lower than Glasgow Airport, which reported some of the longest wait times. 
 
-The number of recommended \glspl{egate} is to be understood as the number of \glspl{egate} required to be in operation. If maintenance and unplanned disruption exceed the historically low level \cite{Inspection_eGates}, this needs to be taken into account. Our recommendation implies the purchase of a total XX new \glspl{egate}, as there are currently 10 \glspl{egate} in operation at Edinburgh Airport. To put this number into perspective, the Home Office has approved funding of up to 70 \glspl{egate} UK-wide to increase capacity at larger airports \cite{Inspection_eGates}. with Edinburgh being among the top ten busiest airports in the UK \cite{busiestairport}, it does not seem unreasonable to assume that XXX new \glspl{egate} are built over the course of five years. 
+The number of recommended \glspl{egate} is to be understood as the number of \glspl{egate} required to be in operation. If maintenance and unplanned disruption exceed the historically low level \cite{Inspection_eGates}, this needs to be taken into account. Our recommendation implies the purchase of a total XX new \glspl{egate}, as there are currently 10 \glspl{egate} in operation at Edinburgh Airport. To put this number into perspective, the Home Office has approved funding of up to 70 \glspl{egate} UK-wide to increase capacity at larger airports \cite{Inspection_eGates}. With Edinburgh being among the top ten busiest airports in the UK \cite{busiestairport}, it does not seem unreasonable to assume that XXX new \glspl{egate} are built over the course of five years. 
 
 
 \subsection{Hall Layout}
@@ -324,53 +333,65 @@ Given the assumed number of \gls{egate} eligibility and uptake, and our recommen
  
 
 \section{Robustness Considerations} \label{sec:robustness}
+In producing the recommendation given Section~\ref{sec:rec_num_egates}, we made assumptions about external factors such as \gls{egate} eligibility and the progress of \gls{egate} construction that could be liable to change. Here we investigate the effect of such changes on the performance of immigration services.
 
 \subsection{Eligibility and Uptake}
+Edinburgh Airport envisages 95\% of passengers using \glspl{egate} by 2027, up from 60\% at present. To a first approximation, overall \gls{egate} usage is equal to the product of \gls{egate} eligibility and uptake. While increases in \gls{egate} eligibility are planned \cite{UK_border_2025}, they fall largely outside of Edinburgh Airport's direct control. We therefore aimed to test whether lower than anticipated \gls{egate} eligibility could be compensated for by improvements to \gls{egate} uptake. We therefore simulated a variety of combinations of eligibility and uptake for arrivals in 2027, the busiest year forecast in the given time period. In Figure~\ref{fig:robustness_fig} we show a selected range of \glspl{kpi} for these scenarios, and see that as long as eligibility reaches 90\% comparable performance is achievable purely through compensatory improvements in uptake.
 
 \begin{figure}[!ht]
     \centering
     \figuretitle{Under misspecification of eGate eligibility, increased eGate uptake can provide balance}
     \includegraphics[width=\textwidth]{figures/robustness_fig.png}
-     \caption{XX} \label{fig:robustness_fig}
+     \caption{\textbf{Top panels}: Average (over 100 simulations) number of minutes in 2027 week spent with contingency use caused by \gls{egate} or desk queues, under a variety of eligibility/uptake scenarios. \textbf{Bottom panels}: Average (over 100 simulations) proportion of passengers waiting less than 60 minutes, for the same range of scenarios.} \label{fig:robustness_fig}
 \end{figure}
 
 \subsection{Number of eGates}
-One less eGate than core recommendation 2024-2027
+We selected the recommendation laid out in Section~\ref{sec:rec_num_egates} in order to minimise the need for new \gls{egate} construction while satisfying the conditions we described. However, for practical reasons the airport may choose to place immigration services under stress for a short period in order to construct more \glspl{egate} at once. It is also possible that \glspl{egate} may fail or be delayed in construction. In Figure~\ref{fig:minus_core_rec_fig}, therefore, we present identical analytics to Figure~\ref{fig:core_rec_fig} for a `recommendation-minus-one' strategy, whereby for each year after 2023 (in 2023 we do not recommend construction of new \glspl{egate}) we consider one fewer total available \glspl{egate} than were recommended.
+
 \begin{figure}[!ht]
     \centering
     \figuretitle{With one fewer eGate than recommended, queue length SLAs are breached}
     \includegraphics[width=\textwidth]{figures/minus_core_rec_fig.png}
-     \caption{\textbf{Left}: Core \gls{egate} construction recommendation, with one fewer \glspl{egate} for each of the years 2024-2027. All other figures as in Figure~\ref{fig:core_rec_fig}.} \label{fig:minus_core_rec_fig}
+     \caption{\textbf{Top Left}: Adjusted \gls{egate} construction schedule, with one fewer \glspl{egate} than recommended for each of the years 2024-2027. \textbf{All other panels}: as in Figure~\ref{fig:core_rec_fig}.} \label{fig:minus_core_rec_fig}
 \end{figure}
 
-\section{Conclusion}
-Edinburgh Airport has identified strain on immigration services due to increased passenger burden as a risk to border operations over the next five years. To address this, they have asked for a simulation model to test different demand scenarios and process enhancements. We have developed such a model, which can be explored interactively via a \href{app_url}{Shiny App}. We have incorporated data provided by the modelling competition and external sources to guide simulation parameters. Where we could not find appropriate data sources, we have made assumptions erring towards pessimistic values in order to evaluate worst-case scenarios. We have provided a central recommendation for the construction of X, X, X, and X new \glspl{egate} by 2024, 2025, 2026, and 2027 respectively. From extensive simulation and robustness analyses, our key conclusions are as follows.
+\section{Conclusions}
+Edinburgh Airport has identified strain on immigration services due to increased passenger burden as a risk to border operations over the next five years. To address this, they have asked for a simulation model to test different demand scenarios and process enhancements. We have developed such a model, which can be explored interactively via a \href{https://github.com/cobrbra/immigration_queue_simulation_edinburgh_airport}{Shiny App}. We have incorporated data provided by the modelling competition and external sources to guide simulation parameters. Where we could not find appropriate data sources, we have made assumptions erring towards pessimistic values in order to evaluate worst-case scenarios. We have provided a central recommendation for the construction of X, X, X, and X new \glspl{egate} by 2024, 2025, 2026, and 2027 respectively. From extensive simulation and robustness analyses, our key conclusions are sumarised below.
+
+\begin{tcolorbox}[
+colframe=edi-dark-purple,
+colback=edi-light-purple,
+fonttitle=\bfseries,
+title = {Summary of Key Conclusions}]
 \begin{enumerate}
 
-    \item Building five or fewer \glspl{egate} per year, queueing \glspl{kpi} for \gls{egate} passengers can stay within appropriate levels and indeed improve within the given time period.
-    \item Regardless of \gls{egate} construction, long desk queues pose a serious risk until \gls{egate} usage increases. 
-    \item Improved \gls{egate} usage effectively mitigates dangerous desk queue scenarios, whether achieved by expanded eligibility or by increased uptake (for example via deployment of flow hosts).
-    \item Under high demand scenarios (such as those anticipated by 2027), lower-than-recommended \gls{egate} construction will impact queue length and contingency usage without seriously impacting individual passenger wait times.
+    \item \textbf{Building five or fewer \glspl{egate} per year can keep \gls{egate} queue \glspl{kpi} within appropriate levels.}\\
+    Our recommended schedule for \gls{egate} construction never exceeds one comprising five new \glspl{egate} per year, and allows for consistent satisfaction of UK Border Force's one hour target and sustained improvements towards satisfying Edinburgh Airport's aspirational 15 minute target for \gls{egate} passengers. Alternately, practical constraints may motivate building all new \glspl{egate} in one go. Such scenarios can easily be explored in our \href{https://github.com/cobrbra/immigration_queue_simulation_edinburgh_airport}{Shiny App}. \\ 
+    \item \textbf{Regardless of new \glspl{egate}, long desk queues pose a serious risk until \gls{egate} usage increases.}\\
+     Additional \glspl{egate} need to be used in order to have a positive impact on border operations. To that extend it is important that \glspl{egate} usage is high as soon as there is sufficient \gls{egate} capacity to match. The airport's current estimate of overall \gls{egate} usage is 60\% \cite{modelling_competition}. At this level, the passenger arrivals schedule proposed for July 2023 implies sustained periods with desk queue lengths severely compromising immigration services, regardless of \gls{egate} installation numbers.\\
+    
+    \item \textbf{Effective \gls{egate} usage may be achieved by expanded eligibility or by increased uptake.}\\
+    Under high demand scenarios (such as those anticipated by 2027), high \gls{egate} usage is required. Increased eligibility is expected, but broadly outside the airport's control. Improvements to uptake, however, may be achieved with clear and prominent signage and direction. Flow hosts at \glspl{egate} may also play a critical role (as suggested in \cite{Inspection_eGates}, paragraph 6.28: ``[flow hosts are]... particularly vital given high passenger usage and rapid throughput'') in directing passengers.\\
+    
+    \item \textbf{Lower-than-recommended \gls{egate} construction will impact queue lengths before wait times.}\\
 \end{enumerate}
-
-No matter how many \glspl{egate} are built, they need to be used in order to have an impact on the wait times at the airport. To that extend it is important to keep \glspl{egate} uptake amongst eligible passengers high. It is therefore crucial that signage and direction are clear and prominent. Flow hosts also play a critical role as they can direct passengers to the correct queue. They are seen to be \textit{``particularly vital given high passenger usage and rapid throughput''} \cite[][paragraph 6.28]{Inspection_eGates} at the \glspl{egate}.
-
+\end{tcolorbox}
 
 
 \subsection{Future Work}
-check all the assumptions we made, include limitations \\
+Many options for modelling lay beyond the scope of this report (and so are omitted) but may provide avenues for further work. We list several here, some of which incorporate modelling considerations relating to other airport teams (e.g. operations, aeronautics) and may therefore provide opportunities for future collaboration.
 
-In the future we could see even more coached flights, as the number of contact spaces at the airport is relatively fixed. More coached flights can increase the overall number of flights at Edinburgh Airport without extensive building work, if all other aspects of the airport can be scaled up accordingly.
+Throughout our analyses we have assumed aircraft delays to occur independently. In practice, delays are highly interrelated, as well as being associated with weather and air traffic control operations.
 
-\jbnote{Some discussion of international arrivals 1 and international arrivals 2, the former of which is only available at certain times.}
+In 2019, 55\% of all flights arriving at Edinburgh Airport came from UKIE airports \cite{noise_lab}. It is currently unclear whether domestic air travel will become less popular, with any future trends depending on government policy \cite{flight_tax_independent}, post-Covid travel habits \cite{post_covid_flights}, and competition from other infrastructure including rail \cite{train_airplane_guardian}. If Edinburgh and other airports shift to more non-UKIE flights, demand on border operations would continue to change in complex ways. For example, while overall passenger burden might increase, logistical simplifications could be possible with reduced need to provide separated routes for domestic and international arrivals.
 
-\jbnote{}
+Demand for contact stands for aircraft at Edinburgh Airport is expected to increase with arrivals, in particular increasing arrivals of aircraft with large wingspans and/or retrofitted winglets (which may take up two stands). Site footprint restrictions make the construction of new contact stands unlikely. Future arrivals could therefore skew more strongly towards coached flights. While this is reflected in the modelling assumptions provided here, future work might incorporate operational factors to understand under what circumstances coached arrivals are most likely to be more predominant (e.g. later in the day). 
 
-In 2019, XX \% of all flights arriving at Edinburgh Airport came from UKIE. If domestic air travel became less popular, for example due to improved rail infrastructure \cite{train_airplane_guardian}, the airport could retain its number of flights by shifting to more non-UKIE flights. This would increase demand on border operations, as more passengers need to clear immigration. 
+We have modelled a fixed number of nine desk border checks located in one immigration hall throughout all of our analyses. In reality, Edinburgh Airport has access to two immigration arrivals buildings (International Arrivals 1 and International Arrivals 2), the former of which is only opened at certain times. Future work might investigate optimally scheduling the opening of IA1.
 
-In our analysis we have simulated normal border operations. This excludes special cases, such as \glspl{bfo} deciding to close all \glspl{egate} for selected high-risk flights \cite{Inspection_eGates}. Modelling this knock-on effect lay outside the scope of this analysis, but could be considered in future work.
+Finally, in our analysis we have simulated `normal' border operations. This excludes special cases, such as \glspl{bfo} deciding to close all \glspl{egate} for selected high-risk flights \cite{Inspection_eGates}. 
 
-
+\newpage
 {\footnotesize
 \bibliography{report/references}}
 % \bibliography{report/references.bib}
