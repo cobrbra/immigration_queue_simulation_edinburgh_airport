@@ -7,7 +7,7 @@
 
 % Draft watermark
 \usepackage[
-stamp = true,
+stamp = false,
 firstpageonly = true
 ]{draftwatermark}
 
@@ -36,6 +36,7 @@ firstpageonly = true
 }
 
 % Boxes
+\usepackage{enumitem}
 \usepackage{tcolorbox}
 \definecolor{edi-dark-purple}{rgb}{0.4882812,0.046875,0.4296875}
 \definecolor{edi-light-purple}{rgb}{0.9453125,0.8359375,0.9140625}
@@ -78,33 +79,37 @@ firstpageonly = true
 
 \begin{document}
 \maketitle
+\thispagestyle{empty}
 
 \vspace{-15pt}
 \paragraph{Introduction}
-Edinburgh Airport has requested an investigation into the need for further construction of \glspl{egate} to support border force operations. This document provides an overview of results from the longer ten-page report of the same name. 
+Edinburgh Airport has requested an investigation into the need for construction of new \glsxtrshortpl{egate} to support border force operations. This document provides an overview of results from our longer report.
 
 \paragraph{Recommendations}
-We propose a schedule for \gls{egate} construction that sees no fewer than 14 \glspl{egate} available by 2023, 18 by 2024, 21 by 2025, 26 by 2026, and 30 by 2027. From a baseline of 10 \glspl{egate} currently available, this entails a 200\% increase spread approximately evenly over the five year period in question. We also strongly recommend that the airport pursue measures to increase \gls{egate} usage via increasing eligibility and uptake, in line with the 2025 UK Border Strategy. Summaries of our conclusions are given below and expanded upon in the long-form report.
+We propose a schedule for \glsxtrshort{egate} construction that sees no fewer than 14 \glsxtrshortpl{egate} available by 2023, 18 by 2024, 21 by 2025, 26 by 2026, and 30 by 2027. From a baseline of 10 \glsxtrshortpl{egate} currently available, this entails a 200\% increase spread over the five year period. We also strongly recommend that the airport pursue measures to increase \glsxtrshort{egate} usage via eligibility and uptake, in line with the 2025 UK Border Strategy. Summaries of our conclusions are given below and expanded upon in the long-form report.
 \begin{tcolorbox}[
 colframe=edi-dark-purple,
 colback=edi-light-purple,
 fonttitle=\bfseries,
-title = {Summary of Recommendations and Conclusions}]
-\begin{enumerate}
+title = {Report Highlights}]
+\begin{enumerate}[itemsep=-1ex]
 
     \item \textbf{Building four \glsxtrshortpl{egate} per year can keep \glsxtrshort{egate} queue \glsxtrshortpl{kpi} within appropriate levels.}\\
     \item \textbf{Regardless of new \glsxtrshortpl{egate}, long desk queues pose a serious risk until \glsxtrshort{egate} usage increases.}\\
     \item \textbf{Effective \glsxtrshort{egate} usage may be achieved by expanded eligibility or by increased uptake.}\\
-    \item \textbf{Lower-than-recommended \glsxtrshort{egate} construction will impact queue lengths before wait times.}\\
+    \item \textbf{Lower-than-recommended \glsxtrshort{egate} construction will impact queue lengths before wait times.}
 \end{enumerate}
 \end{tcolorbox}
 
 \paragraph{Overview of Results}
-We have developed a simulation framework for  the central recommendation scenario 
+We developed a simulation framework for analysing the impact of \glsxtrshort{egate} construction on border check queues, as well as changes to \glsxtrshort{egate} eligibility and uptake, and variation in immigration hall allocation to these separate queues. We give an overview of the airport's chosen \glsxtrshortpl{kpi} under our central recommendation scenario in Figure~\ref{fig:core_rec_fig}.
 \begin{figure}[!h]
     \centering
     \includegraphics[width=\textwidth]{figures/core_rec_fig.png}
-     \caption{Recommended \gls{egate} construction schedule, alongside usage assumptions and \glsxtrshort{kpi} summaries.} \label{fig:core_rec_fig}
+     \caption{Recommended \glsxtrshort{egate} construction schedule, alongside usage assumptions and \glsxtrshort{kpi} summaries.} \label{fig:core_rec_fig}
 \end{figure}
+
+\vspace{-5pt}
+We see that excellent \gls{egate} wait times are achievable, and that the main pressure on immigration services comes via queue lengths demanding regular use of the airport's overflow and contingency spaces. This is especially true for desk queues until the airport is able to improve overall \glsxtrshort{egate} usage. We show that measures to change allocation of immigration hall space over time can mitigate this problem, but give extensive evidence that this problem not addressable purely through new \glsxtrshortpl{egate}. 
 
 \end{document}
