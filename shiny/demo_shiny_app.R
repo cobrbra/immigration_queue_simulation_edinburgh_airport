@@ -1,10 +1,8 @@
-library(shiny)
 library(profvis)
 
-source("credentials/credentials.R")
+setwd(here("shiny"))
 source("ui.R")
 source("server.R")
-
-profvis(runApp(appDir = "."))
+profvis(runApp(appDir = ".")); setwd(here())
 
 

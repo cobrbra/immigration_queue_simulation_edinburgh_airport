@@ -4,6 +4,14 @@ library(tidyverse)
 library(vroom)
 
 server <- function(input, output) {
+  source("credentials/credentials.R")
+  res_auth <- secure_server(
+    check_credentials = check_credentials(credentials)
+  )
+  
+  output$auth_output <- renderPrint({
+    reactiveValuesToList(res_auth)
+  })
   
   # font_add_google("Lato", "lato")
   # showtext_auto()
@@ -21,13 +29,13 @@ server <- function(input, output) {
     "Proportion waits < 1hr" = "wait_time_60", 
     "Proportion waits < 25mins" = "wait_time_25", 
     "Proportion waits < 15mins" = "wait_time_15",
-    "Minutes exceeding overflow" = "queue_length_650",
-    "Minutes exceeding contingency" = "queue_length_1250"
+    "Minutes exceeding overflow" = "exceeds_overflow",
+    "Minutes exceeding contingency" = "exceeds_contingency"
   )
   
-  shiny_raw_passenger_data <- vroom("shiny_data/shiny_raw_passenger_data.csv", )
-  shiny_raw_queue_length_data <- vroom("shiny_data/shiny_raw_queue_length_data.csv")
-  shiny_sim_kpi_data <- vroom("shiny_data/shiny_sim_kpi_data.csv")
+  shiny_raw_passenger_data <- vroom("shiny_data/raw_passenger_data.csv", )
+  shiny_raw_queue_length_data <- vroom("shiny_data/raw_queue_length_data.csv")
+  shiny_sim_kpi_data <- vroom("shiny_data/kpi_data.csv")
   
   queue_length_data <- shiny_raw_queue_length_data %>% 
     pivot_longer(cols = c(desk_queue_length, egate_queue_length), 
@@ -76,7 +84,8 @@ server <- function(input, output) {
            y = "Queue length") + 
       scale_colour_manual(labels = c("Desk", "eGate"), 
                           values = edi_airport_colours[2:1],
-                          drop = FALSE)
+                          drop = FALSE) + 
+      scale_y_continuous(labels = scales::comma)
   })
   
   output$queue_data_plot <- renderPlot({
@@ -106,7 +115,8 @@ server <- function(input, output) {
            y = "Wait time (mins)") + 
       scale_colour_manual(labels = c("Desk", "eGate"), 
                           values = edi_airport_colours[2:1],
-                          drop = FALSE)
+                          drop = FALSE) + 
+      scale_y_continuous(labels = scales::comma)
   })
   
   
@@ -139,7 +149,8 @@ server <- function(input, output) {
       labs(x = "Year", y = input$select_kpi) + 
       scale_fill_manual(labels = c("Desk", "eGate"), 
                         values = edi_airport_colours[2:1],
-                        drop = FALSE)
+                        drop = FALSE) + 
+      scale_y_continuous(labels = scales::comma)
   })
   
   output$joint_kpi_plot <- renderPlot({
@@ -165,7 +176,9 @@ server <- function(input, output) {
                                       size = 30),
             legend.title = element_blank()) + 
       labs(x = "Year", y = input$select_kpi) + 
-      scale_fill_manual(values = edi_airport_colours[3])
+      scale_fill_manual(values = edi_airport_colours[3]) + 
+      scale_y_continuous(labels = scales::comma)
+    
   })
   
   output$bottom_text <- renderText("Note that queue lengths (upper panel) are queried once ever fifteen minutes, \n

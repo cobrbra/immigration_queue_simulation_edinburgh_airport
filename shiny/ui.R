@@ -1,4 +1,5 @@
 library(shiny)
+library(shinymanager)
 library(shinyWidgets)
 
 ui <- fluidPage(
@@ -76,3 +77,5 @@ ui <- fluidPage(
     )
   )
 )
+
+ui <- secure_app(ui)
