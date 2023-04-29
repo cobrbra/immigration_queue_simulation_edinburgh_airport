@@ -47,3 +47,6 @@ shiny_data
 
 # targets metadata
 _targets/meta/meta
+
+# Shiny credentials
+shiny/credentials/*

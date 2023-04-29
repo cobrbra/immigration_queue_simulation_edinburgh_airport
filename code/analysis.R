@@ -62,7 +62,8 @@ sim_analysis_data <- function(sim_settings,
                               queue_length_kpis = list(),
                               queue_sample_size = 500,
                               input_time_interval = 15*60,
-                              save_data = FALSE) {
+                              save_data = FALSE,
+                              save_dir = NULL) {
   # generate desks
   n_desks <- 9
   desk_means <- pmax(0, rep(90, n_desks))
@@ -159,11 +160,11 @@ sim_analysis_data <- function(sim_settings,
         
         sim_settings$non_arrivals_data[[arrivals_id]]$sample_queue_data[[non_arrivals_id]] <- 
           simulated_queue %>% 
-          select(sched_aircraft_date_posix, route_datetime_int, 
-                 bordercheck_start_time, bordercheck_end_time,
-                 nationality, egate_used, egate_failed) %>% 
-          mutate(wait_time = bordercheck_start_time - route_datetime_int) %>% 
-          slice_sample(n = queue_sample_size)
+            select(sched_aircraft_date_posix, route_datetime_int, 
+                   bordercheck_start_time, bordercheck_end_time,
+                   nationality, egate_used, egate_failed) %>% 
+            mutate(wait_time = bordercheck_start_time - route_datetime_int) %>% 
+            slice_sample(n = queue_sample_size)
       }
       
       non_arrivals_id <- non_arrivals_id + 1
@@ -176,5 +177,26 @@ sim_analysis_data <- function(sim_settings,
   }
   
   sim_settings <- unnest(sim_settings, non_arrivals_data)
+  if (!is.null(save_dir)) {
+    if (save_data) {
+      write_csv(sim_settings %>% 
+                select(-queue_length_data) %>% 
+                unnest(sample_queue_data),
+              paste0(save_dir, "/raw_passenger_data.csv"))
+      
+      write_csv(sim_settings %>% 
+                  select(-sample_queue_data) %>% 
+                  unnest(queue_length_data),
+                paste0(save_dir, "/raw_queue_length_data.csv"))
+    }
+    else {
+      write_csv(sim_settings,
+                paste0(save_dir, "kpi_data.csv"))
+    }
+  }
+  
   return(sim_settings)
 }
+
+
+

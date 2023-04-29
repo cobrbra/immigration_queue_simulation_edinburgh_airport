@@ -184,6 +184,9 @@ list(
   tar_target(failed_egate_priority, .75),
   
   # Generation of shiny data
+  tar_target(shiny_data_dir,
+             here("shiny/shiny_data/"),
+             format = "file"),
   tar_target(shiny_sim_raw_data_settings,
              generate_sim_settings(n_gen_arrivals = 1,
                                    n_gen_queues = 1,
@@ -204,7 +207,10 @@ list(
                                base_walk_dist = base_walk_dist,
                                egate_failure_prop = egate_failure_prop,
                                failed_egate_priority = failed_egate_priority,
-                               save_data = TRUE)),
+                               input_time_interval = 30*60,
+                               queue_sample_size = 200,
+                               save_data = TRUE,
+                               save_dir = shiny_data_dir)),
   tar_target(shiny_sim_kpi_data_settings,
              generate_sim_settings(n_gen_arrivals = 5,
                                    n_gen_queues = 5,
