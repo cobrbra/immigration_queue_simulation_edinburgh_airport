@@ -233,7 +233,8 @@ list(
                                failed_egate_priority = failed_egate_priority,
                                wait_time_kpis = c("mean_wait_time", "wait_time_60", "wait_time_15", "wait_time_25"),
                                queue_length_kpis = c("exceeds_overflow", "exceeds_contingency"),
-                               save_data = FALSE)),
+                               save_data = FALSE,
+                               save_dir = shiny_data_dir)),
   
   # Data around core recommendations
   tar_target(core_recommendation, 
@@ -256,7 +257,7 @@ list(
                                coach_dist = (coach_dist), 
                                walk_dist = (walk_dist), 
                                base_walk_dist = (base_walk_dist),
-                               wait_time_kpis = c("mean_wait_time", "wait_time_60", "wait_time_15"),
+                               wait_time_kpis = c("mean_wait_time", "wait_time_60", "wait_time_15", "wait_time_25"),
                                queue_length_kpis = c("exceeds_overflow", "exceeds_contingency"),
                                save_data = FALSE)),
   
@@ -289,8 +290,8 @@ list(
                               coach_dist = (coach_dist), 
                               walk_dist = (walk_dist), 
                               base_walk_dist = (base_walk_dist),
-                              wait_time_kpis = c("wait_time_60"),
-                              queue_length_kpis = c("exceeds_contingency"),
+                              wait_time_kpis = c("wait_time_60", "wait_time_15", "wait_time_25", "mean_wait_time"),
+                              queue_length_kpis = c("exceeds_contingency", "exceeds_overflow"),
                               save_data = FALSE)),
   
   tar_target(rec_minus_fig_sim_settings,
@@ -311,7 +312,7 @@ list(
                                coach_dist = (coach_dist), 
                                walk_dist = (walk_dist), 
                                base_walk_dist = (base_walk_dist),
-                               wait_time_kpis = c("mean_wait_time", "wait_time_60", "wait_time_15"),
+                               wait_time_kpis = c("mean_wait_time", "wait_time_60", "wait_time_25", "wait_time_15"),
                                queue_length_kpis = c("exceeds_contingency", "exceeds_overflow"),
                                save_data = FALSE)),
   
