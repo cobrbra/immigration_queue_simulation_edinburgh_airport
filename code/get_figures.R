@@ -79,7 +79,8 @@ get_figures <- function(future_aircrafts_arrivals, future_coached_levels,
     geom_col(position = position_stack(reverse = TRUE)) +
     # labs(title = "Passenger pressure forecasted to increase beyond pre-Covid levels") + 
     theme_edi_airport() +
-    theme(legend.title = element_blank()) +
+    theme(legend.title = element_blank(),
+          axis.title.x = element_blank()) +
     scale_fill_manual(values = edi_airport_colours[c(4,5,6)]) +
     scale_y_continuous(labels = scales::comma)
   figure_sizes$future_passenger_burden_fig <- c(7, 3)
