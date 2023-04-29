@@ -74,7 +74,8 @@ sim_results <- sim_analysis_data(sim_settings,
                                  walk_dist = tar_read(walk_dist), 
                                  base_walk_dist = tar_read(base_walk_dist),
                                  wait_time_kpis = c("mean_wait_time", "wait_time_60", "wait_time_15"),
-                                 save_data = FALSE)
+                                 save_data = TRUE,
+                                 save_dir = here("raw_data/"))
 
 
 # EXAMPLE MULTI-SIM EXPERIMENT SPECIFYING TRAJECTORY
@@ -100,75 +101,61 @@ sim_results <- sim_analysis_data(sim_settings,
                                  queue_length_kpis = c("queue_length_650", "queue_length_1250"),
                                  save_data = FALSE)
 
-core_recommendation_stats <- sim_results %>% 
-  summarise(wait_time_60_egate = mean(wait_time_60_egate), 
-            wait_time_60_desk = mean(wait_time_60_desk),
-            wait_time_15_desk = mean(wait_time_15_desk),
-            wait_time_15_egate = mean(wait_time_15_egate),
-            queue_length_650_egate = mean(queue_length_650_egate),
-            queue_length_650_desk = mean(queue_length_650_desk),
-            queue_length_1250_egate = mean(queue_length_1250_egate),
-            queue_length_1250_desk = mean(queue_length_1250_desk),
-            .by = c("year", "n_egates", "egate_uptake", "target_eligibility")) %>% 
-  mutate(overall_usage = egate_uptake * target_eligibility) %>% 
-  pivot_longer(cols = c(n_egates, target_eligibility, egate_uptake, overall_usage,
-                        wait_time_60_desk, wait_time_60_egate, wait_time_15_desk, wait_time_15_egate,
-                        queue_length_650_egate, queue_length_650_desk, queue_length_1250_egate, queue_length_1250_desk),
-               names_to = "which_stat",
-               values_to = "stat") %>%
-  mutate(
-    fill = factor(
-      case_when(
-        which_stat == "n_egates" ~ "No. eGates",
-        str_detect(which_stat, "_desk") ~ "Desk", 
-        str_detect(which_stat, "_egate") ~ "eGate",
-        which_stat == "target_eligibility" ~ "eGate Eligibility",
-        which_stat == "egate_uptake" ~ "eGate Uptake",
-        which_stat == "overall_usage" ~ "Overall eGate Usage"),
-      levels = c("No. eGates", "eGate Eligibility", "eGate Uptake", "Overall eGate Usage", "Desk", "eGate")),
-    fac = factor(
-      case_when(
-        str_detect(which_stat, "n_egates") ~ "Recommended Number of eGates",
-        which_stat %in% c("egate_uptake", "target_eligibility", "overall_usage") ~ "Core Assumptions",
-        str_detect(which_stat, "15") ~ "Proportion waits < 15mins", 
-        str_detect(which_stat, "60") ~ "Proportion waits < 60mins",
-        str_detect(which_stat, "650") ~ "Minutes exceeding overflow",
-        str_detect(which_stat, "1250") ~ "Minutes exceeding contingency"),
-      levels = c("Recommended Number of eGates",
-                 "Core Assumptions",
-                 "Proportion waits < 15mins", 
-                 "Proportion waits < 60mins",
-                 "Minutes exceeding overflow", 
-                 "Minutes exceeding contingency")))
+#### DELAY DIST FIG
 
-prototype_rec_fig <- core_recommendation_stats %>% 
-  ggplot(aes(x = year, y = stat, fill = fill, colour = fill)) + 
-    geom_col(position = "dodge", alpha = 0.9) + 
-    facet_wrap(~fac, scales = "free_y", dir = "v", nrow = 2) + 
-    theme_edi_airport() +
-    theme(legend.title = element_blank(),
-          legend.position = "bottom") + 
-    labs(x = "Year", y = "")  + 
-    scale_fill_manual(values = edi_airport_colours[c(7, 4:6, 2:1)]) +
-    scale_colour_manual(values = edi_airport_colours[c(7, 4:6, 2:1)])
+sigma <- 15
 
-prototype_rec_fig
+bind_rows(
+  tar_read(future_aircrafts_arrivals) %>% 
+    complete_aircrafts_arrivals(tar_read(hubs), tar_read(countries), tar_read(prop_nationality), 
+                                tar_read(delay_dist), tar_read(n_passengers_quantiles), tar_read(load_factor),
+                                tar_read(future_coached_levels), seed = 1) %>% 
+    select(sched_aircraft_datetime_int,
+           aircraft_datetime_int) %>% 
+    mutate(actual = "Simulated Future",
+           delay = (aircraft_datetime_int - sched_aircraft_datetime_int)/60) %>% 
+    mutate(delay_density = approx(x = density(delay)$x,
+                                  y = density(delay)$y,
+                                  xout = delay)$y,
+           delay_status = factor(
+             case_when(delay < -15 ~ "Early",
+                       delay > 15 ~ "Late",
+                       TRUE ~ "On Time"),
+             levels = c("Early", "On Time", "Late"))),
+  tar_read(filtered_observed_aircrafts_arrivals) %>%
+    filter(aircraft_datetime_int != 1657536060) %>% 
+    select(sched_aircraft_datetime_int,
+           aircraft_datetime_int) %>% 
+    mutate(actual = "Historical",
+           delay = (aircraft_datetime_int - sched_aircraft_datetime_int)/60) %>% 
+    mutate(delay_density = approx(x = density(delay)$x,
+                                  y = density(delay)$y,
+                                  xout = delay)$y,
+           delay_status = factor(
+             case_when(delay < -15 ~ "Early",
+                       delay > 15 ~ "Late",
+                       TRUE ~ "On Time"),
+             levels = c("Early", "On Time", "Late")))
+) %>% 
+  ggplot(aes(x = delay, y = delay_density, colour = actual)) +
+  geom_line() +
+  facet_wrap(~delay_status, scales = "free_x") +
+  theme_bw() +
+  theme(legend.title = element_blank()) + 
+  labs(x = "Delay (mins)", y = "Density") + 
+  # scale_colour_manual(values = edi_airport_colours[c(4,7)]) + 
+  scale_x_continuous(trans = scales::pseudo_log_trans(sigma = sigma),
+                     breaks = round(pseudo_log_trans(sigma = sigma)$inverse(c(-3:-1, -0.25, 0, 0.25, 1:4))))#c(early_breaks, on_time_breaks, late_breaks))
 
-# SAVE MANUALLY
-ggsave(filename = here("figures/prototype_rec_fig.png"),
-       plot = prototype_rec_fig,
-       width = 12, 
-       height = 5)
-
-
-
-
-
-
-
-
-
-
-
-
+hall_split_desk = 0.6
+simulated_queue %>% 
+  get_queue_lengths() %>% 
+  mutate(year = lubridate::year(queue_length_date_posix)) %>% 
+  select(-c(queue_length_datetime_int, queue_length_date_posix)) %>% 
+  mutate(desk_queue_exceeds_hall = desk_queue_length >= 500*0.6) %>% 
+  mutate(egate_queue_exceeds_hall = egate_queue_length >= 500*0.4) %>% 
+  mutate(joint_queue_exceeds_overflow = desk_queue_length + egate_queue_length >= 650) %>% 
+  count(year, 
+        desk_queue_exceeds_hall&joint_queue_exceeds_overflow, 
+        egate_queue_exceeds_hall&joint_queue_exceeds_overflow)
 
