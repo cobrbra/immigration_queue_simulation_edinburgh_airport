@@ -200,6 +200,7 @@ get_figures <- function(future_aircrafts_arrivals, future_coached_levels,
     theme_edi_airport() +
     theme(legend.title = element_blank(),
           legend.position = "bottom") + 
+    guides(fill = guide_legend(nrow = 1)) +
     labs(x = "Year", y = "")  + 
     scale_fill_manual(values = edi_airport_colours[c(7, 4:6, 2:1)]) +
     scale_colour_manual(values = edi_airport_colours[c(7, 4:6, 2:1)]) +
@@ -254,6 +255,7 @@ get_figures <- function(future_aircrafts_arrivals, future_coached_levels,
     theme_edi_airport() +
     theme(legend.title = element_blank(),
           legend.position = "bottom") + 
+    guides(fill = guide_legend(nrow = 1)) +
     labs(x = "Year", y = "")  + 
     scale_fill_manual(values = edi_airport_colours[c(7, 4:6, 2:1)]) +
     scale_colour_manual(values = edi_airport_colours[c(7, 4:6, 2:1)]) + 
