@@ -199,9 +199,10 @@ get_figures <- function(future_aircrafts_arrivals, future_coached_levels,
     facet_wrap(~fac, scales = "free_y", dir = "v", nrow = 2) + 
     theme_edi_airport() +
     theme(legend.title = element_blank(),
-          legend.position = "bottom") + 
+          legend.position = "bottom",
+          axis.title = element_blank()) + 
     guides(fill = guide_legend(nrow = 1)) +
-    labs(x = "Year", y = "")  + 
+    # labs(x = "Year", y = "")  + 
     scale_fill_manual(values = edi_airport_colours[c(7, 4:6, 2:1)]) +
     scale_colour_manual(values = edi_airport_colours[c(7, 4:6, 2:1)]) +
     scale_y_continuous(labels = scales::comma)
@@ -254,9 +255,10 @@ get_figures <- function(future_aircrafts_arrivals, future_coached_levels,
     facet_wrap(~fac, scales = "free_y", dir = "v", nrow = 2) + 
     theme_edi_airport() +
     theme(legend.title = element_blank(),
-          legend.position = "bottom") + 
+          legend.position = "bottom",
+          axis.title = element_blank()) + 
     guides(fill = guide_legend(nrow = 1)) +
-    labs(x = "Year", y = "")  + 
+    labs(x = "", y = "")  +
     scale_fill_manual(values = edi_airport_colours[c(7, 4:6, 2:1)]) +
     scale_colour_manual(values = edi_airport_colours[c(7, 4:6, 2:1)]) + 
     scale_y_continuous(labels = scales::comma)
