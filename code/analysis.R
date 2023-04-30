@@ -181,12 +181,16 @@ sim_analysis_data <- function(sim_settings,
     if (save_data) {
       write_csv(sim_settings %>% 
                 select(-queue_length_data) %>% 
-                unnest(sample_queue_data),
+                unnest(sample_queue_data) %>% 
+                select(-c(nationality, egate_failed, gen_arrivals_seed, gen_queue_seed, 
+                          bordercheck_start_time, bordercheck_end_time, sched_aircraft_date_posix)),
               paste0(save_dir, "/raw_passenger_data.csv"))
       
       write_csv(sim_settings %>% 
                   select(-sample_queue_data) %>% 
-                  unnest(queue_length_data),
+                  unnest(queue_length_data) %>% 
+                  select(-c(gen_arrivals_seed, gen_queue_seed, queue_length_datetime_int, 
+                            queue_length_date_posix, queue_length_time_int)),
                 paste0(save_dir, "/raw_queue_length_data.csv"))
     }
     else {

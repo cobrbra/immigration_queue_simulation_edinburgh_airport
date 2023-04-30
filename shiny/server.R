@@ -33,8 +33,10 @@ server <- function(input, output) {
     "Minutes exceeding contingency" = "exceeds_contingency"
   )
   
-  shiny_raw_passenger_data <- vroom("shiny_data/raw_passenger_data.csv", )
-  shiny_raw_queue_length_data <- vroom("shiny_data/raw_queue_length_data.csv")
+  shiny_raw_passenger_data <- vroom("shiny_data/raw_passenger_data.csv") %>% 
+    select(-c(nationality, egate_failed, gen_arrivals_seed, gen_queue_seed, bordercheck_start_time, bordercheck_end_time, sched_aircraft_date_posix))
+  shiny_raw_queue_length_data <- vroom("shiny_data/raw_queue_length_data.csv") %>% 
+    select(-c(gen_arrivals_seed, gen_queue_seed, queue_length_datetime_int, queue_length_date_posix, queue_length_time_int))
   shiny_sim_kpi_data <- vroom("shiny_data/kpi_data.csv")
   
   queue_length_data <- shiny_raw_queue_length_data %>% 
@@ -42,25 +44,19 @@ server <- function(input, output) {
                  names_to = "Bordercheck type",
                  values_to = "Queue length") %>% 
     mutate(`Bordercheck type` = factor(if_else(`Bordercheck type` == "desk_queue_length", "Desk", "eGate"),
-                                       levels = c("Desk", "eGate"))) %>% 
-    filter(gen_arrivals_seed == gen_arrivals_seed[1],
-           gen_queue_seed == gen_queue_seed[1])
+                                       levels = c("Desk", "eGate")))
   
   sample_queue_data <- shiny_raw_passenger_data %>% 
     mutate(route_datetime_posix = as.POSIXct(route_datetime_int, origin = "1970-01-01 00:00:00")) %>% 
     mutate(`Bordercheck type` = factor(if_else(egate_used == "desk", "Desk", "eGate"),
-                                       levels = c("Desk", "eGate"))) %>% 
-    filter(gen_arrivals_seed == gen_arrivals_seed[1],
-           gen_queue_seed == gen_queue_seed[1])
+                                       levels = c("Desk", "eGate")))
   
   output$queue_length_plot <- renderPlot({
     queue_length_data %>% 
       filter(`Bordercheck type` %in% check_filters[[input$check_filter]],
              n_egates == input$n_egates,
              round(egate_uptake, 8) == round(input$egate_uptake, 8),
-             round(target_eligibility, 8) == round(input$target_eligibility, 8),
-             gen_arrivals_seed == gen_arrivals_seed[1],
-             gen_queue_seed == gen_queue_seed[1]) %>% 
+             round(target_eligibility, 8) == round(input$target_eligibility, 8)) %>% 
       ggplot(aes(x = queue_length_datetime_posix, 
                  y = `Queue length`,
                  colour = `Bordercheck type`)) + 
