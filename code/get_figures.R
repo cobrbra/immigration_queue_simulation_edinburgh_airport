@@ -129,7 +129,7 @@ get_figures <- function(future_aircrafts_arrivals, future_coached_levels,
       pivot_longer(c(desk_queue_length, egate_queue_length), 
                    names_to = "check", values_to = "length") %>% 
       mutate(check = if_else(check == "desk_queue_length", "Desk", "eGate"),
-             fac = "Queue Length (no. passengers)",
+             fac = "Queue Length (num. passengers)",
              wait = NA) %>% 
       select(route_datetime_posix = queue_length_datetime_posix, check, wait, length, fac)
   ) %>% 
