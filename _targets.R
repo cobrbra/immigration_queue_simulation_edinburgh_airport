@@ -10,7 +10,7 @@ library(here)
 
 # Set target options:
 tar_option_set(
-  packages = c("here", "readxl", "scales", "showtext", "tidyverse", "xtable", "cowplot", "lubridate"), # packages that your targets need to run
+  packages = c("here", "readxl", "scales", "showtext", "tidyverse", "xtable", "cowplot", "lubridate", "ggpattern"), # packages that your targets need to run
   format = "rds" # default storage format
   # Set other options as needed.
 )

@@ -252,7 +252,7 @@ get_figures <- function(future_aircrafts_arrivals, future_coached_levels,
   
   figures$minus_core_rec_fig <- minus_core_recommendation_stats %>%
     ggplot(aes(x = year, y = stat, fill = fill, colour = fill)) + 
-    geom_col(position = "dodge", alpha = 0.9) + 
+    geom_col_pattern(aes(pattern = fac == "Recommended Number of eGates"), pattern_colour = "red", position = "dodge", alpha = 0.9) + 
     facet_wrap(~fac, scales = "free_y", dir = "v", nrow = 2) + 
     theme_edi_airport() +
     theme(legend.title = element_blank(),
@@ -261,6 +261,7 @@ get_figures <- function(future_aircrafts_arrivals, future_coached_levels,
     guides(fill = guide_legend(nrow = 1)) +
     labs(x = "", y = "")  +
     scale_fill_manual(values = edi_airport_colours[c(7, 4:6, 2:1)]) +
+    scale_pattern_manual(values = c("none", "stripe")) + 
     scale_colour_manual(values = edi_airport_colours[c(7, 4:6, 2:1)]) + 
     scale_y_continuous(labels = scales::comma)
   figure_sizes$minus_core_rec_fig <- c(8, 4)
