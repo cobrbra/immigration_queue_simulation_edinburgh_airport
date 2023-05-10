@@ -11,7 +11,7 @@ get_tables <- function(future_aircrafts_arrivals,
   tables$core_recommendation <- matrix(as.integer(tar_read(core_recommendation)), 
                                        nrow = 1, byrow = TRUE) %>%
       as_tibble(.name_repair = ~ as.character(2023:2027))
-  captions$core_recommendation <- c("Core recommendation for eGate construction.")
+  captions$core_recommendation <- c("Core recommendation for eGate availability.")
   
   # tables$table_1 <- ...
   # add code to generate new tables here
