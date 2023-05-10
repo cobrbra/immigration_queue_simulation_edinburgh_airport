@@ -237,13 +237,13 @@ get_figures <- function(future_aircrafts_arrivals, future_coached_levels,
         levels = c("No. eGates", "eGate Eligibility", "eGate Uptake", "Overall eGate Usage", "Desk", "eGate")),
       fac = factor(
         case_when(
-          str_detect(which_stat, "n_egates") ~ "Recommended Number of eGates",
+          str_detect(which_stat, "n_egates") ~ "Number of eGates",
           which_stat %in% c("egate_uptake", "target_eligibility", "overall_usage") ~ "Core Assumptions",
           str_detect(which_stat, "15") ~ "Proportion waits < 15mins", 
           str_detect(which_stat, "60") ~ "Proportion waits < 60mins",
           str_detect(which_stat, "overflow") ~ "Contingency in use (hrs)",
           str_detect(which_stat, "contingency") ~ "Exceeding contingency (hrs)"),
-        levels = c("Recommended Number of eGates",
+        levels = c("Number of eGates",
                    "Core Assumptions",
                    "Proportion waits < 15mins", 
                    "Proportion waits < 60mins",
@@ -264,7 +264,7 @@ get_figures <- function(future_aircrafts_arrivals, future_coached_levels,
     scale_colour_manual(values = edi_airport_colours[c(7, 4:6, 2:1)]) + 
     scale_y_continuous(labels = scales::comma) + 
     guides(fill = guide_legend(nrow = 1),
-           pattern_colour = FALSE)
+           pattern_colour = guide_legend(nrow = 1))
   figure_sizes$minus_core_rec_fig <- c(8, 4)
   
   figures$robustness_fig <- (robustness_sim_data) %>% 
