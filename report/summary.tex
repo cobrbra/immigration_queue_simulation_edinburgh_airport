@@ -24,6 +24,7 @@ firstpageonly = true
     amsmath, % aligns, equations, etc.
     amsfonts, % blackboard bold, etc.
     bbm, % blackboard bold for numbers.
+    pifont, % for planes
 }
 
 % Figures
@@ -92,22 +93,22 @@ fonttitle=\bfseries,
 title = {Report Highlights}]
 \begin{enumerate}[itemsep=-1ex]
    \vspace{-1.5mm}
-    \item \textbf{Building 5-4-2-2-0 \glspl{egate} per year can keep \gls{egate} queue \glspl{kpi} within appropriate levels.}\\
+    \item[\ding{40}] \textbf{Building 13 \glspl{egate} over five years can keep \gls{egate} queue \glsxtrshortpl{kpi} within appropriate levels.}\\
     \vspace{-1.5mm}
-    \item \textbf{Regardless of new \glsxtrshortpl{egate}, long desk queues pose a serious risk until \glsxtrshort{egate} usage increases.}\\
+    \item[\ding{40}] \textbf{Regardless of new \glsxtrshortpl{egate}, long desk queues pose a serious risk until \glsxtrshort{egate} usage increases.}\\
     \vspace{-1.5mm}
-    \item \textbf{Effective \glsxtrshort{egate} usage may be achieved by expanded eligibility or by increased uptake.}\\
+    \item[\ding{40}] \textbf{Effective \glsxtrshort{egate} usage may be achieved by expanded eligibility or by increased uptake.}\\
     \vspace{-1.5mm}
-    \item \textbf{Lower-than-recommended \glsxtrshort{egate} construction will impact queue lengths before wait times.}
+    \item[\ding{40}] \textbf{Lower-than-recommended \glsxtrshort{egate} construction will impact queue lengths before wait times.}
     \vspace{-1.5mm}
 \end{enumerate}
 \end{tcolorbox}
 \paragraph{Recommendations}
-We propose a schedule for \glsxtrshort{egate} construction that sees 15 \glsxtrshortpl{egate} available by 2023, 19 by 2024, 21 by 2025, 23 by 2026, and 23 by 2027. From a baseline of 10 \glsxtrshortpl{egate} currently available, this entails a 130\% increase spread over the five year period. We also strongly recommend that the airport pursue measures to increase \glsxtrshort{egate} usage via eligibility and uptake, in line with the 2025 UK Border Strategy. 
+We propose a schedule for \glsxtrshort{egate} construction that sees 15 \glsxtrshortpl{egate} available in 2023, 19 in 2024, 21 in 2025, 23 in 2026, and 23 in 2027. From a baseline of 10 \glsxtrshortpl{egate} currently available, this entails a 130\% increase spread over the five year period. We also strongly recommend that the airport pursue measures to increase \glsxtrshort{egate} usage via eligibility and uptake, in line with the 2025 UK Border Strategy. 
 
 
-\paragraph{Results}
-We developed a simulation framework for analysing the impact of \glsxtrshort{egate} construction on border check queues, as well as changes to \glsxtrshort{egate} eligibility and uptake, and variation in immigration hall allocation to these separate queues. Based on ou `passenger procession model' we give an overview of the airport's chosen \glsxtrshortpl{kpi} under our central recommendation scenario in the figure below. % Figure~\ref{fig:core_rec_fig}.
+\paragraph{Contributions}
+We develop a simulation framework for analysing the impact of \glsxtrshort{egate} construction on border check queues. In addition, we consider changes to \glsxtrshort{egate} eligibility, uptake, and allocation of immigration hall space. Based on our passenger processing model we are able to explore the airport's chosen \glsxtrshortpl{kpi} over a large number of simulations. We give an overview of our central recommendation scenario in the figure below. % Figure~\ref{fig:core_rec_fig}.
 \begin{figure}[!h]
     \centering
     \includegraphics[width=\textwidth]{figures/core_rec_fig.png}
@@ -116,8 +117,9 @@ We developed a simulation framework for analysing the impact of \glsxtrshort{ega
 
 \vspace{-5pt}
 
-We see that excellent \gls{egate} wait times are achievable, and that the main pressure on immigration services comes via queue lengths demanding regular use of the airport's overflow and contingency spaces. This is especially true for desk queues until the airport is able to improve overall \glsxtrshort{egate} usage. We show that measures to change allocation of immigration hall space over time can mitigate this problem, but give extensive evidence that this problem not addressable purely through new \glsxtrshortpl{egate}. 
+We see that excellent \gls{egate} wait times are achievable, and that the main pressure on immigration services comes via queue lengths demanding regular use of the airport's overflow and contingency spaces. This is especially pressing for desk queues until the airport is able to improve overall \glsxtrshort{egate} usage. 
 
+In line with the project brief, we provide robustness analyses in order to understand the implications of varying scenarios on our core conclusions. To allow further investigation, we present a bespoke Shiny Application. 
 
 \begin{tcolorbox}[
 colframe=edi-dark-purple,
@@ -126,8 +128,8 @@ fonttitle=\bfseries,
 title = {Use our Shiny Application to interactively explore demand scenarios!}]
 \vspace{-1.5mm}
 \begin{itemize}
-\item URL: \url{https://jacob-bradley.shinyapps.io/shiny/}
-\item Username: \texttt{edi-airport} \quad Password: \texttt{flowhost}
+\item[\ding{40}] URL: \url{https://jacob-bradley.shinyapps.io/shiny/}
+\item[\ding{40}] Username: \texttt{edi-airport} \quad Password: \texttt{flowhost}
 \vspace{-1.5mm}
 \end{itemize}
 \end{tcolorbox}
