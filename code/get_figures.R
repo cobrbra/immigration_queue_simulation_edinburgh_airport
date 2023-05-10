@@ -207,7 +207,7 @@ get_figures <- function(future_aircrafts_arrivals, future_coached_levels,
     scale_fill_manual(values = edi_airport_colours[c(7, 4:6, 2:1)]) +
     scale_colour_manual(values = edi_airport_colours[c(7, 4:6, 2:1)]) +
     scale_y_continuous(labels = scales::comma)
-  figure_sizes$core_rec_fig <- c(12, 5)
+  figure_sizes$core_rec_fig <- c(10, 4)
   
   minus_core_recommendation_stats <- (rec_minus_fig_sim_data) %>% 
     summarise(wait_time_60_egate = mean(wait_time_60_egate), 
@@ -263,7 +263,7 @@ get_figures <- function(future_aircrafts_arrivals, future_coached_levels,
     scale_fill_manual(values = edi_airport_colours[c(7, 4:6, 2:1)]) +
     scale_colour_manual(values = edi_airport_colours[c(7, 4:6, 2:1)]) + 
     scale_y_continuous(labels = scales::comma)
-  figure_sizes$minus_core_rec_fig <- c(12, 5)
+  figure_sizes$minus_core_rec_fig <- c(10, 4)
   
   figures$robustness_fig <- (robustness_sim_data) %>% 
     summarise(wait_time_60_egate = mean(wait_time_60_egate),
