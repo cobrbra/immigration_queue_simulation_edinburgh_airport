@@ -238,11 +238,13 @@ list(
   
   # Data around core recommendations
   tar_target(core_recommendation, 
-             c(14, 18, 21, 26, 30)),
+             c(15, 19, 21, 23, 23)),
   tar_target(rec_fig_sim_settings,
-             specify_sim_settings(n_egates_range = core_recommendation,
-                                  n_gen_arrivals = 5,
-                                  n_gen_queues = 5)),
+             specify_sim_settings(n_egates_range = core_recommendation, 
+                                  egate_uptake_range = seq(.75, .99, length.out = 7)[2:6],
+                                  target_eligibility_range = seq(.8, .96, length.out = 7)[2:6],
+                                  n_gen_arrivals = 10,
+                                  n_gen_queues = 10)),
   tar_target(rec_fig_sim_data,
              sim_analysis_data(rec_fig_sim_settings,
                                (future_aircrafts_arrivals), 
@@ -259,7 +261,7 @@ list(
                                base_walk_dist = (base_walk_dist),
                                wait_time_kpis = c("mean_wait_time", "wait_time_60", "wait_time_15", "wait_time_25"),
                                queue_length_kpis = c("exceeds_overflow", "exceeds_contingency"),
-                               hall_desk_splits = seq(10, 90, 10),
+                               hall_desk_splits = seq(25, 75, 25),
                                save_data = FALSE)),
   
   # Data to demonstrate robustness
@@ -274,8 +276,8 @@ list(
                egate_uptake_range = robustness_sim_df$egate_uptake,
                target_eligibility_range = robustness_sim_df$target_eligibility,
                year_range = robustness_sim_df$year,
-               n_gen_arrivals = 5,
-               n_gen_queues = 5)),
+               n_gen_arrivals = 10,
+               n_gen_queues = 10)),
   
   tar_target(robustness_sim_data, 
              sim_analysis_data(robustness_sim_settings,
@@ -293,13 +295,15 @@ list(
                               base_walk_dist = (base_walk_dist),
                               wait_time_kpis = c("wait_time_60", "wait_time_15", "wait_time_25", "mean_wait_time"),
                               queue_length_kpis = c("exceeds_contingency", "exceeds_overflow"),
-                              hall_desk_splits = seq(10, 90, 10),
+                              hall_desk_splits = seq(25, 75, 25),
                               save_data = FALSE)),
   
   tar_target(rec_minus_fig_sim_settings,
-             specify_sim_settings(n_egates_range = c(10, core_recommendation[1:4]),
-                                  n_gen_arrivals = 5,
-                                  n_gen_queues = 5)),
+             specify_sim_settings(n_egates_range = c(10, core_recommendation[1:4]), 
+                                  egate_uptake_range = seq(.75, .99, length.out = 7)[2:6],
+                                  target_eligibility_range = seq(.8, .96, length.out = 7)[2:6],
+                                  n_gen_arrivals = 10,
+                                  n_gen_queues = 10)),
   tar_target(rec_minus_fig_sim_data,
              sim_analysis_data(rec_minus_fig_sim_settings,
                                (future_aircrafts_arrivals), 
@@ -316,7 +320,7 @@ list(
                                base_walk_dist = (base_walk_dist),
                                wait_time_kpis = c("mean_wait_time", "wait_time_60", "wait_time_25", "wait_time_15"),
                                queue_length_kpis = c("exceeds_contingency", "exceeds_overflow"),
-                               hall_desk_splits = seq(10, 90, 10),
+                               hall_desk_splits = seq(25, 75, 25),
                                save_data = FALSE)),
   
   # Trackable report outputs
