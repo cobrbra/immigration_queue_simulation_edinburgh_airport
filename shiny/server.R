@@ -33,10 +33,8 @@ server <- function(input, output) {
     "Minutes exceeding contingency" = "exceeds_contingency"
   )
   
-  shiny_raw_passenger_data <- vroom("shiny_data/raw_passenger_data.csv") %>% 
-    select(-c(nationality, egate_failed, gen_arrivals_seed, gen_queue_seed, bordercheck_start_time, bordercheck_end_time, sched_aircraft_date_posix))
-  shiny_raw_queue_length_data <- vroom("shiny_data/raw_queue_length_data.csv") %>% 
-    select(-c(gen_arrivals_seed, gen_queue_seed, queue_length_datetime_int, queue_length_date_posix, queue_length_time_int))
+  shiny_raw_passenger_data <- vroom("shiny_data/raw_passenger_data.csv")
+  shiny_raw_queue_length_data <- vroom("shiny_data/raw_queue_length_data.csv")
   shiny_sim_kpi_data <- vroom("shiny_data/kpi_data.csv")
   
   queue_length_data <- shiny_raw_queue_length_data %>% 
