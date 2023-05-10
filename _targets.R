@@ -259,6 +259,7 @@ list(
                                base_walk_dist = (base_walk_dist),
                                wait_time_kpis = c("mean_wait_time", "wait_time_60", "wait_time_15", "wait_time_25"),
                                queue_length_kpis = c("exceeds_overflow", "exceeds_contingency"),
+                               hall_desk_splits = seq(10, 90, 10),
                                save_data = FALSE)),
   
   # Data to demonstrate robustness
@@ -292,6 +293,7 @@ list(
                               base_walk_dist = (base_walk_dist),
                               wait_time_kpis = c("wait_time_60", "wait_time_15", "wait_time_25", "mean_wait_time"),
                               queue_length_kpis = c("exceeds_contingency", "exceeds_overflow"),
+                              hall_desk_splits = seq(10, 90, 10),
                               save_data = FALSE)),
   
   tar_target(rec_minus_fig_sim_settings,
@@ -314,6 +316,7 @@ list(
                                base_walk_dist = (base_walk_dist),
                                wait_time_kpis = c("mean_wait_time", "wait_time_60", "wait_time_25", "wait_time_15"),
                                queue_length_kpis = c("exceeds_contingency", "exceeds_overflow"),
+                               hall_desk_splits = seq(10, 90, 10),
                                save_data = FALSE)),
   
   # Trackable report outputs

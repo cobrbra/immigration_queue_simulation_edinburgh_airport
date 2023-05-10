@@ -60,6 +60,7 @@ sim_analysis_data <- function(sim_settings,
                               failed_egate_priority,
                               wait_time_kpis = list(),
                               queue_length_kpis = list(),
+                              hall_desk_splits = c(50),
                               queue_sample_size = 500,
                               input_time_interval = 15*60,
                               save_data = FALSE,
@@ -88,6 +89,7 @@ sim_analysis_data <- function(sim_settings,
     sim_settings[[paste0(kpi, "_desk")]] <- numeric(n_settings)
     sim_settings[[paste0(kpi, "_egate")]] <- numeric(n_settings)
     sim_settings[[paste0(kpi, "_both")]] <- numeric(n_settings)
+    sim_settings$hall_split <- NA
   }
   
   sim_settings <- nest(sim_settings, non_arrivals_data = -gen_arrivals_seed)
@@ -146,12 +148,28 @@ sim_analysis_data <- function(sim_settings,
         
       }
       for (kpi in queue_length_kpis) {
-        sim_settings$non_arrivals_data[[arrivals_id]][[paste0(kpi, "_desk")]][non_arrivals_id] <- 
-          get(kpi)(simulated_queue_lengths, "desk")
-        sim_settings$non_arrivals_data[[arrivals_id]][[paste0(kpi, "_egate")]][non_arrivals_id] <- 
-          get(kpi)(simulated_queue_lengths, "egate")
+        if (is.na(sim_settings$non_arrivals_data[[arrivals_id]]$hall_split[non_arrivals_id])) {
+          kpi_hall_split_levels_both <- c()
+          for (hall_desk_split in hall_desk_splits) {
+            hall_split <- c(desk = hall_desk_split/100, egate = 1 - hall_desk_split/100)
+            kpi_hall_split_levels_both[as.character(hall_desk_split)] <- 
+              get(kpi)(simulated_queue_lengths, "both", hall_split = hall_split)
+          }
+          best_hall_split = names(kpi_hall_split_levels_both)[which.min(kpi_hall_split_levels_both)]
+          sim_settings$non_arrivals_data[[arrivals_id]]$hall_split[non_arrivals_id] <- as.numeric(best_hall_split)
+        }
+
+        hall_split <-  sim_settings$non_arrivals_data[[arrivals_id]]$hall_split[non_arrivals_id]
+        hall_split <- c(desk = hall_split/100, egate = 1 - hall_split/100)
+        
         sim_settings$non_arrivals_data[[arrivals_id]][[paste0(kpi, "_both")]][non_arrivals_id] <- 
-          get(kpi)(simulated_queue_lengths, "both")
+          get(kpi)(simulated_queue_lengths, 
+                   "desk", hall_split = hall_split)
+        sim_settings$non_arrivals_data[[arrivals_id]][[paste0(kpi, "_desk")]][non_arrivals_id] <- 
+          get(kpi)(simulated_queue_lengths, 
+                   "desk", hall_split = hall_split)
+        sim_settings$non_arrivals_data[[arrivals_id]][[paste0(kpi, "_egate")]][non_arrivals_id] <- 
+          get(kpi)(simulated_queue_lengths, "egate", hall_split = hall_split)
       }
       
       if (save_data) {
