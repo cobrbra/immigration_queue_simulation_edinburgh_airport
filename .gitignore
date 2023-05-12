@@ -42,7 +42,8 @@ vignettes/*.pdf
 .Renviron
 
 # Data
-raw_data
+raw_data/*
+-raw_data/README.md
 shiny_data
 
 # targets metadata
