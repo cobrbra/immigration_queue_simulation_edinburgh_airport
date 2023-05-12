@@ -297,10 +297,6 @@ get_figures <- function(future_aircrafts_arrivals, future_coached_levels,
     scale_y_continuous(labels = scales::comma)
   figure_sizes$robustness_fig <- c(8, 4.2)
   
-  # figures$figure_1 <- ...  + 
-    # theme_edi_airport() +
-    # scale_fill_manual(values = edi_airport_colours)
-  # insert more code that generates figures here
   
   
   for (figure_index in seq_len(length(figures))) {
