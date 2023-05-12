@@ -1,4 +1,4 @@
-print("Hi, I'm Bella")
+print("This is Bella's sandbox")
 
 library("ggplot2")
 library("here")
@@ -277,7 +277,7 @@ legend("topleft", lwd = 2, col = c("pink", "grey40"), legend = c("eGate", "Desk"
 
 
 
-### generate the airport classification for a flight from the competitiond data ###
+### generate the airport classification for a flight from the competition data ###
 
 
 
