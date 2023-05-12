@@ -41,12 +41,14 @@ vignettes/*.pdf
 # R Environment Variables
 .Renviron
 
-# Data
+# Data and large files
 raw_data/*
 !raw_data/README.md
 
 shiny/shiny_data/*
 !shiny/shiny_data/README.md
+
+README.html
 
 # Rough working and planning documents
 report/tech.tex
