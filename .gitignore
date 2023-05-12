@@ -48,6 +48,12 @@ raw_data/*
 shiny/shiny_data/*
 !shiny/shiny_data/README.md
 
+# Rough working and planning documents
+report/tech.tex
+code/jacob_rough.R
+code/bella_rough.R
+
+
 # targets metadata
 _targets/meta/meta
 
