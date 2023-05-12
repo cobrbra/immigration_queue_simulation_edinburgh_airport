@@ -31,8 +31,9 @@ We provide a bespoke Shiny Application for interactive exploration of our analys
 ```
 source("shiny/demo_shiny_app.R")
 ```
-Note that, as with `raw_data`, there's too much data underpinning the Shiny App to provide here. There are three options for dealing with this:
+Note that, as with `raw_data`, there's too much data underpinning the Shiny App to provide here. There are two options for dealing with this:
 
  * Running `targets::tar_make()`. Beware: this will take some time (maybe one to be run overnight).
  * Asking us, and we'll send you a pre-computed data folder.
- * The Shiny App is also available through a password-protected online application. If you would like log-in credentials, please get in touch.
+
+The Shiny App is also of coure available through its online interface. See our report for login credentials.
