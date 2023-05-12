@@ -1,4 +1,4 @@
-# Raw Data folder
+# Raw data folder
 
 We have not provided raw data as part of this GitHub repository for two reasons: firstly, some of it is private (e.g. only available to Maxwell Institute researchers) and we might make this repository public at some point. Secondly, it's too large and would slow down working with GitHub.
 
