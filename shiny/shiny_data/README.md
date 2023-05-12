@@ -1,3 +1,3 @@
 # Shiny App data
 
-We've not provided data to run our Shiny App locally here -- it's too big to work smoothly with GitHub. We're more than happy to provide some that we've made earlier, however. Alternately, it can be generated directly by running `targets::tar_make()` from the home directory of this repository.
+We've not provided data to run our Shiny App locally here -- it's too big to work smoothly with GitHub. We're more than happy to provide some that we've made earlier, however. Alternately, it can be generated directly by running `targets::tar_make()` from the home directory of this repository (note this might take a long time -- depending on your compute availability, up to an entire day).
