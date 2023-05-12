@@ -36,4 +36,4 @@ Note that, as with `raw_data`, there's too much data underpinning the Shiny App 
  * Running `targets::tar_make()`. Beware: this will take some time (maybe one to be run overnight).
  * Asking us, and we'll send you a pre-computed data folder.
 
-The Shiny App is also of coure available through its online interface. See our report for login credentials.
+The Shiny App is also of course available through its online interface. See our report for login credentials.
