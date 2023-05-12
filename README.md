@@ -17,7 +17,10 @@ Throughout this project we've used the `targets` framework for workflow manageme
 ```
 targets::tar_visnetwork(targets_only = TRUE)
 ```
-We show an example of a recent run of this command (for a recent almost-complete point in the project). `targets` also allows for concise reproduction of all results (note that to do so, one needs access to the `raw_data` folder). We would recommend running 
+We show below an example of a recent run of this command (for a recent almost-complete point in the project). 
+![](figures/targets_example_screenshot.png)
+
+`targets` also allows for concise reproduction of all results (note that to do so, one needs access to the `raw_data` folder). We would recommend running 
 
 ```
 targets::tar_make('figures')
@@ -31,6 +34,9 @@ We provide a bespoke Shiny Application for interactive exploration of our analys
 ```
 source("shiny/demo_shiny_app.R")
 ```
+This should produce an output like the one below (after a login prompt):
+![](figures/demo_shiny_screenshot.png)
+
 Note that, as with `raw_data`, there's too much data underpinning the Shiny App to provide here. There are two options for dealing with this:
 
  * Running `targets::tar_make()`. Beware: this will take some time (maybe one to be run overnight).
