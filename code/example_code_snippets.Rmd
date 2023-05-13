@@ -33,7 +33,7 @@ tar_source(files = c(
 ## Example single simulation
 Here we show how to produce a single simulation. Note that first we have to make sure `targets` has access to the right objects and datasets. We do this as follows (we'll explain more of what's going on here later).
 
-``` {r, message = FALSE}
+``` {r, echo = TRUE, include = FALSE}
 tar_make(c(
   'future_aircrafts_arrivals',
   'hubs',
@@ -76,8 +76,9 @@ simulated_arrivals <- tar_read(future_aircrafts_arrivals) %>%
   get_passengers_after_aircrafts() %>% 
   get_passengers_after_routes(tar_read(coach_dist), tar_read(walk_dist), tar_read(base_walk_dist))
 
+head(simulated_arrivals)
 ```
-
+and some queues
 ``` {r}
 
 simulated_queue <- simulated_arrivals %>% 
@@ -86,4 +87,7 @@ simulated_queue <- simulated_arrivals %>%
              egate_uptake_prop = .7, target_eligibility = .8, 
              egate_failure_prop = tar_read(egate_failure_prop), 
              failed_egate_priority = tar_read(failed_egate_priority))  
+
+head(simulated_queue)
 ```
+where we've shown some outputs to give an indication of the sort of information we store.
